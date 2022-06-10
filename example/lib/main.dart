@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
 void main() {
@@ -17,39 +16,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final String _platformVersion = 'Unknown';
-  String _decideResponse = 'Unknown';
+  String optimizelyConfig = 'Unknown';
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    runOptimizelySDK();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    // String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    String decideResponse;
-    try {
-      // platformVersion = await OptimizelyFlutterSdk.platformVersion ??
-      //     'Unknown platform version';
-      var response = await OptimizelyFlutterSdk.decide;
-      decideResponse = json.encode(response);
-    } on PlatformException {
-      // platformVersion = 'Failed to get platform version.';
-      decideResponse = 'Failed to get decide response';
-    }
+  Future<void> runOptimizelySDK() async {
+    var response =
+        await OptimizelyFlutterSdk.initializeClient("X9mZd2WDywaUL9hZXyh9A");
+    // print('$response');
+    response = await OptimizelyFlutterSdk.getOptimizelyConfig();
+    // print('$response');
+    // response = await OptimizelyFlutterSdk.createUserContext("1234");
+    // print('$response');
+    // response = await OptimizelyFlutterSdk.decide(['flag1']);
+    // print('$response');
+    // response = await OptimizelyFlutterSdk.trackEvent('myevent');
+    // print('$response');
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
-      // _platformVersion = platformVersion;
-      _decideResponse = decideResponse;
+      optimizelyConfig = json.encode(response);
     });
   }
 
@@ -61,8 +52,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text(
-              'Running on: $_platformVersion\ndecide Response: $_decideResponse'),
+          child: Text('OptimizelyConfig: $optimizelyConfig'),
         ),
       ),
     );

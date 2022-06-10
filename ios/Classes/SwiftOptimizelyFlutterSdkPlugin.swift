@@ -1,9 +1,34 @@
+/****************************************************************************
+ * Copyright 2022, Optimizely, Inc. and contributors                        *
+ *                                                                          *
+ * Licensed under the Apache License, Version 2.0 (the "License");          *
+ * you may not use this file except in compliance with the License.         *
+ * You may obtain a copy of the License at                                  *
+ *                                                                          *
+ *    http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                          *
+ * Unless required by applicable law or agreed to in writing, software      *
+ * distributed under the License is distributed on an "AS IS" BASIS,        *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ * See the License for the specific language governing permissions and      *
+ * limitations under the License.                                           *
+ ***************************************************************************/
+
 import Flutter
 import UIKit
 import Optimizely
 import Foundation
 
-struct RequestParameterKeys {
+struct API {
+    static let initialize = "initialize"
+    static let getOptimizelyConfig = "getOptimizelyConfig"
+    static let createUserContext = "createUserContext"
+    static let setAttributes = "set_attributes"
+    static let trackEvent = "track_event"
+    static let decide = "decide"
+}
+
+struct RequestParameterKey {
     static let sdkKey = "sdk_key"
     static let userId = "user_id"
     static let attributes = "attributes"
@@ -36,10 +61,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
     
-    func createResponse(success: Bool, result: Any?, reason: String) -> [String: Any] {
-        var response: [String: Any] = ["success": success, "reason": reason]
+    func createResponse(success: Bool, result: Any? = nil, reason: String? = nil) -> [String: Any] {
+        var response: [String: Any] = ["success": success]
         if let result = result {
             response["result"] = result
+        }
+        if let reason = reason {
+            response["reason"] = reason
         }
         return response
     }
@@ -48,9 +76,9 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         
         switch call.method {
             
-        case "initialize":
-            guard let parameters = call.arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKeys.sdkKey] as? String else {
-                result(createResponse(success: false, result: nil, reason: ErrorMessage.invalidParameters))
+        case API.initialize:
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
                 return
             }
             
@@ -62,40 +90,40 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             optimizelyInstance?.start{ [weak self] res in
                 switch res {
                 case .success(_):
-                    result(self?.createResponse(success: true, result: nil, reason: SuccessMessage.instanceCreated))
+                    result(self?.createResponse(success: true, reason: SuccessMessage.instanceCreated))
                 case .failure(let err):
-                    result(self?.createResponse(success: false, result: nil, reason: err.localizedDescription))
+                    result(self?.createResponse(success: false, reason: err.localizedDescription))
                 }
             }
             
-        case "getOptimizelyConfig":
+        case API.getOptimizelyConfig:
             guard let optimizelyConfig = try? optimizelyInstance?.getOptimizelyConfig(), let optlyConfigDict = optimizelyConfig.dict else {
-                result(self.createResponse(success: false, result: nil, reason: ErrorMessage.optimizelyConfigNotFound))
+                result(self.createResponse(success: false, reason: ErrorMessage.optimizelyConfigNotFound))
                 return
             }
             result(self.createResponse(success: true, result: optlyConfigDict, reason: SuccessMessage.optimizelyConfigFound))
             
-        case "createUserContext":
-            guard let parameters = call.arguments as? Dictionary<String, Any?>, let userId = parameters[RequestParameterKeys.userId] as? String else {
-                result(createResponse(success: false, result: nil, reason: ErrorMessage.invalidParameters))
+        case API.createUserContext:
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let userId = parameters[RequestParameterKey.userId] as? String else {
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
                 return
             }
             
-            if let attributes = parameters[RequestParameterKeys.attributes] as? [String: Any] {
+            if let attributes = parameters[RequestParameterKey.attributes] as? [String: Any] {
                 userContext = optimizelyInstance?.createUserContext(userId: userId, attributes: attributes)
             } else {
                 userContext = optimizelyInstance?.createUserContext(userId: userId)
             }
-            result(self.createResponse(success: true, result: nil, reason: SuccessMessage.userContextCreated))
+            result(self.createResponse(success: true, reason: SuccessMessage.userContextCreated))
             
-        case "set_attributes":
+        case API.setAttributes:
             guard let usrContext = userContext else  {
-                result(self.createResponse(success: false, result: nil, reason: ErrorMessage.userContextNotFound))
+                result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
                 return
             }
             
-            guard let parameters = call.arguments as? Dictionary<String, Any?>, let attributes = parameters[RequestParameterKeys.attributes] as? [String: Any] else {
-                result(createResponse(success: false, result: nil, reason: ErrorMessage.invalidParameters))
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let attributes = parameters[RequestParameterKey.attributes] as? [String: Any] else {
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
                 return
             }
             
@@ -103,29 +131,29 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 usrContext.setAttribute(key: k, value: v)
             }
             
-        case "track_event":
+        case API.trackEvent:
             
             guard let usrContext = userContext else  {
-                result(self.createResponse(success: false, result: nil, reason: ErrorMessage.userContextNotFound))
+                result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
                 return
             }
             
-            guard let parameters = call.arguments as? Dictionary<String, Any?>, let eventKey = parameters[RequestParameterKeys.eventKey] as? String else {
-                result(createResponse(success: false, result: nil, reason: ErrorMessage.invalidParameters))
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let eventKey = parameters[RequestParameterKey.eventKey] as? String else {
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
                 return
             }
             
-            let eventTags = parameters[RequestParameterKeys.eventTags] as? [String: Any]
+            let eventTags = parameters[RequestParameterKey.eventTags] as? [String: Any]
             do {
                 try usrContext.trackEvent(eventKey: eventKey, eventTags: eventTags)
-                result(self.createResponse(success: true, result: nil, reason: ""))
+                result(self.createResponse(success: true))
             } catch {
-                result(self.createResponse(success: false, result: nil, reason: error.localizedDescription))
+                result(self.createResponse(success: false, reason: error.localizedDescription))
             }
             
-        case "decide":
+        case API.decide:
             guard let usrContext = userContext else  {
-                result(self.createResponse(success: false, result: nil, reason: ErrorMessage.userContextNotFound))
+                result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
                 return
             }
             
@@ -135,19 +163,25 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             }
             
             var decideKeys: [String]?
-            if let keys = parameters?[RequestParameterKeys.decideKeys] as? [String] {
+            if let keys = parameters?[RequestParameterKey.decideKeys] as? [String] {
                 decideKeys = keys
             }
             
             var decideOptions: [String]?
-            if let options = parameters?[RequestParameterKeys.decideOptions] as? [String] {
+            if let options = parameters?[RequestParameterKey.decideOptions] as? [String] {
                 decideOptions = options
             }
             
             let options = getDecideOptions(options: decideOptions)
+            var decisions = [String: OptimizelyDecision]()
             var resultMap = [String: Any]()
             
-            let decisions = (decideKeys != nil) ? usrContext.decide(keys: decideKeys!, options: options) : usrContext.decideAll(options: options)
+            if let keys = decideKeys, keys.count > 0 {
+                decisions = usrContext.decide(keys: keys, options: options)
+            } else {
+                decisions = usrContext.decideAll(options: options)
+            }
+            
             for (key, decision) in decisions {
                 resultMap[key] = convertDecisionToDictionary(decision: decision)
             }
