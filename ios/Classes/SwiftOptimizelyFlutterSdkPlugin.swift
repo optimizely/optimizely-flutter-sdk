@@ -26,11 +26,22 @@ struct API {
     static let setAttributes = "set_attributes"
     static let trackEvent = "track_event"
     static let decide = "decide"
+    static let addListener = "addListener"
+    static let removeListener = "removeListener"
+}
+
+struct NotificationType {
+    static let track = "track"
+    static let decision = "decision"
+    static let logEvent = "logEvent"
 }
 
 struct RequestParameterKey {
     static let sdkKey = "sdk_key"
     static let userId = "user_id"
+    static let notificationId = "id"
+    static let notificationType = "type"
+    static let notificationPayload = "payload"
     static let attributes = "attributes"
     static let decideKeys = "keys"
     static let decideOptions = "optimizely_decide_option"
@@ -41,6 +52,7 @@ struct RequestParameterKey {
 struct ErrorMessage {
     static let invalidParameters = "Invalid parameters provided."
     static let optimizelyConfigNotFound = "No optimizely config found."
+    static let optlyClientNotFound = "Optimizely client not found."
     static let userContextNotFound = "User context not found."
 }
 
@@ -48,15 +60,20 @@ struct SuccessMessage {
     static let instanceCreated = "Optimizely instance created successfully."
     static let optimizelyConfigFound = "Optimizely config found."
     static let userContextCreated = "User context created successfully."
+    static let listenerAdded = "Listener added successfully."
+    static let listenerRemoved = "Listener removed successfully."
 }
 
 public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
-    var optimizelyInstance: OptimizelyClient?
-    var userContext: OptimizelyUserContext?
+    var notificationIdsTracker = [Int: Int]()
+    var optimizelyClientsTracker = [String: OptimizelyClient?]()
+    var userContextsTracker = [String: OptimizelyUserContext?]()
+    static var channel: FlutterMethodChannel!
+    
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
+        channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftOptimizelyFlutterSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
@@ -72,22 +89,40 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         return response
     }
     
+    func getOptimizelyClient(arguments: Any?) -> OptimizelyClient? {
+        guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+            return nil
+        }
+        return optimizelyClientsTracker[sdkKey] ?? nil
+    }
+    
+    func getUserContext(arguments: Any?) -> OptimizelyUserContext? {
+        guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+            return nil
+        }
+        return userContextsTracker[sdkKey] ?? nil
+    }
+    
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
         switch call.method {
             
         case API.initialize:
+            
             guard let parameters = call.arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
                 result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
                 return
             }
             
             // Delete old user context
-            userContext = nil
-            // Creating new instance
-            optimizelyInstance = OptimizelyClient(sdkKey:sdkKey)
+            userContextsTracker[sdkKey] = nil
+            userContextsTracker.removeValue(forKey: sdkKey)
             
-            optimizelyInstance?.start{ [weak self] res in
+            // Creating new instance
+            let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey)
+            optimizelyClientsTracker[sdkKey] = optimizelyInstance
+            
+            optimizelyInstance.start{ [weak self] res in
                 switch res {
                 case .success(_):
                     result(self?.createResponse(success: true, reason: SuccessMessage.instanceCreated))
@@ -96,28 +131,88 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 }
             }
             
+        case API.addListener:
+            
+            guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
+                result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+                return
+            }
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let id = parameters[RequestParameterKey.notificationId] as? Int, let type = parameters[RequestParameterKey.notificationType] as? String else {
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+                return
+            }
+            switch type {
+            case NotificationType.decision:
+                let notificationId = optimizelyClient.notificationCenter?.addDecisionNotificationListener(decisionListener: getDecisionCallback(id: id))!
+                notificationIdsTracker[id] = notificationId
+                result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
+                break
+            case NotificationType.track:
+                let notificationId = optimizelyClient.notificationCenter?.addTrackNotificationListener(trackListener: getTrackCallback(id: id))
+                notificationIdsTracker[id] = notificationId
+                result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
+                break
+            case NotificationType.logEvent:
+                let notificationId = optimizelyClient.notificationCenter?.addLogEventNotificationListener(logEventListener: getLogEventCallback(id: id))
+                notificationIdsTracker[id] = notificationId
+                result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
+                break
+            default:
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            }
+            
+        case API.removeListener:
+            
+            guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
+                result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+                return
+            }
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let id = parameters[RequestParameterKey.notificationId] as? Int else {
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+                return
+            }
+            if let notificationID = notificationIdsTracker[id] {
+                optimizelyClient.notificationCenter?.removeNotificationListener(notificationId: notificationID)
+                notificationIdsTracker.removeValue(forKey: id)
+                result(self.createResponse(success: true, reason: SuccessMessage.listenerRemoved))
+            } else {
+                result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            }
+            
         case API.getOptimizelyConfig:
-            guard let optimizelyConfig = try? optimizelyInstance?.getOptimizelyConfig(), let optlyConfigDict = optimizelyConfig.dict else {
+            
+            guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
+                result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+                return
+            }
+            
+            guard let optimizelyConfig = try? optimizelyClient.getOptimizelyConfig(), let optlyConfigDict = optimizelyConfig.dict else {
                 result(self.createResponse(success: false, reason: ErrorMessage.optimizelyConfigNotFound))
                 return
             }
             result(self.createResponse(success: true, result: optlyConfigDict, reason: SuccessMessage.optimizelyConfigFound))
             
         case API.createUserContext:
-            guard let parameters = call.arguments as? Dictionary<String, Any?>, let userId = parameters[RequestParameterKey.userId] as? String else {
+            
+            guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
+                result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+                return
+            }
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let userId = parameters[RequestParameterKey.userId] as? String, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
                 result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
                 return
             }
             
             if let attributes = parameters[RequestParameterKey.attributes] as? [String: Any] {
-                userContext = optimizelyInstance?.createUserContext(userId: userId, attributes: attributes)
+                userContextsTracker[sdkKey] = optimizelyClient.createUserContext(userId: userId, attributes: attributes)
             } else {
-                userContext = optimizelyInstance?.createUserContext(userId: userId)
+                userContextsTracker[sdkKey] = optimizelyClient.createUserContext(userId: userId)
             }
             result(self.createResponse(success: true, reason: SuccessMessage.userContextCreated))
             
         case API.setAttributes:
-            guard let usrContext = userContext else  {
+            
+            guard let usrContext = getUserContext(arguments: call.arguments) else  {
                 result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
                 return
             }
@@ -133,7 +228,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             
         case API.trackEvent:
             
-            guard let usrContext = userContext else  {
+            guard let usrContext = getUserContext(arguments: call.arguments) else  {
                 result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
                 return
             }
@@ -152,7 +247,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             }
             
         case API.decide:
-            guard let usrContext = userContext else  {
+            
+            guard let usrContext = getUserContext(arguments: call.arguments) else  {
                 result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
                 return
             }
@@ -192,37 +288,76 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             result(FlutterMethodNotImplemented)
         }
     }
-}
-
-func getDecideOptions(options: [String]?) -> [OptimizelyDecideOption]? {
-    guard let finalOptions = options else {
-        return nil
-    }
-    var convertedOptions = [OptimizelyDecideOption]()
-    for option in finalOptions {
-        switch option {
-        case "DISABLE_DECISION_EVENT":
-            convertedOptions.append(OptimizelyDecideOption.disableDecisionEvent)
-        case "ENABLED_FLAGS_ONLY":
-            convertedOptions.append(OptimizelyDecideOption.enabledFlagsOnly)
-        case "IGNORE_USER_PROFILE_SERVICE":
-            convertedOptions.append(OptimizelyDecideOption.ignoreUserProfileService)
-        case "EXCLUDE_VARIABLES":
-            convertedOptions.append(OptimizelyDecideOption.excludeVariables)
-        case "INCLUDE_REASONS":
-            convertedOptions.append(OptimizelyDecideOption.includeReasons)
-        default: break
+    
+    private func getLogEventCallback(id: Int) -> LogEventListener {
+        
+        let listener : LogEventListener = {(url, logEvent) in
+            let listenerDict : [String : Any] = [
+                "url"       : url,
+                "params"    : logEvent as Any
+            ]
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
         }
+        
+        return listener
     }
-    return convertedOptions
-}
-
-func convertDecisionToDictionary(decision: OptimizelyDecision?) -> [String: Any?] {
-    let userContext: [String: Any?] =
+    
+    private func getDecisionCallback(id: Int) -> DecisionListener {
+        let listener : DecisionListener = {(type, userId, attributes, decisionInfo) in
+            let listenerDict : [String : Any] = [
+                "type" : type,
+                "user_id"       : userId,
+                "attributes"   : attributes as Any,
+                "decision_info": decisionInfo
+            ]
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
+        }
+        return listener
+    }
+    
+    private func getTrackCallback(id: Int) -> TrackListener {
+        let listener : TrackListener = {(eventKey, userId, attributes, eventTags, event) in
+            let listenerDict : [String : Any] = [
+                "attributes": attributes as Any,
+                "event_key"        : eventKey,
+                "event_tags"    : eventTags as Any,
+                "user_id"       : userId,
+//                "event": event as Any, This is causing codec related exceptions on flutter side, need to debug
+            ]
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
+        }
+        return listener
+    }
+    
+    func getDecideOptions(options: [String]?) -> [OptimizelyDecideOption]? {
+        guard let finalOptions = options else {
+            return nil
+        }
+        var convertedOptions = [OptimizelyDecideOption]()
+        for option in finalOptions {
+            switch option {
+            case "DISABLE_DECISION_EVENT":
+                convertedOptions.append(OptimizelyDecideOption.disableDecisionEvent)
+            case "ENABLED_FLAGS_ONLY":
+                convertedOptions.append(OptimizelyDecideOption.enabledFlagsOnly)
+            case "IGNORE_USER_PROFILE_SERVICE":
+                convertedOptions.append(OptimizelyDecideOption.ignoreUserProfileService)
+            case "EXCLUDE_VARIABLES":
+                convertedOptions.append(OptimizelyDecideOption.excludeVariables)
+            case "INCLUDE_REASONS":
+                convertedOptions.append(OptimizelyDecideOption.includeReasons)
+            default: break
+            }
+        }
+        return convertedOptions
+    }
+    
+    func convertDecisionToDictionary(decision: OptimizelyDecision?) -> [String: Any?] {
+        let userContext: [String: Any?] =
         ["user_id" : decision?.userContext.userId,
          "attributes" : decision?.userContext.attributes]
-    
-    let decisionMap: [String: Any?] =
+        
+        let decisionMap: [String: Any?] =
         ["variation_key": decision?.variationKey,
          "rule_key": decision?.ruleKey,
          "enabled": decision?.enabled,
@@ -230,7 +365,8 @@ func convertDecisionToDictionary(decision: OptimizelyDecision?) -> [String: Any?
          "user_context": userContext,
          "variables": decision?.variables.toMap(),
          "reasons": decision?.reasons]
-    return decisionMap
+        return decisionMap
+    }
 }
 
 // Extension to convert OptimizelyConfig to Map

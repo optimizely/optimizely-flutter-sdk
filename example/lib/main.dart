@@ -25,23 +25,43 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> runOptimizelySDK() async {
-    var response =
-        await OptimizelyFlutterSdk.initializeClient("X9mZd2WDywaUL9hZXyh9A");
-    // print('$response');
-    response = await OptimizelyFlutterSdk.getOptimizelyConfig();
-    // print('$response');
-    // response = await OptimizelyFlutterSdk.createUserContext("1234");
-    // print('$response');
-    // response = await OptimizelyFlutterSdk.decide(['flag1']);
-    // print('$response');
-    // response = await OptimizelyFlutterSdk.trackEvent('myevent');
-    // print('$response');
-
-    if (!mounted) return;
+    var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A");
+    var response = await flutterSDK.initializeClient();
 
     setState(() {
       optimizelyConfig = json.encode(response);
     });
+
+    Map<String, dynamic> attributes = {"age": 20};
+    response = await flutterSDK.createUserContext("12314", attributes);
+
+    // To add decide listener
+    var cancelDecideListener =
+        await flutterSDK.addNotificationListener((notification) {
+      print(notification);
+      print("decide notification received");
+    }, ListenerType.decision);
+
+    // Decide call
+    response = await flutterSDK.decide(['flag1']);
+
+    // To cancel decide listener
+    // cancelDecideListener();
+
+    // To add track listener
+    var cancelTrackListener =
+        await flutterSDK.addNotificationListener((notification) {
+      print(notification);
+      print("track notification received");
+    }, ListenerType.track);
+
+    // Track call
+    response = await flutterSDK.trackEvent("myevent");
+
+    // To cancel track listener
+    // cancelTrackListener();
+
+    if (!mounted) return;
   }
 
   @override

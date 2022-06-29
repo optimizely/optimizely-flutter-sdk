@@ -1,40 +1,48 @@
+library optimizely_flutter_sdk;
+
 import 'dart:async';
-import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
+
+export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
+    show ListenerType;
 
 class OptimizelyFlutterSdk {
-  static const MethodChannel _channel = MethodChannel('optimizely_flutter_sdk');
+  final String _sdkKey;
+  OptimizelyFlutterSdk(this._sdkKey);
 
-  static Future<Map<String, dynamic>> initializeClient(String sdkKey) async {
-    return Map<String, dynamic>.from(
-        await _channel.invokeMethod('initialize', {'sdk_key': sdkKey}));
+  Future<Map<String, dynamic>> initializeClient() async {
+    return await OptimizelyClientWrapper.initializeClient(_sdkKey);
   }
 
-  static Future<Map<String, dynamic>> getOptimizelyConfig() async {
-    return Map<String, dynamic>.from(
-        await _channel.invokeMethod('getOptimizelyConfig'));
+  Future<Map<String, dynamic>> getOptimizelyConfig() async {
+    return await OptimizelyClientWrapper.getOptimizelyConfig(_sdkKey);
   }
 
-  static Future<Map<String, dynamic>> createUserContext(String userId,
+  Future<Map<String, dynamic>> createUserContext(String userId,
       [Map<String, dynamic> attributes = const {}]) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
-        'createUserContext', {'user_id': userId, 'attributes': attributes}));
+    return await OptimizelyClientWrapper.createUserContext(
+        _sdkKey, userId, attributes);
   }
 
-  static Future<Map<String, dynamic>> setAttributes(
+  Future<Map<String, dynamic>> setAttributes(
       Map<String, dynamic> attributes) async {
-    return Map<String, dynamic>.from(await _channel
-        .invokeMethod('set_attributes', {'attributes': attributes}));
+    return await OptimizelyClientWrapper.setAttributes(_sdkKey, attributes);
   }
 
-  static Future<Map<String, dynamic>> trackEvent(String eventKey,
+  Future<Map<String, dynamic>> trackEvent(String eventKey,
       [Map<String, dynamic> eventTags = const {}]) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
-        'track_event', {'event_key': eventKey, 'event_tags': eventTags}));
+    return await OptimizelyClientWrapper.trackEvent(
+        _sdkKey, eventKey, eventTags);
   }
 
-  static Future<Map<String, dynamic>> decide(
+  Future<Map<String, dynamic>> decide(
       [List<String> keys = const [], List<String> options = const []]) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
-        'decide', {'keys': keys, 'optimizely_decide_option': options}));
+    return await OptimizelyClientWrapper.decide(_sdkKey, keys, options);
+  }
+
+  Future<CancelListening> addNotificationListener(
+      MultiUseCallback callback, ListenerType listenerType) async {
+    return await OptimizelyClientWrapper.addNotificationListener(
+        _sdkKey, callback, listenerType);
   }
 }
