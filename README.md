@@ -1,15 +1,18 @@
 # optimizely_flutter_sdk
 
-A new flutter plugin project.
-
-## Getting Started
-
 This project is a starting point for a Flutter
 [plug-in package](https://flutter.dev/developing-packages/),
 a specialized package that includes platform-specific implementation code for
 Android and/or iOS.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Getting Started
 
+1. [Install Dart](https://dart.dev/get-dart#install) for your platform.
+2. Configure your IDE to point to the Dart SDK directory listed from the installation instructions. <br/> e.g. Windows: C:\tools\dart-sdk
+3. [Install Flutter](https://docs.flutter.dev/get-started/install) for your platform.
+*Note*: The download is big. Extract using an archive tool if needed. 
+4. Ensure your PATH includes the `bin` directory of your Flutter installation. <br/> e.g. Windows: `C:\src\flutter\binC:\src\flutter\bin`
+5. For users of IntelliJ, install the following plugins:
+   1. Dart by JetBrains 
+   2. Flutter by flutter.dev
+6. In your IDE and in the path of this repo, open a terminal and run <br/>`flutter packages get`
