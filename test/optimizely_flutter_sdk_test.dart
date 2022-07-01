@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
 void main() {
-  // const String testSDKKey = "KZbunNn9bVfBWLpZPq2XC4";
+  const String testSDKKey = "KZbunNn9bVfBWLpZPq2XC4";
   // const MethodChannel channel = MethodChannel('optimizely_flutter_sdk');
 
   // setUpAll(() async {
@@ -36,11 +36,16 @@ void main() {
     // channel.setMockMethodCallHandler(null);
   });
 
-  group('API Tests', () {
-    // test('test initialization', () async {
-    //   final response = Map<String, dynamic>.from(await channel
-    //       .invokeMockMethod('initialize', {'sdk_key': testSDKKey}));
-    //   expect(response["success"], "true");
-    // });
+  group('Flutter SDK', () {
+    test('should initialize Optimizely client successfully', () async {
+      // Arrange
+      var sdk = new OptimizelyFlutterSdk(testSDKKey);
+
+      // Act
+      var client = sdk.initializeClient();
+
+      // Assert
+      expect(client, isNotNull);
+    });
   });
 }
