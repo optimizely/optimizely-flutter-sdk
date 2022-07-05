@@ -5,39 +5,40 @@ import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 void main() {
   const String testSDKKey = "KZbunNn9bVfBWLpZPq2XC4";
   const MethodChannel channel = MethodChannel('optimizely_flutter_sdk');
+  TestDefaultBinaryMessenger? tester;
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
 
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
+    tester = TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger;
+
+    tester?.setMockMethodCallHandler(channel, (MethodCall methodCall) async {
       // log.add(methodCall);
       switch (methodCall.method) {
         case 'initialize':
-          return {
-            'initialized': true
-          };
-      //   case 'start':
-      //     isRecording = true;
-      //     return null;
-      //   case 'stop':
-      //     isRecording = false;
-      //     return {
-      //       'duration': duration,
-      //       'path': path,
-      //       'audioOutputFormat': extension,
-      //     };
-      //   case 'isRecording':
-      //     return isRecording;
-      //   case 'hasPermissions':
-      //     return true;
-      //   default:
-      //     return null;
+          return {'initialized': true, 'mockBdd': 'needed'};
+        //   case 'start':
+        //     isRecording = true;
+        //     return null;
+        //   case 'stop':
+        //     isRecording = false;
+        //     return {
+        //       'duration': duration,
+        //       'path': path,
+        //       'audioOutputFormat': extension,
+        //     };
+        //   case 'isRecording':
+        //     return isRecording;
+        //   case 'hasPermissions':
+        //     return true;
+        default:
+          return null;
       }
     });
   });
 
   tearDown(() {
-    channel.setMockMethodCallHandler(null);
+    tester?.setMockMethodCallHandler(channel, null);
   });
 
   group('Flutter SDK', () {
