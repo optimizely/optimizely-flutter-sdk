@@ -64,6 +64,13 @@ struct SuccessMessage {
     static let listenerRemoved = "Listener removed successfully."
 }
 
+struct TypeValue {
+    static let string = "string"
+    static let int = "int"
+    static let double = "double"
+    static let bool = "bool"
+}
+
 public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     var notificationIdsTracker = [Int: Int]()
@@ -101,6 +108,43 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             return nil
         }
         return userContextsTracker[sdkKey] ?? nil
+    }
+    
+    func getTypedMap(arguments: Any?) -> [String: Any]? {
+        guard let args = arguments as? Dictionary<String, Any?> else {
+            return nil
+        }
+        var typedDictionary = [String: Any]()
+        for (k,v) in args {
+            if let typedValue = v as? Dictionary<String, Any?>, let value = typedValue["value"] as? Any, let type = typedValue["type"] as? String {
+                switch type {
+                case TypeValue.string:
+                    if let strValue = value as? String {
+                        typedDictionary[k] = strValue
+                    }
+                    break
+                case TypeValue.int:
+                    if let intValue = value as? Int {
+                        typedDictionary[k] = NSNumber(value: intValue).intValue
+                    }
+                    break
+                case TypeValue.double:
+                    if let doubleValue = value as? Double {
+                        typedDictionary[k] = NSNumber(value: doubleValue).doubleValue
+                    }
+                    break
+                case TypeValue.bool:
+                    if let booleanValue = value as? Bool {
+                        typedDictionary[k] = NSNumber(value: booleanValue).boolValue
+                    }
+                    break
+                default:
+                    break
+                }
+            }
+            continue
+        }
+        return typedDictionary
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -203,7 +247,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 return
             }
             
-            if let attributes = parameters[RequestParameterKey.attributes] as? [String: Any] {
+            if let attributes = getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any) {
                 userContextsTracker[sdkKey] = optimizelyClient.createUserContext(userId: userId, attributes: attributes)
             } else {
                 userContextsTracker[sdkKey] = optimizelyClient.createUserContext(userId: userId)
@@ -217,7 +261,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 return
             }
             
-            guard let parameters = call.arguments as? Dictionary<String, Any?>, let attributes = parameters[RequestParameterKey.attributes] as? [String: Any] else {
+            guard let parameters = call.arguments as? Dictionary<String, Any?>, let attributes = getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any) else {
                 result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
                 return
             }
@@ -238,7 +282,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 return
             }
             
-            let eventTags = parameters[RequestParameterKey.eventTags] as? [String: Any]
+            let eventTags = getTypedMap(arguments: parameters[RequestParameterKey.eventTags] as? Any)
             do {
                 try usrContext.trackEvent(eventKey: eventKey, eventTags: eventTags)
                 result(self.createResponse(success: true))
@@ -322,7 +366,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 "event_key"        : eventKey,
                 "event_tags"    : eventTags as Any,
                 "user_id"       : userId,
-//                "event": event as Any, This is causing codec related exceptions on flutter side, need to debug
+                //                "event": event as Any, This is causing codec related exceptions on flutter side, need to debug
             ]
             SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
         }
