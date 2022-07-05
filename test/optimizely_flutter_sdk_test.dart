@@ -5,12 +5,12 @@ import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 void main() {
   const String testSDKKey = "KZbunNn9bVfBWLpZPq2XC4";
   const MethodChannel channel = MethodChannel('optimizely_flutter_sdk');
-  TestDefaultBinaryMessenger? tester;
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
 
-    tester = TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger;
+    var tester =
+        TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger;
 
     tester?.setMockMethodCallHandler(channel, (MethodCall methodCall) async {
       // log.add(methodCall);
@@ -38,19 +38,27 @@ void main() {
   });
 
   tearDown(() {
-    tester?.setMockMethodCallHandler(channel, null);
+    //tester?.setMockMethodCallHandler(channel, null);
   });
 
-  group('Flutter SDK', () {
-    test('should initialize Optimizely client successfully', () async {
-      // Arrange
-      var sdk = new OptimizelyFlutterSdk(testSDKKey);
+  group('Mocked Flutter SDK', () {
+    group('OptimizelyFlutterSdk constructor', () {
+      test('with empty string SDK Key should instantiates successfully',
+          () async {
+        const String emptyStringSdkKey = '';
+        var sdk = new OptimizelyFlutterSdk(emptyStringSdkKey);
 
-      // Act
-      var client = await sdk.initializeClient();
+        expect(sdk.runtimeType == OptimizelyFlutterSdk, isTrue);
+      });
+    });
+    group('initializeClient()', () {
+      test('with valid SDK Key should succeed', () async {
+        var sdk = new OptimizelyFlutterSdk(testSDKKey);
 
-      // Assert
-      expect(client, isNotNull);
+        var client = await sdk.initializeClient();
+
+        expect(client, isNotNull);
+      });
     });
   });
 }
