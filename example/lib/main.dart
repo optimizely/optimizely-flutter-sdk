@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
@@ -32,8 +33,10 @@ class _MyAppState extends State<MyApp> {
       optimizelyConfig = json.encode(response);
     });
 
-    Map<String, dynamic> attributes = {"age": 20};
-    response = await flutterSDK.createUserContext("12314", attributes);
+    var rng = Random();
+    var randomUserName = "${rng.nextInt(1000)}";
+    Map<String, TypedValue> attributes = {"age": TypedValue(20, ValueType.int)};
+    response = await flutterSDK.createUserContext(randomUserName, attributes);
 
     // To add decide listener
     var cancelDecideListener =
@@ -43,7 +46,7 @@ class _MyAppState extends State<MyApp> {
     }, ListenerType.decision);
 
     // Decide call
-    response = await flutterSDK.decide(['flag1']);
+    response = await flutterSDK.decide('flag1');
 
     // To cancel decide listener
     // cancelDecideListener();

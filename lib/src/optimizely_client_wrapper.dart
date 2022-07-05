@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/datamodels/typed_value.dart';
 
 enum ListenerType { track, decision, logEvent }
 
@@ -24,22 +25,32 @@ class OptimizelyClientWrapper {
 
   static Future<Map<String, dynamic>> createUserContext(
       String sdkKey, String userId,
-      [Map<String, dynamic> attributes = const {}]) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
-        'createUserContext',
-        {'sdk_key': sdkKey, 'user_id': userId, 'attributes': attributes}));
+      [Map<String, TypedValue> attributes = const {}]) async {
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod('createUserContext', {
+      'sdk_key': sdkKey,
+      'user_id': userId,
+      'attributes': OptimizelyClientWrapper._covertTypedMap(attributes)
+    }));
   }
 
   static Future<Map<String, dynamic>> setAttributes(
-      String sdkKey, Map<String, dynamic> attributes) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
-        'set_attributes', {'sdk_key': sdkKey, 'attributes': attributes}));
+      String sdkKey, Map<String, TypedValue> attributes) async {
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod('set_attributes', {
+      'sdk_key': sdkKey,
+      'attributes': OptimizelyClientWrapper._covertTypedMap(attributes)
+    }));
   }
 
   static Future<Map<String, dynamic>> trackEvent(String sdkKey, String eventKey,
-      [Map<String, dynamic> eventTags = const {}]) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod('track_event',
-        {'sdk_key': sdkKey, 'event_key': eventKey, 'event_tags': eventTags}));
+      [Map<String, TypedValue> eventTags = const {}]) async {
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod('track_event', {
+      'sdk_key': sdkKey,
+      'event_key': eventKey,
+      'event_tags': OptimizelyClientWrapper._covertTypedMap(eventTags)
+    }));
   }
 
   static Future<Map<String, dynamic>> decide(String sdkKey,
@@ -79,7 +90,15 @@ class OptimizelyClientWrapper {
         break;
       default:
         // ignore: avoid_print
-        print('Method ' + call.method + ' not implemented.');
+        print('Method ${call.method} not implemented.');
     }
+  }
+
+  static Map<String, dynamic> _covertTypedMap(
+      Map<String, TypedValue> typedMap) {
+    if (typedMap.isEmpty) {
+      return {};
+    }
+    return {for (var e in typedMap.keys) e: typedMap[e]!.toMap()};
   }
 }

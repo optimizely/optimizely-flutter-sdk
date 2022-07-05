@@ -4,10 +4,16 @@ PODS:
     - Flutter
     - OptimizelySwiftSDK (= 3.10.1)
   - OptimizelySwiftSDK (3.10.1)
+  - path_provider_ios (0.0.1):
+    - Flutter
+  - url_launcher (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - optimizely_flutter_sdk (from `.symlinks/plugins/optimizely_flutter_sdk/ios`)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+  - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
 SPEC REPOS:
   trunk:
@@ -18,11 +24,17 @@ EXTERNAL SOURCES:
     :path: Flutter
   optimizely_flutter_sdk:
     :path: ".symlinks/plugins/optimizely_flutter_sdk/ios"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
+  url_launcher:
+    :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   optimizely_flutter_sdk: f6f378ce73fc2531b7239886f83b0b9485c8b297
   OptimizelySwiftSDK: 5db17cc54e4e7319fdb8424b72c1dabfd6e6c9e5
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+  url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
 
 PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea
 
