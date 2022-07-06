@@ -18,17 +18,17 @@ Android and/or iOS.
 6. In your IDE and in the path of this repo, open a terminal and run <br/>`flutter packages get`
 7. For users of IntelliJ, configure Flutter settings
    1. Go to File > Settings...
-      ![](docs\intellij-settings-menu.png)
+      ![](docs/intellij-settings-menu.png)
    2. Configure the Flutter SDK and additional settings
-      ![](docs\intellij-settings-flutter.png)
+      ![](docs/intellij-settings-flutter.png)
 
 ## Testing In IntelliJ
 
 1. Click Edit Configurations... in the Run/Debug configurations menu
-   ![](docs\edit-config.png)
+   ![](docs/edit-config.png)
 2. Click the + button and add a Flutter Test configuration
-   ![](docs\add-flutter-test-config.png)
+   ![](docs/add-flutter-test-config.png)
 3. Configure the settings for the test run
-   ![](docs\flutter-test-config-values.png)
+   ![](docs/flutter-test-config-values.png)
 4. Run the test suite to ensure correct settings
-   ![](docs\run-flutter-test.png)
+   ![](docs/run-flutter-test.png)
