@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
@@ -16,21 +19,25 @@ void main() {
       // log.add(methodCall);
       switch (methodCall.method) {
         case 'initialize':
-          return {'initialized': true, 'mockBdd': 'needed'};
-        //   case 'start':
-        //     isRecording = true;
-        //     return null;
-        //   case 'stop':
-        //     isRecording = false;
-        //     return {
-        //       'duration': duration,
-        //       'path': path,
-        //       'audioOutputFormat': extension,
-        //     };
-        //   case 'isRecording':
-        //     return isRecording;
-        //   case 'hasPermissions':
-        //     return true;
+          return {'mockBdd': 'valueNeeded'};
+        case 'getOptimizelyConfig':
+          final file = new File('test_resources/mockOptimizelyConfig.json');
+          final json = jsonDecode(await file.readAsString());
+          return json;
+        case 'createUserContext':
+          return {'mockBdd': 'valueNeeded'};
+        case 'set_attributes':
+          return {'mockBdd': 'valueNeeded'};
+        case 'track_event':
+          return {'mockBdd': 'valueNeeded'};
+        case 'decide':
+          return {'mockBdd': 'valueNeeded'};
+        case 'addListener':
+          return {'mockBdd': 'valueNeeded'};
+        case 'addListener':
+          return {'mockBdd': 'valueNeeded'};
+        case 'removeListener':
+          return {'mockBdd': 'valueNeeded'};
         default:
           return null;
       }
@@ -41,9 +48,9 @@ void main() {
     //tester?.setMockMethodCallHandler(channel, null);
   });
 
-  group('Mocked Flutter SDK', () {
-    group('OptimizelyFlutterSdk constructor', () {
-      test('with empty string SDK Key should instantiates successfully',
+  group('Mocked OptimizelyFlutterSdk', () {
+    group('constructor', () {
+      test('with empty string SDK Key should instantiate successfully',
           () async {
         const String emptyStringSdkKey = '';
         var sdk = new OptimizelyFlutterSdk(emptyStringSdkKey);
@@ -61,12 +68,19 @@ void main() {
       });
     });
     group('getOptimizelyConfig()', () {
-      test('___ should succeed', () async {
-        // arrange
+      test('returns valid digested OptimizelyConfig should succeed', () async {
+        var sdk = new OptimizelyFlutterSdk(testSDKKey);
 
-        // act
+        var config = await sdk.getOptimizelyConfig();
 
-        // assert
+        expect(config['sdkKey'], equals(testSDKKey));
+        expect(config['environmentKey'], equals('production'));
+        expect(config['attributes'].length, equals(1));
+        expect(config['events'].length, equals(1));
+        expect(config['revision'], equals('130'));
+        expect(config['experimentsMap'], isNotNull);
+        expect(config['featuresMap'], isNotNull);
+        expect(config['datafile'], isNotNull);
       });
     });
     group('createUserContext()', () {
