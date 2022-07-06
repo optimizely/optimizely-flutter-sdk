@@ -60,6 +60,7 @@ struct SuccessMessage {
     static let instanceCreated = "Optimizely instance created successfully."
     static let optimizelyConfigFound = "Optimizely config found."
     static let userContextCreated = "User context created successfully."
+    static let AttributesAdded = "Attributes added successfully."
     static let listenerAdded = "Listener added successfully."
     static let listenerRemoved = "Listener removed successfully."
 }
@@ -67,7 +68,7 @@ struct SuccessMessage {
 struct TypeValue {
     static let string = "string"
     static let int = "int"
-    static let double = "double"
+    static let float = "float"
     static let bool = "bool"
 }
 
@@ -128,7 +129,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                         typedDictionary[k] = NSNumber(value: intValue).intValue
                     }
                     break
-                case TypeValue.double:
+                case TypeValue.float:
                     if let doubleValue = value as? Double {
                         typedDictionary[k] = NSNumber(value: doubleValue).doubleValue
                     }
@@ -269,6 +270,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             for (k,v) in attributes {
                 usrContext.setAttribute(key: k, value: v)
             }
+            result(createResponse(success: true, reason: SuccessMessage.AttributesAdded))
             
         case API.trackEvent:
             

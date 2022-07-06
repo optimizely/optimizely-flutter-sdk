@@ -35,8 +35,13 @@ class _MyAppState extends State<MyApp> {
 
     var rng = Random();
     var randomUserName = "${rng.nextInt(1000)}";
+
+    // Create user context
+    response = await flutterSDK.createUserContext(randomUserName);
+
+    // Set attributes
     Map<String, TypedValue> attributes = {"age": TypedValue(20, ValueType.int)};
-    response = await flutterSDK.createUserContext(randomUserName, attributes);
+    response = await flutterSDK.setAttributes(attributes);
 
     // To add decide listener
     var cancelDecideListener =
@@ -59,7 +64,8 @@ class _MyAppState extends State<MyApp> {
     }, ListenerType.track);
 
     // Track call
-    response = await flutterSDK.trackEvent("myevent");
+    Map<String, TypedValue> eventTags = {"age": TypedValue(20, ValueType.int)};
+    response = await flutterSDK.trackEvent("myevent", eventTags);
 
     // To cancel track listener
     // cancelTrackListener();
