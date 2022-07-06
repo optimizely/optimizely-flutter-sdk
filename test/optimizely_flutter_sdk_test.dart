@@ -60,5 +60,77 @@ void main() {
         expect(client, isNotNull);
       });
     });
+    group('getOptimizelyConfig()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
+    group('createUserContext()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
+    group('setAttributes()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
+    group('trackEvent()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
+    group('decide()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
+    group('decideForKeys()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
+    group('decideAll()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
+    group('addNotificationListener()', () {
+      test('___ should succeed', () async {
+        // arrange
+
+        // act
+
+        // assert
+      });
+    });
   });
 }
