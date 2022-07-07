@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:optimizely_flutter_sdk/src/datamodels/typed_value.dart';
+import 'dart:io' show Platform;
+import 'constants.dart';
 
 enum ListenerType { track, decision, logEvent }
 
@@ -14,51 +15,54 @@ class OptimizelyClientWrapper {
 
   static Future<Map<String, dynamic>> initializeClient(String sdkKey) async {
     _channel.setMethodCallHandler(_methodCallHandler);
-    return Map<String, dynamic>.from(
-        await _channel.invokeMethod('initialize', {'sdk_key': sdkKey}));
+    return Map<String, dynamic>.from(await _channel
+        .invokeMethod(Constants.initializeMethod, {Constants.sdkKey: sdkKey}));
   }
 
   static Future<Map<String, dynamic>> getOptimizelyConfig(String sdkKey) async {
-    return Map<String, dynamic>.from(await _channel
-        .invokeMethod('getOptimizelyConfig', {'sdk_key': sdkKey}));
+    return Map<String, dynamic>.from(await _channel.invokeMethod(
+        Constants.getOptimizelyConfigMethod, {Constants.sdkKey: sdkKey}));
   }
 
   static Future<Map<String, dynamic>> createUserContext(
       String sdkKey, String userId,
-      [Map<String, TypedValue> attributes = const {}]) async {
+      [Map<String, dynamic> attributes = const {}]) async {
     return Map<String, dynamic>.from(
-        await _channel.invokeMethod('createUserContext', {
-      'sdk_key': sdkKey,
-      'user_id': userId,
-      'attributes': OptimizelyClientWrapper._covertTypedMap(attributes)
+        await _channel.invokeMethod(Constants.createUserContextMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.userID: userId,
+      Constants.attributes:
+          OptimizelyClientWrapper._covertToTypedMap(attributes)
     }));
   }
 
   static Future<Map<String, dynamic>> setAttributes(
-      String sdkKey, Map<String, TypedValue> attributes) async {
+      String sdkKey, Map<String, dynamic> attributes) async {
     return Map<String, dynamic>.from(
-        await _channel.invokeMethod('set_attributes', {
-      'sdk_key': sdkKey,
-      'attributes': OptimizelyClientWrapper._covertTypedMap(attributes)
+        await _channel.invokeMethod(Constants.setAttributesMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.attributes:
+          OptimizelyClientWrapper._covertToTypedMap(attributes)
     }));
   }
 
   static Future<Map<String, dynamic>> trackEvent(String sdkKey, String eventKey,
-      [Map<String, TypedValue> eventTags = const {}]) async {
+      [Map<String, dynamic> eventTags = const {}]) async {
     return Map<String, dynamic>.from(
-        await _channel.invokeMethod('track_event', {
-      'sdk_key': sdkKey,
-      'event_key': eventKey,
-      'event_tags': OptimizelyClientWrapper._covertTypedMap(eventTags)
+        await _channel.invokeMethod(Constants.trackEventMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.eventKey: eventKey,
+      Constants.eventTags: OptimizelyClientWrapper._covertToTypedMap(eventTags)
     }));
   }
 
   static Future<Map<String, dynamic>> decide(String sdkKey,
       [List<String> keys = const [], List<String> options = const []]) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod('decide', {
-      'sdk_key': sdkKey,
-      'keys': keys,
-      'optimizely_decide_option': options
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.decideMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.keys: keys,
+      Constants.optimizelyDecideOption: options
     }));
   }
 
@@ -70,20 +74,23 @@ class OptimizelyClientWrapper {
     var listenerTypeStr = listenerType
         .toString()
         .substring(listenerType.toString().indexOf('.') + 1);
-    await _channel.invokeMethod("addListener",
-        {'sdk_key': sdkKey, "id": currentListenerId, "type": listenerTypeStr});
+    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.id: currentListenerId,
+      Constants.type: listenerTypeStr
+    });
     return () {
-      _channel.invokeMethod(
-          "removeListener", {'sdk_key': sdkKey, "id": currentListenerId});
+      _channel.invokeMethod(Constants.removeNotificationListenerMethod,
+          {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
       _callbacksById.remove(currentListenerId);
     };
   }
 
   static Future<void> _methodCallHandler(MethodCall call) async {
     switch (call.method) {
-      case 'callbackListener':
-        var id = call.arguments["id"];
-        var payload = call.arguments["payload"];
+      case Constants.callBackListener:
+        var id = call.arguments[Constants.id];
+        var payload = call.arguments[Constants.payload];
         if (id is int && payload != null) {
           _callbacksById[id]!(payload);
         }
@@ -94,11 +101,47 @@ class OptimizelyClientWrapper {
     }
   }
 
-  static Map<String, dynamic> _covertTypedMap(
-      Map<String, TypedValue> typedMap) {
-    if (typedMap.isEmpty) {
+  static Map<String, dynamic> _covertToTypedMap(Map<String, dynamic> map) {
+    if (map.isEmpty) {
       return {};
     }
-    return {for (var e in typedMap.keys) e: typedMap[e]!.toMap()};
+    // No alterations required for Android since types are successfully passed to its native code
+    if (Platform.isAndroid) {
+      return map;
+    }
+
+    // Send type along with value so typecasting is easily possible
+    Map<String, dynamic> typedMap = {};
+    for (MapEntry e in map.entries) {
+      if (e.value is String) {
+        typedMap[e.key] = {
+          Constants.value: e.value,
+          Constants.type: Constants.stringType
+        };
+        continue;
+      }
+      if (e.value is double) {
+        typedMap[e.key] = {
+          Constants.value: e.value,
+          Constants.type: Constants.doubleType
+        };
+        continue;
+      }
+      if (e.value is int) {
+        typedMap[e.key] = {
+          Constants.value: e.value,
+          Constants.type: Constants.intType
+        };
+        continue;
+      }
+      if (e.value is bool) {
+        typedMap[e.key] = {
+          Constants.value: e.value,
+          Constants.type: Constants.boolType
+        };
+      }
+    }
+
+    return typedMap;
   }
 }

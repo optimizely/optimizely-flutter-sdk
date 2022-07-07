@@ -1,13 +1,8 @@
 library optimizely_flutter_sdk;
 
 import 'dart:async';
-import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
-import 'package:optimizely_flutter_sdk/src/datamodels/typed_value.dart';
-
-export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
-    show ListenerType;
-export 'package:optimizely_flutter_sdk/src/datamodels/typed_value.dart'
-    show TypedValue, ValueType;
+import './src/optimizely_client_wrapper.dart';
+export './src/optimizely_client_wrapper.dart' show ListenerType;
 
 class OptimizelyFlutterSdk {
   final String _sdkKey;
@@ -22,18 +17,18 @@ class OptimizelyFlutterSdk {
   }
 
   Future<Map<String, dynamic>> createUserContext(String userId,
-      [Map<String, TypedValue> attributes = const {}]) async {
+      [Map<String, dynamic> attributes = const {}]) async {
     return await OptimizelyClientWrapper.createUserContext(
         _sdkKey, userId, attributes);
   }
 
   Future<Map<String, dynamic>> setAttributes(
-      Map<String, TypedValue> attributes) async {
+      Map<String, dynamic> attributes) async {
     return await OptimizelyClientWrapper.setAttributes(_sdkKey, attributes);
   }
 
   Future<Map<String, dynamic>> trackEvent(String eventKey,
-      [Map<String, TypedValue> eventTags = const {}]) async {
+      [Map<String, dynamic> eventTags = const {}]) async {
     return await OptimizelyClientWrapper.trackEvent(
         _sdkKey, eventKey, eventTags);
   }
