@@ -23,11 +23,11 @@ struct API {
     static let initialize = "initialize"
     static let getOptimizelyConfig = "getOptimizelyConfig"
     static let createUserContext = "createUserContext"
-    static let setAttributes = "set_attributes"
-    static let trackEvent = "track_event"
+    static let setAttributes = "setAttributes"
+    static let trackEvent = "trackEvent"
     static let decide = "decide"
-    static let addListener = "addListener"
-    static let removeListener = "removeListener"
+    static let addNotificationListener = "addNotificationListener"
+    static let removeNotificationListener = "removeNotificationListener"
 }
 
 struct NotificationType {
@@ -68,7 +68,7 @@ struct SuccessMessage {
 struct TypeValue {
     static let string = "string"
     static let int = "int"
-    static let float = "float"
+    static let double = "double"
     static let bool = "bool"
 }
 
@@ -129,7 +129,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                         typedDictionary[k] = NSNumber(value: intValue).intValue
                     }
                     break
-                case TypeValue.float:
+                case TypeValue.double:
                     if let doubleValue = value as? Double {
                         typedDictionary[k] = NSNumber(value: doubleValue).doubleValue
                     }
@@ -176,7 +176,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-        case API.addListener:
+        case API.addNotificationListener:
             
             guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
                 result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
@@ -206,7 +206,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             }
             
-        case API.removeListener:
+        case API.removeNotificationListener:
             
             guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
                 result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
