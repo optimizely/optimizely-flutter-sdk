@@ -60,9 +60,10 @@ struct SuccessMessage {
     static let instanceCreated = "Optimizely instance created successfully."
     static let optimizelyConfigFound = "Optimizely config found."
     static let userContextCreated = "User context created successfully."
-    static let AttributesAdded = "Attributes added successfully."
+    static let attributesAdded = "Attributes added successfully."
     static let listenerAdded = "Listener added successfully."
     static let listenerRemoved = "Listener removed successfully."
+    static let decideCalled = "Decide called successfully."
 }
 
 struct TypeValue {
@@ -270,7 +271,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             for (k,v) in attributes {
                 usrContext.setAttribute(key: k, value: v)
             }
-            result(createResponse(success: true, reason: SuccessMessage.AttributesAdded))
+            result(createResponse(success: true, reason: SuccessMessage.attributesAdded))
             
         case API.trackEvent:
             
@@ -328,7 +329,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 resultMap[key] = convertDecisionToDictionary(decision: decision)
             }
             
-            result(self.createResponse(success: true, result: resultMap, reason: ""))
+            result(self.createResponse(success: true, result: resultMap, reason: SuccessMessage.decideCalled))
             
         default:
             result(FlutterMethodNotImplemented)
