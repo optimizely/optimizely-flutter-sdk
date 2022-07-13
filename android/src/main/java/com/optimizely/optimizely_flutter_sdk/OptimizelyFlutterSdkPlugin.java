@@ -110,15 +110,15 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
         }
         switch (type) {
           case NotificationType.DECISION: {
-            Map<String, Object> notificationMap = new HashMap<>();
             int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(DecisionNotification.class, decisionNotification -> {
+              Map<String, Object> notificationMap = new HashMap<>();
               notificationMap.put("type", decisionNotification.getType());
               notificationMap.put("user_id", decisionNotification.getUserId());
               notificationMap.put("attributes", decisionNotification.getAttributes());
               notificationMap.put("decision_info", convertKeysCamelCaseToSnakeCase(decisionNotification.getDecisionInfo()));
+              invokeNotification(id, NotificationType.DECISION, notificationMap);
             });
-
-            addNotification(id, notificationId, NotificationType.DECISION, notificationMap);
+            notificationIdsTracker.put(id, notificationId);
             result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
             break;
           }
@@ -129,21 +129,23 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
               notificationMap.put("user_id", trackNotification.getUserId());
               notificationMap.put("attributes", trackNotification.getAttributes());
               notificationMap.put("event_tags", trackNotification.getEventTags());
+              invokeNotification(id, NotificationType.TRACK, notificationMap);
             });
-            addNotification(id, notificationId, NotificationType.TRACK, notificationMap);
+            notificationIdsTracker.put(id, notificationId);
             result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
             break;
           }
           case NotificationType.LOG_EVENT: {
-            Map<String, Object> listenerMap = new HashMap<>();
             int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(LogEvent.class, logEvent -> {
               ObjectMapper mapper = new ObjectMapper();
               Map<String, Object> eventParams = mapper.readValue(logEvent.getBody(), Map.class);
+              Map<String, Object> listenerMap = new HashMap<>();
               listenerMap.put("url", logEvent.getEndpointUrl());
               listenerMap.put("http_verb", logEvent.getRequestMethod());
               listenerMap.put("params", eventParams);
+              invokeNotification(id, NotificationType.LOG_EVENT, listenerMap);
             });
-            addNotification(id, notificationId, NotificationType.LOG_EVENT, listenerMap);
+            notificationIdsTracker.put(id, notificationId);
             result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
             break;
           }
@@ -292,16 +294,15 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
     }
   }
 
-  private void addNotification(int id, int notificationId, String notificationType, Map notificationMap) {
+  private void invokeNotification(int id, String notificationType, Map notificationMap) {
     Map<String, Object> listenerResponse = new HashMap<>();
-    listenerResponse.put(RequestParameterKey.NOTIFICATION_ID, notificationId);
+    listenerResponse.put(RequestParameterKey.NOTIFICATION_ID, id);
     listenerResponse.put(RequestParameterKey.NOTIFICATION_TYPE, notificationType);
     listenerResponse.put(RequestParameterKey.NOTIFICATION_PAYLOAD, notificationMap);
     Map<String, Object> listenerUnmodifiable = Collections.unmodifiableMap(listenerResponse);
-    notificationIdsTracker.put(id, notificationId);
     OptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", listenerUnmodifiable);
   }
-  
+
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     channel = new MethodChannel(binding.getBinaryMessenger(), "optimizely_flutter_sdk");
