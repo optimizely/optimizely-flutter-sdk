@@ -8,10 +8,12 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:7.2.1'
     }
 }
-
+configurations {
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+}
 rootProject.allprojects {
     repositories {
         google()
@@ -28,8 +30,31 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
+    packagingOptions {
+        exclude 'androidsupportmultidexversion.txt'
+    }
     defaultConfig {
         minSdkVersion 16
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+
+dependencies {
+    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+    implementation group: 'org.slf4j', name: 'slf4j-android', version: '1.7.25'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10"
+    implementation "com.optimizely.ab:android-sdk:3.13.2"
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation ('com.google.guava:guava:19.0') {
+        exclude group:'com.google.guava', module:'listenablefuture'
     }
 }
