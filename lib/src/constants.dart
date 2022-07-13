@@ -29,4 +29,14 @@ class Constants {
   static const String value = "value";
   static const String type = "type";
   static const String callBackListener = "callbackListener";
+
+  // SuccessMessage from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
+  static const String instanceCreated =
+      "Optimizely instance created successfully.";
+  static const String optimizelyConfigFound = "Optimizely config found.";
+  static const String userContextCreated = "User context created successfully.";
+  static const String attributesAdded = "Attributes added successfully.";
+  static const String listenerAdded = "Listener added successfully.";
+  static const String listenerRemoved = "Listener removed successfully.";
+  static const String decideCalled = "Decide called successfully.";
 }
