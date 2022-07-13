@@ -27,6 +27,7 @@ import com.optimizely.ab.optimizelyconfig.OptimizelyConfig;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecision;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,13 +38,13 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 
 /** OptimizelyFlutterSdkPlugin */
 public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
-  private MethodChannel channel;
+  private static MethodChannel channel;
   private Context context;
   private Activity activity;
 
   private static final Map<String, OptimizelyManager> optimizelyManagerTracker = new HashMap<>();
   private static final Map<String, OptimizelyUserContext> userContextsTracker = new HashMap<>();
-  private static final Map<String, NotificationListenerCall> notificationListenerCalls = new HashMap<>();
+    private static final Map<Integer, Integer> notificationIdsTracker = new HashMap<>();
 
   public Map<String, ?> createResponse(Boolean success, Object result, String reason) {
     Map<String, Object> response = new HashMap<>();
@@ -109,40 +110,40 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
         }
         switch (type) {
           case NotificationType.DECISION: {
+            Map<String, Object> notificationMap = new HashMap<>();
             int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(DecisionNotification.class, decisionNotification -> {
-              Map<String, Object> notificationMap = new HashMap<>();
               notificationMap.put("type", decisionNotification.getType());
               notificationMap.put("user_id", decisionNotification.getUserId());
               notificationMap.put("attributes", decisionNotification.getAttributes());
               notificationMap.put("decision_info", convertKeysCamelCaseToSnakeCase(decisionNotification.getDecisionInfo()));
-              //TODO fix this
-              //AndroidSDKFlutterPlugin.channel.invokeMethod("callbackListener", Collections.unmodifiableMap(): [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
             });
 
+            addNotification(id, notificationId, NotificationType.DECISION, notificationMap);
             result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
             break;
           }
           case NotificationType.TRACK: {
+            Map<String, Object> notificationMap = new HashMap<>();
             int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(TrackNotification.class, trackNotification -> {
-              Map<String, Object> notificationMap = new HashMap<>();
               notificationMap.put("event_key", trackNotification.getEventKey());
               notificationMap.put("user_id", trackNotification.getUserId());
               notificationMap.put("attributes", trackNotification.getAttributes());
               notificationMap.put("event_tags", trackNotification.getEventTags());
             });
+            addNotification(id, notificationId, NotificationType.TRACK, notificationMap);
             result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
             break;
           }
           case NotificationType.LOG_EVENT: {
-            int notificationIdLog = optimizelyClient.getNotificationCenter().addNotificationHandler(LogEvent.class, logEvent -> {
+            Map<String, Object> listenerMap = new HashMap<>();
+            int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(LogEvent.class, logEvent -> {
               ObjectMapper mapper = new ObjectMapper();
               Map<String, Object> eventParams = mapper.readValue(logEvent.getBody(), Map.class);
-              Map<String, Object> listenerMap = new HashMap<>();
               listenerMap.put("url", logEvent.getEndpointUrl());
               listenerMap.put("http_verb", logEvent.getRequestMethod());
               listenerMap.put("params", eventParams);
-
             });
+            addNotification(id, notificationId, NotificationType.LOG_EVENT, listenerMap);
             result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
             break;
           }
@@ -164,7 +165,7 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
           return;
         }
         optimizelyClient.getNotificationCenter().removeNotificationListener(id);
-
+        notificationIdsTracker.remove(id);
         result.success(createResponse(true, SuccessMessage.LISTENER_REMOVED));
         break;
       }
@@ -291,6 +292,16 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
     }
   }
 
+  private void addNotification(int id, int notificationId, String notificationType, Map notificationMap) {
+    Map<String, Object> listenerResponse = new HashMap<>();
+    listenerResponse.put(RequestParameterKey.NOTIFICATION_ID, notificationId);
+    listenerResponse.put(RequestParameterKey.NOTIFICATION_TYPE, notificationType);
+    listenerResponse.put(RequestParameterKey.NOTIFICATION_PAYLOAD, notificationMap);
+    Map<String, Object> listenerUnmodifiable = Collections.unmodifiableMap(listenerResponse);
+    notificationIdsTracker.put(id, notificationId);
+    OptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", listenerUnmodifiable);
+  }
+  
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     channel = new MethodChannel(binding.getBinaryMessenger(), "optimizely_flutter_sdk");
@@ -321,14 +332,6 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
   @Override
   public void onDetachedFromActivity() {
 
-  }
-
-  //TODO: Move these util functions to util class
-  public String getSDKKey(Map<String, ?> arguments) {
-    return (String) arguments.get(RequestParameterKey.SDK_KEY);
-  }
-  public void addNotificationListenerCall(String id, NotificationListenerCall notificationListenerCall) {
-    notificationListenerCalls.put(id, notificationListenerCall);
   }
 
   private static Map<String, ?> convertKeysCamelCaseToSnakeCase(Map<String, ?> decisionInfo) {
