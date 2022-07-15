@@ -381,7 +381,7 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
     public static final String TRACK="track";
     public static final String DECISION = "decision";
     public static final String LOG_EVENT = "logEvent";
-    public static final String CONFIG_UPDATE = "configUpdate";
+    public static final String CONFIG_UPDATE = "projectConfigUpdate";
   }
 
   public static class RequestParameterKey {
