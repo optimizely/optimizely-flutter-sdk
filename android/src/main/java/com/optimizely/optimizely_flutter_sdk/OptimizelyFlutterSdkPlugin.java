@@ -23,6 +23,7 @@ import com.optimizely.ab.android.sdk.OptimizelyManager;
 import com.optimizely.ab.event.LogEvent;
 import com.optimizely.ab.notification.DecisionNotification;
 import com.optimizely.ab.notification.TrackNotification;
+import com.optimizely.ab.notification.UpdateConfigNotification;
 import com.optimizely.ab.optimizelyconfig.OptimizelyConfig;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecision;
@@ -144,6 +145,16 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
               listenerMap.put("http_verb", logEvent.getRequestMethod());
               listenerMap.put("params", eventParams);
               invokeNotification(id, NotificationType.LOG_EVENT, listenerMap);
+            });
+            notificationIdsTracker.put(id, notificationId);
+            result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
+            break;
+          }
+          case NotificationType.CONFIG_UPDATE: {
+            int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(UpdateConfigNotification.class, configUpdate -> {
+              Map<String, Object> listenerMap = new HashMap<>();
+              listenerMap.put("Config-update", Collections.emptyMap());
+              invokeNotification(id, NotificationType.CONFIG_UPDATE, listenerMap);
             });
             notificationIdsTracker.put(id, notificationId);
             result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
@@ -370,6 +381,7 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
     public static final String TRACK="track";
     public static final String DECISION = "decision";
     public static final String LOG_EVENT = "logEvent";
+    public static final String CONFIG_UPDATE = "configUpdate";
   }
 
   public static class RequestParameterKey {
