@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
 import 'constants.dart';
 
-enum ListenerType { track, decision, logEvent }
+enum ListenerType { track, decision, logEvent, projectConfigUpdate }
 
 typedef MultiUseCallback = void Function(dynamic msg);
 typedef CancelListening = void Function();
