@@ -34,6 +34,7 @@ struct NotificationType {
     static let track = "track"
     static let decision = "decision"
     static let logEvent = "logEvent"
+    static let projectConfigUpdate = "projectConfigUpdate"
 }
 
 struct RequestParameterKey {
@@ -208,6 +209,11 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 notificationIdsTracker[id] = notificationId
                 result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
                 break
+            case NotificationType.projectConfigUpdate:
+                let notificationId = optimizelyClient.notificationCenter?.addDatafileChangeNotificationListener(datafileListener:  getProjectConfigUpdateCallback(id: id))
+                notificationIdsTracker[id] = notificationId
+                result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
+                break
             default:
                 result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             }
@@ -349,6 +355,19 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 "params"    : logEvent as Any
             ]
             SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
+        }
+        
+        return listener
+    }
+    
+    private func getProjectConfigUpdateCallback(id: Int) -> DatafileChangeListener {
+        
+        let listener : DatafileChangeListener = { datafile in
+            var listenerDict = [String : Any]()
+            if let datafileMap = try? JSONSerialization.jsonObject(with: datafile, options: []) as? [String: Any] {
+                listenerDict["datafile"] = datafileMap
+            }
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.projectConfigUpdate, RequestParameterKey.notificationPayload: listenerDict])
         }
         
         return listener
