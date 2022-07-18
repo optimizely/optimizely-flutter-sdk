@@ -2,6 +2,8 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
 # Run `pod lib lint optimizely_flutter_sdk.podspec` to validate before publishing.
 #
+
+# Please specify the right description here.
 Pod::Spec.new do |s|
   s.name             = 'optimizely_flutter_sdk'
   s.version          = '0.0.1'

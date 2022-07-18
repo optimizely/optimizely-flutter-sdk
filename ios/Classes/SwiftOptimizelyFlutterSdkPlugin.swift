@@ -65,22 +65,24 @@ struct SuccessMessage {
     static let listenerRemoved = "Listener removed successfully."
     static let decideCalled = "Decide called successfully."
 }
-
+//Sohail: There is one issue, can we make sure the types remain same, probably we will need to write unit test separately for type.
 struct TypeValue {
     static let string = "string"
     static let int = "int"
     static let double = "double"
     static let bool = "bool"
 }
-
+// document
 public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
-    
+    // add comment what's the purpose of it.
     var notificationIdsTracker = [Int: Int]()
+    // explanation. 
     var optimizelyClientsTracker = [String: OptimizelyClient?]()
+    // explanation. 
     var userContextsTracker = [String: OptimizelyUserContext?]()
     static var channel: FlutterMethodChannel!
     
-    
+    // document every method.
     public static func register(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftOptimizelyFlutterSdkPlugin()
@@ -151,6 +153,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
+        // for all switch case, can you please add separate methods, it will be more readable 
+        // and switch / case will explain what action is being performed.
         switch call.method {
             
         case API.initialize:
@@ -161,6 +165,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             }
             
             // Delete old user context
+            //Sohail? In which case we will need to delete old user context?
             userContextsTracker[sdkKey] = nil
             userContextsTracker.removeValue(forKey: sdkKey)
             
@@ -178,7 +183,6 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             }
             
         case API.addNotificationListener:
-            
             guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
                 result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
                 return
@@ -188,6 +192,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 return
             }
             switch type {
+                // do we have any config notification listener? 
             case NotificationType.decision:
                 let notificationId = optimizelyClient.notificationCenter?.addDecisionNotificationListener(decisionListener: getDecisionCallback(id: id))!
                 notificationIdsTracker[id] = notificationId
@@ -335,7 +340,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             result(FlutterMethodNotImplemented)
         }
     }
-    
+    // can we have a different class to manage this stuff.    
     private func getLogEventCallback(id: Int) -> LogEventListener {
         
         let listener : LogEventListener = {(url, logEvent) in
@@ -417,6 +422,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
 }
 
 // Extension to convert OptimizelyConfig to Map
+// I think we have it in existing SDK or can we jsonencode?
 extension OptimizelyConfig {
     var dict: [String: Any]? {
         return [

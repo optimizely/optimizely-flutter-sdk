@@ -1,9 +1,13 @@
+//Sohail: Add Copyright
 library optimizely_flutter_sdk;
 
 import 'dart:async';
 import './src/optimizely_client_wrapper.dart';
+
+// Is the OptimizelyFlutterSdk class visible to User?
 export './src/optimizely_client_wrapper.dart' show ListenerType;
 
+// Add description of this class.
 class OptimizelyFlutterSdk {
   final String _sdkKey;
   OptimizelyFlutterSdk(this._sdkKey);
@@ -35,6 +39,7 @@ class OptimizelyFlutterSdk {
 
   Future<Map<String, dynamic>> decide(String key,
       [List<String> options = const []]) async {
+    // Is the [key] used to distinguish reserved word.
     return await OptimizelyClientWrapper.decide(_sdkKey, [key], options);
   }
 

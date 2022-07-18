@@ -1,3 +1,5 @@
+// Copyright comment.
+// Can we group together consts into Type constants, Method, parameter keys etc ...
 class Constants {
   // Supported data types for attributes and eventTags
   static const String stringType = "string";
@@ -30,6 +32,7 @@ class Constants {
   static const String type = "type";
   static const String callBackListener = "callbackListener";
 
+  // Are these messsages exist in other SDKs?
   // SuccessMessage from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
   static const String instanceCreated =
       "Optimizely instance created successfully.";

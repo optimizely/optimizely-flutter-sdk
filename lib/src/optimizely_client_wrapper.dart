@@ -1,3 +1,4 @@
+// Copyright?
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
@@ -8,6 +9,7 @@ enum ListenerType { track, decision, logEvent }
 typedef MultiUseCallback = void Function(dynamic msg);
 typedef CancelListening = void Function();
 
+// Document each class and method.
 class OptimizelyClientWrapper {
   static const MethodChannel _channel = MethodChannel('optimizely_flutter_sdk');
   static int _nextCallbackId = 0;
@@ -66,11 +68,14 @@ class OptimizelyClientWrapper {
     }));
   }
 
+  //Sohail: i need to check this method canellistening.
   static Future<CancelListening> addNotificationListener(String sdkKey,
       MultiUseCallback callback, ListenerType listenerType) async {
     _channel.setMethodCallHandler(_methodCallHandler);
+    // This should be atmoic, otherwise overriden.
     int currentListenerId = _nextCallbackId++;
     _callbacksById[currentListenerId] = callback;
+    // add comment what logic you are using.
     var listenerTypeStr = listenerType
         .toString()
         .substring(listenerType.toString().indexOf('.') + 1);
@@ -79,6 +84,7 @@ class OptimizelyClientWrapper {
       Constants.id: currentListenerId,
       Constants.type: listenerTypeStr
     });
+    // add a comment what's the purpose.
     return () {
       _channel.invokeMethod(Constants.removeNotificationListenerMethod,
           {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
@@ -101,8 +107,11 @@ class OptimizelyClientWrapper {
     }
   }
 
+  //[Sohail]: Move this method to utils.
   static Map<String, dynamic> _covertToTypedMap(Map<String, dynamic> map) {
+    // return map and join map.isEmpty & Platform.isAndroid.
     if (map.isEmpty) {
+      // can it be NULL?
       return {};
     }
     // No alterations required for Android since types are successfully passed to its native code
@@ -111,6 +120,7 @@ class OptimizelyClientWrapper {
     }
 
     // Send type along with value so typecasting is easily possible
+    // Can you add logging here, in case any type we are missing here.
     Map<String, dynamic> typedMap = {};
     for (MapEntry e in map.entries) {
       if (e.value is String) {

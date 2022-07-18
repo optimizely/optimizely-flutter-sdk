@@ -1,3 +1,4 @@
+// copyright
 #import "OptimizelyFlutterSdkPlugin.h"
 #if __has_include(<optimizely_flutter_sdk/optimizely_flutter_sdk-Swift.h>)
 #import <optimizely_flutter_sdk/optimizely_flutter_sdk-Swift.h>
