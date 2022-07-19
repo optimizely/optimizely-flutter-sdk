@@ -2,6 +2,14 @@ group 'com.optimizely.optimizely_flutter_sdk'
 version '1.0'
 
 buildscript {
+
+    def version_name = System.getenv('TRAVIS_TAG')
+    if (version_name != null) {
+        rootProject.ext.version_name = version_name
+    } else {
+        rootProject.ext.version_name = 'debugVersion'
+    }
+
     repositories {
         google()
         mavenCentral()
@@ -23,8 +31,25 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 
+ext {
+    compile_sdk_version = 32
+    build_tools_version = "30.0.3"
+    min_sdk_version = 14
+    target_sdk_version = 29
+}
+
 android {
-    compileSdkVersion 31
+    compileSdkVersion compile_sdk_version
+    buildToolsVersion build_tools_version
+
+    defaultConfig {
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
+        versionCode 1
+        versionName version_name
+        buildConfigField "String", "CLIENT_VERSION", "\"$version_name\""
+        multiDexEnabled true
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -33,10 +58,7 @@ android {
     packagingOptions {
         exclude 'androidsupportmultidexversion.txt'
     }
-    defaultConfig {
-        minSdkVersion 16
-        multiDexEnabled true
-    }
+
     buildTypes {
         release {
             minifyEnabled false
