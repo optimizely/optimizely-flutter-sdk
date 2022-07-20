@@ -115,7 +115,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    /// Removes notification listeners to the optimizely client as requested
+    /// Removes notification listeners from the optimizely client as requested
     func removeNotificationListener(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
             result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
