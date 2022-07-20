@@ -24,7 +24,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-import static com.optimizely.ab.notification.DecisionNotification.FeatureVariableDecisionNotificationBuilder.SOURCE_INFO;
 
 import android.app.Activity;
 import android.content.Context;
@@ -42,6 +41,8 @@ import com.optimizely.ab.notification.UpdateConfigNotification;
 import com.optimizely.ab.optimizelyconfig.OptimizelyConfig;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecision;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.convertKeysCamelCaseToSnakeCase;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,7 +96,6 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
       case APIs.INITIALIZE: {
         // Delete old user context
         userContextsTracker.remove(sdkKey);
-        //String datafile = (String) arguments.get("datafile");
         // Creating new instance
         OptimizelyManager optimizelyManager = OptimizelyManager.builder()
                 .withEventDispatchInterval(60L, TimeUnit.SECONDS)
@@ -128,10 +128,10 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
           case NotificationType.DECISION: {
             int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(DecisionNotification.class, decisionNotification -> {
               Map<String, Object> notificationMap = new HashMap<>();
-              notificationMap.put("type", decisionNotification.getType());
-              notificationMap.put("user_id", decisionNotification.getUserId());
-              notificationMap.put("attributes", decisionNotification.getAttributes());
-              notificationMap.put("decision_info", convertKeysCamelCaseToSnakeCase(decisionNotification.getDecisionInfo()));
+              notificationMap.put(DecisionListenerKeys.TYPE, decisionNotification.getType());
+              notificationMap.put(DecisionListenerKeys.USER_ID, decisionNotification.getUserId());
+              notificationMap.put(DecisionListenerKeys.ATTRIBUTES, decisionNotification.getAttributes());
+              notificationMap.put(DecisionListenerKeys.DECISION_INFO, convertKeysCamelCaseToSnakeCase(decisionNotification.getDecisionInfo()));
               invokeNotification(id, NotificationType.DECISION, notificationMap);
             });
             notificationIdsTracker.put(id, notificationId);
@@ -141,10 +141,10 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
           case NotificationType.TRACK: {
             Map<String, Object> notificationMap = new HashMap<>();
             int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(TrackNotification.class, trackNotification -> {
-              notificationMap.put("event_key", trackNotification.getEventKey());
-              notificationMap.put("user_id", trackNotification.getUserId());
-              notificationMap.put("attributes", trackNotification.getAttributes());
-              notificationMap.put("event_tags", trackNotification.getEventTags());
+              notificationMap.put(TrackListenerKeys.EVENT_KEY, trackNotification.getEventKey());
+              notificationMap.put(TrackListenerKeys.USER_ID, trackNotification.getUserId());
+              notificationMap.put(TrackListenerKeys.ATTRIBUTES, trackNotification.getAttributes());
+              notificationMap.put(TrackListenerKeys.EVENT_TAGS, trackNotification.getEventTags());
               invokeNotification(id, NotificationType.TRACK, notificationMap);
             });
             notificationIdsTracker.put(id, notificationId);
@@ -156,9 +156,9 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
               ObjectMapper mapper = new ObjectMapper();
               Map<String, Object> eventParams = mapper.readValue(logEvent.getBody(), Map.class);
               Map<String, Object> listenerMap = new HashMap<>();
-              listenerMap.put("url", logEvent.getEndpointUrl());
-              listenerMap.put("http_verb", logEvent.getRequestMethod());
-              listenerMap.put("params", eventParams);
+              listenerMap.put(LogEventListenerKeys.URL, logEvent.getEndpointUrl());
+              listenerMap.put(LogEventListenerKeys.HTTP_VERB, logEvent.getRequestMethod());
+              listenerMap.put(LogEventListenerKeys.PARAMS, eventParams);
               invokeNotification(id, NotificationType.LOG_EVENT, listenerMap);
             });
             notificationIdsTracker.put(id, notificationId);
@@ -295,7 +295,7 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
 
         List<OptimizelyDecideOption> decideOptions = (List<OptimizelyDecideOption>) arguments.get(RequestParameterKey.DECIDE_OPTIONS);
 
-        Map<String, OptimizelyDecision> optimizelyDecisionsMap = new HashMap<>();
+        Map<String, OptimizelyDecision> optimizelyDecisionsMap;
 
         if (decideKeys.size() > 0) {
           optimizelyDecisionsMap = userContext.decideForKeys(decideKeys, decideOptions);
@@ -359,73 +359,5 @@ public class OptimizelyFlutterSdkPlugin implements FlutterPlugin, ActivityAware,
   @Override
   public void onDetachedFromActivity() {
 
-  }
-
-  private static Map<String, ?> convertKeysCamelCaseToSnakeCase(Map<String, ?> decisionInfo) {
-    Map<String, Object> decisionInfoCopy = new HashMap<>(decisionInfo);
-
-    if (decisionInfo.containsKey(SOURCE_INFO) && decisionInfo.get(SOURCE_INFO) instanceof Map) {
-      Map<String, String> sourceInfo = (Map<String, String>) decisionInfoCopy.get(SOURCE_INFO);
-      Map<String, String> sourceInfoCopy = new HashMap<>(sourceInfo);
-
-      for (String key : sourceInfo.keySet()) {
-        sourceInfoCopy.put(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key), sourceInfoCopy.remove(key));
-      }
-      decisionInfoCopy.remove(SOURCE_INFO);
-      decisionInfoCopy.put(SOURCE_INFO, sourceInfoCopy);
-    }
-
-    for (String key : decisionInfo.keySet()) {
-      decisionInfoCopy.put(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key), decisionInfoCopy.remove(key));
-    }
-    return decisionInfoCopy;
-  }
-
-  public static class APIs {
-    public static final String INITIALIZE = "initialize";
-    public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
-    public static final String CREATE_USER_CONTEXT="createUserContext";
-    public static final String SET_ATTRIBUTES="setAttributes";
-    public static final String TRACK_EVENT="trackEvent";
-    public static final String DECIDE="decide";
-    public static final String ADD_NOTIFICATION_LISTENER="addNotificationListener";
-    public static final String REMOVE_NOTIFICATION_LISTENER ="removeNotificationListener";
-  }
-
-  public static class NotificationType {
-    public static final String TRACK="track";
-    public static final String DECISION = "decision";
-    public static final String LOG_EVENT = "logEvent";
-    public static final String CONFIG_UPDATE = "projectConfigUpdate";
-  }
-
-  public static class RequestParameterKey {
-    public static final String SDK_KEY = "sdk_key";
-    public static final String USER_ID = "user_id";
-    public static final String NOTIFICATION_ID = "id";
-    public static final String NOTIFICATION_TYPE = "type";
-    public static final String NOTIFICATION_PAYLOAD = "payload";
-    public static final String ATTRIBUTES = "attributes";
-    public static final String DECIDE_KEYS = "keys";
-    public static final String DECIDE_OPTIONS = "optimizely_decide_option";
-    public static final String EVENT_KEY= "event_key";
-    public static final String EVENT_TAGS= "event_tags";
-  }
-
-  public static class ErrorMessage {
-    public static final String INVALID_PARAMS = "Invalid parameters provided.";
-    public static final String OPTIMIZELY_CONFIG_NOT_FOUND = "No optimizely config found.";
-    public static final String OPTIMIZELY_CLIENT_NOT_FOUND = "Optimizely client not found.";
-    public static final String USER_CONTEXT_NOT_FOUND = "User context not found.";
-  }
-
-  public static class SuccessMessage {
-    public static final String INSTANCE_CREATED = "Optimizely instance created successfully.";
-    public static final String OPTIMIZELY_CONFIG_FOUND = "Optimizely config found.";
-    public static final String USER_CONTEXT_CREATED = "User context created successfully.";
-    public static final String LISTENER_REMOVED = "Listener removed successfully.";
-    public static final String LISTENER_ADDED = "Listener added successfully.";
-    public static final String ATTRIBUTES_ADDED = "Attributes added successfully.";
-    public static final String EVENT_TRACKED = "Event Tracked successfully.";
   }
 }
