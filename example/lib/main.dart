@@ -49,10 +49,10 @@ class _MyAppState extends State<MyApp> {
 
     // To add decide listener
     var cancelDecideListener =
-        await flutterSDK.addNotificationListener((notification) {
+        await flutterSDK.addDecisionNotificationListener((notification) {
       print(notification);
       print("decide notification received");
-    }, ListenerType.decision);
+    });
 
     // Decide call
     response = await flutterSDK.decide('flag1');
@@ -62,10 +62,10 @@ class _MyAppState extends State<MyApp> {
 
     // To add track listener
     var cancelTrackListener =
-        await flutterSDK.addNotificationListener((notification) {
+        await flutterSDK.addTrackNotificationListener((notification) {
       print(notification);
       print("track notification received");
-    }, ListenerType.track);
+    });
 
     // Track call
     response = await flutterSDK.trackEvent("myevent", {
