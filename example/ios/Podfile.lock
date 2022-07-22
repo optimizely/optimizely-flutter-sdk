@@ -1,0 +1,29 @@
+PODS:
+  - Flutter (1.0.0)
+  - optimizely_flutter_sdk (0.0.1):
+    - Flutter
+    - OptimizelySwiftSDK (= 3.10.1)
+  - OptimizelySwiftSDK (3.10.1)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - optimizely_flutter_sdk (from `.symlinks/plugins/optimizely_flutter_sdk/ios`)
+
+SPEC REPOS:
+  trunk:
+    - OptimizelySwiftSDK
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  optimizely_flutter_sdk:
+    :path: ".symlinks/plugins/optimizely_flutter_sdk/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  optimizely_flutter_sdk: 9cfad4651fb23fe3fe71132de1c63c789645a24e
+  OptimizelySwiftSDK: 5db17cc54e4e7319fdb8424b72c1dabfd6e6c9e5
+
+PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea
+
+COCOAPODS: 1.11.3
