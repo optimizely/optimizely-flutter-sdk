@@ -22,6 +22,11 @@ Android and/or iOS.
    2. Configure the Flutter SDK and additional settings  
       ![](docs/intellij-settings-flutter.png)
 
+## Testing in Terminal
+
+1. To run [unit tests](https://docs.flutter.dev/cookbook/testing/unit/introduction) using terminal, simply use the following command:
+`flutter test test/optimizely_flutter_sdk_test.dart`
+
 ## Testing In IntelliJ
 
 1. Click Edit Configurations... in the Run/Debug configurations menu  
