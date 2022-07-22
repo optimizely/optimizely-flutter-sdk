@@ -81,8 +81,29 @@ class OptimizelyFlutterSdk {
     return await OptimizelyClientWrapper.decide(_sdkKey, [], options);
   }
 
+  Future<CancelListening> addDecisionNotificationListener(
+      MultiUseCallback callback) async {
+    return await _addNotificationListener(callback, ListenerType.decision);
+  }
+
+  Future<CancelListening> addTrackNotificationListener(
+      MultiUseCallback callback) async {
+    return await _addNotificationListener(callback, ListenerType.track);
+  }
+
+  Future<CancelListening> addUpdateConfigNotificationListener(
+      MultiUseCallback callback) async {
+    return await _addNotificationListener(
+        callback, ListenerType.projectConfigUpdate);
+  }
+
+  Future<CancelListening> addLogEventNotificationListener(
+      MultiUseCallback callback) async {
+    return await _addNotificationListener(callback, ListenerType.logEvent);
+  }
+
   /// Allows user to listen to supported notifications.
-  Future<CancelListening> addNotificationListener(
+  Future<CancelListening> _addNotificationListener(
       MultiUseCallback callback, ListenerType listenerType) async {
     return await OptimizelyClientWrapper.addNotificationListener(
         _sdkKey, callback, listenerType);
