@@ -19,6 +19,8 @@ import "package:flutter_test/flutter_test.dart";
 import "package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart";
 import "package:optimizely_flutter_sdk/src/constants.dart";
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
+import 'dart:io';
+import 'dart:convert';
 
 import 'test_utils.dart';
 
@@ -30,226 +32,16 @@ void main() {
   const String resultKey = "result";
   const String reasonKey = "reason";
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
-  const mockOptimizelyConfig = {
-    "sdkKey": testSDKKey,
-    "environmentKey": "production",
-    "attributes": [
-      {"id": "16921322086", "key": "attr_1"}
-    ],
-    "audiences": [
-      {
-        "id": "16902921321",
-        "conditions":
-            "[\"and\",[\"or\",[\"or\",{\"match\":\"exact\",\"name\":\"attr_1\",\"type\":\"custom_attribute\",\"value\":\"hola\"}]]]",
-        "name": "Audience1"
-      }
-    ],
-    "events": [
-      {
-        "experimentIds": ["16910084756", "16911963060"],
-        "id": "16911532385",
-        "key": "myevent"
-      }
-    ],
-    "revision": "130",
-    "experimentsMap": {
-      "ab_test1": {
-        "id": "16911963060",
-        "key": "ab_test1",
-        "audiences": "\"Audience1\"",
-        "variationsMap": {
-          "variation_1": {
-            "id": "16905941566",
-            "key": "variation_1",
-            "featureEnabled": true,
-            "variablesMap": {}
-          },
-          "variation_2": {
-            "id": "16927770169",
-            "key": "variation_2",
-            "featureEnabled": true,
-            "variablesMap": {}
-          }
-        }
-      },
-      "feature_2_test": {
-        "id": "16910084756",
-        "key": "feature_2_test",
-        "audiences": "\"Audience1\"",
-        "variationsMap": {
-          "variation_1": {
-            "id": "16925360560",
-            "key": "variation_1",
-            "featureEnabled": true,
-            "variablesMap": {}
-          },
-          "variation_2": {
-            "id": "16915611472",
-            "key": "variation_2",
-            "featureEnabled": true,
-            "variablesMap": {}
-          }
-        }
-      }
-    },
-    "featuresMap": {
-      "flag_ab_test1": {
-        "id": "12672",
-        "key": "flag_ab_test1",
-        "experimentRules": [
-          {
-            "id": "16911963060",
-            "key": "ab_test1",
-            "audiences": "\"Audience1\"",
-            "variationsMap": {
-              "variation_1": {
-                "id": "16905941566",
-                "key": "variation_1",
-                "featureEnabled": true,
-                "variablesMap": {}
-              },
-              "variation_2": {
-                "id": "16927770169",
-                "key": "variation_2",
-                "featureEnabled": true,
-                "variablesMap": {}
-              }
-            }
-          }
-        ],
-        "deliveryRules": [
-          {
-            "id": "default-rollout-12672-16935023792",
-            "key": "default-rollout-12672-16935023792",
-            "audiences": "",
-            "variationsMap": {
-              "off": {
-                "id": "35771",
-                "key": "off",
-                "featureEnabled": false,
-                "variablesMap": {}
-              }
-            }
-          }
-        ],
-        "experimentsMap": {
-          "ab_test1": {
-            "id": "16911963060",
-            "key": "ab_test1",
-            "audiences": "\"Audience1\"",
-            "variationsMap": {
-              "variation_1": {
-                "id": "16905941566",
-                "key": "variation_1",
-                "featureEnabled": true,
-                "variablesMap": {}
-              },
-              "variation_2": {
-                "id": "16927770169",
-                "key": "variation_2",
-                "featureEnabled": true,
-                "variablesMap": {}
-              }
-            }
-          }
-        },
-        "variablesMap": {}
-      },
-      "feature_2": {
-        "id": "16928980973",
-        "key": "feature_2",
-        "experimentRules": [
-          {
-            "id": "16910084756",
-            "key": "feature_2_test",
-            "audiences": "\"Audience1\"",
-            "variationsMap": {
-              "variation_1": {
-                "id": "16925360560",
-                "key": "variation_1",
-                "featureEnabled": true,
-                "variablesMap": {}
-              },
-              "variation_2": {
-                "id": "16915611472",
-                "key": "variation_2",
-                "featureEnabled": true,
-                "variablesMap": {}
-              }
-            }
-          }
-        ],
-        "deliveryRules": [
-          {
-            "id": "16924931120",
-            "key": "16924931120",
-            "audiences": "\"Audience1\"",
-            "variationsMap": {
-              "16931381940": {
-                "id": "16931381940",
-                "key": "16931381940",
-                "featureEnabled": true,
-                "variablesMap": {}
-              }
-            }
-          },
-          {
-            "id": "18234756110",
-            "key": "18234756110",
-            "audiences": "",
-            "variationsMap": {
-              "18244927831": {
-                "id": "18244927831",
-                "key": "18244927831",
-                "featureEnabled": true,
-                "variablesMap": {}
-              }
-            }
-          },
-          {
-            "id": "default-16917900798",
-            "key": "default-16917900798",
-            "audiences": "",
-            "variationsMap": {
-              "off": {
-                "id": "35770",
-                "key": "off",
-                "featureEnabled": false,
-                "variablesMap": {}
-              }
-            }
-          }
-        ],
-        "experimentsMap": {
-          "feature_2_test": {
-            "id": "16910084756",
-            "key": "feature_2_test",
-            "audiences": "\"Audience1\"",
-            "variationsMap": {
-              "variation_1": {
-                "id": "16925360560",
-                "key": "variation_1",
-                "featureEnabled": true,
-                "variablesMap": {}
-              },
-              "variation_2": {
-                "id": "16915611472",
-                "key": "variation_2",
-                "featureEnabled": true,
-                "variablesMap": {}
-              }
-            }
-          }
-        },
-        "variablesMap": {}
-      },
-    },
-    "datafile": "<JSON stringified version of datafile here>"
-  };
+  dynamic mockOptimizelyConfig;
 
   TestDefaultBinaryMessenger? tester;
 
   setUp(() async {
+    final optimizelyConfigJsonFile =
+        File('test_resources/OptimizelyConfig.json');
+    mockOptimizelyConfig =
+        jsonDecode(await optimizelyConfigJsonFile.readAsString());
+
     TestWidgetsFlutterBinding.ensureInitialized();
     OptimizelyClientWrapper.callbacksById = {};
     OptimizelyClientWrapper.nextCallbackId = 0;
@@ -425,15 +217,13 @@ void main() {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-        expect(sdk.addNotificationListener((_) => {}, ListenerType.decision),
-            completes);
+        expect(sdk.addDecisionNotificationListener((_) => {}), completes);
       });
     });
     group("removeNotificationListener()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var cancelListener =
-            sdk.addNotificationListener((_) => {}, ListenerType.decision);
+        var cancelListener = sdk.addDecisionNotificationListener((_) => {});
         expect(cancelListener, completes);
       });
     });
@@ -447,10 +237,10 @@ void main() {
       void Function(dynamic) callback = (msg) {
         notifications.add(msg);
       };
-      sdk.addNotificationListener(callback, ListenerType.decision);
-      sdk.addNotificationListener(callback, ListenerType.logEvent);
-      sdk.addNotificationListener(callback, ListenerType.projectConfigUpdate);
-      sdk.addNotificationListener(callback, ListenerType.track);
+      sdk.addDecisionNotificationListener(callback);
+      sdk.addLogEventNotificationListener(callback);
+      sdk.addUpdateConfigNotificationListener(callback);
+      sdk.addTrackNotificationListener(callback);
       TestUtils.sendTestNotifications(callHandler, 4);
       expect(notifications.length, equals(1));
       expect(TestUtils.testNotificationPayload(notifications), true);
@@ -460,18 +250,18 @@ void main() {
         () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      sdk.addNotificationListener((msg) {
+      sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.decision);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.logEvent);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.projectConfigUpdate);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.track);
+      });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestNotifications(callHandler, 4);
@@ -482,30 +272,30 @@ void main() {
     test("should receive notifications with several ListenerTypes", () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      sdk.addNotificationListener((msg) {
+      sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.decision);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.decision);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.logEvent);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.logEvent);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.projectConfigUpdate);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.projectConfigUpdate);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.track);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.track);
+      });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestNotifications(callHandler, 8);
@@ -518,31 +308,31 @@ void main() {
       var sdk1 = OptimizelyFlutterSdk(testSDKKey);
       var sdk2 = OptimizelyFlutterSdk(testSDKKey2);
 
-      sdk1.addNotificationListener((msg) {
+      sdk1.addDecisionNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.decision);
-      sdk1.addNotificationListener((msg) {
+      });
+      sdk1.addLogEventNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.logEvent);
-      sdk1.addNotificationListener((msg) {
+      });
+      sdk1.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.projectConfigUpdate);
-      sdk1.addNotificationListener((msg) {
+      });
+      sdk1.addTrackNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.track);
+      });
 
-      sdk2.addNotificationListener((msg) {
+      sdk2.addDecisionNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.decision);
-      sdk2.addNotificationListener((msg) {
+      });
+      sdk2.addLogEventNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.logEvent);
-      sdk2.addNotificationListener((msg) {
+      });
+      sdk2.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.projectConfigUpdate);
-      sdk2.addNotificationListener((msg) {
+      });
+      sdk2.addTrackNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.track);
+      });
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
@@ -556,34 +346,34 @@ void main() {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-      sdk.addNotificationListener((msg) {
+      sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.decision);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.logEvent);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.projectConfigUpdate);
-      sdk.addNotificationListener((msg) {
+      });
+      sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.track);
+      });
 
-      var cancel = await sdk.addNotificationListener((msg) {
+      var cancel = await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.decision);
+      });
       cancel();
-      cancel = await sdk.addNotificationListener((msg) {
+      cancel = await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.logEvent);
+      });
       cancel();
-      cancel = await sdk.addNotificationListener((msg) {
+      cancel = await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.projectConfigUpdate);
+      });
       cancel();
-      cancel = await sdk.addNotificationListener((msg) {
+      cancel = await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
-      }, ListenerType.track);
+      });
       cancel();
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
