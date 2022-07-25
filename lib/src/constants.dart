@@ -28,6 +28,10 @@ class Constants {
   static const String setAttributesMethod = "setAttributes";
   static const String trackEventMethod = "trackEvent";
   static const String decideMethod = "decide";
+  static const String setForcedDecision = "setForcedDecision";
+  static const String getForcedDecision = "getForcedDecision";
+  static const String removeForcedDecision = "removeForcedDecision";
+  static const String removeAllForcedDecisions = "removeAllForcedDecisions";
   static const String addNotificationListenerMethod = "addNotificationListener";
   static const String removeNotificationListenerMethod =
       "removeNotificationListener";
@@ -40,6 +44,9 @@ class Constants {
   static const String eventKey = "event_key";
   static const String eventTags = "event_tags";
   static const String keys = "keys";
+  static const String variationKey = "variation_key";
+  static const String flagKey = "flag_key";
+  static const String ruleKey = "rule_key";
   static const String optimizelyDecideOption = "optimizely_decide_option";
   static const String payload = "payload";
   static const String value = "value";

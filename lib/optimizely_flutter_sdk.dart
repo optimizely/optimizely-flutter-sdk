@@ -81,6 +81,30 @@ class OptimizelyFlutterSdk {
     return await OptimizelyClientWrapper.decide(_sdkKey, [], options);
   }
 
+  /// Sets the forced decision for a given decision context.
+  Future<Map<String, dynamic>> setForcedDecision(
+      String variationKey, flagKey, ruleKey) async {
+    return await OptimizelyClientWrapper.setForcedDecision(
+        _sdkKey, flagKey, ruleKey, variationKey);
+  }
+
+  /// Returns the forced decision for a given decision context.
+  Future<Map<String, dynamic>> getForcedDecision() async {
+    return await OptimizelyClientWrapper.getForcedDecision(_sdkKey);
+  }
+
+  /// Removes the forced decision for a given decision context.
+  Future<Map<String, dynamic>> removeForcedDecision(
+      String flagKey, ruleKey) async {
+    return await OptimizelyClientWrapper.removeForcedDecision(
+        _sdkKey, flagKey, ruleKey);
+  }
+
+  /// Removes all forced decisions bound to this user context.
+  Future<Map<String, dynamic>> removeAllForcedDecisions() async {
+    return await OptimizelyClientWrapper.removeAllForcedDecisions(_sdkKey);
+  }
+
   Future<CancelListening> addDecisionNotificationListener(
       MultiUseCallback callback) async {
     return await _addNotificationListener(callback, ListenerType.decision);

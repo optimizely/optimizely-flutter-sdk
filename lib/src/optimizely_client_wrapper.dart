@@ -89,6 +89,46 @@ class OptimizelyClientWrapper {
     }));
   }
 
+  /// Sets the forced decision for a given decision context.
+  static Future<Map<String, dynamic>> setForcedDecision(
+      String sdkKey, flagKey, ruleKey, variationKey) async {
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.setForcedDecision, {
+      Constants.sdkKey: sdkKey,
+      Constants.flagKey: flagKey,
+      Constants.ruleKey: ruleKey,
+      Constants.variationKey: variationKey,
+    }));
+  }
+
+  /// Returns the forced decision for a given decision context.
+  static Future<Map<String, dynamic>> getForcedDecision(String sdkKey) async {
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getForcedDecision, {
+      Constants.sdkKey: sdkKey,
+    }));
+  }
+
+  /// Removes the forced decision for a given decision context.
+  static Future<Map<String, dynamic>> removeForcedDecision(
+      String sdkKey, flagKey, ruleKey) async {
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.removeForcedDecision, {
+      Constants.sdkKey: sdkKey,
+      Constants.flagKey: flagKey,
+      Constants.ruleKey: ruleKey,
+    }));
+  }
+
+  /// Removes all forced decisions bound to this user context.
+  static Future<Map<String, dynamic>> removeAllForcedDecisions(
+      String sdkKey) async {
+    return Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
+      Constants.sdkKey: sdkKey,
+    }));
+  }
+
   /// Allows user to listen to supported notifications.
   static Future<CancelListening> addNotificationListener(String sdkKey,
       MultiUseCallback callback, ListenerType listenerType) async {
