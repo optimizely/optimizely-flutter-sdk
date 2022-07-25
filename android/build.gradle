@@ -2,16 +2,26 @@ group 'com.optimizely.optimizely_flutter_sdk'
 version '1.0'
 
 buildscript {
+
+    def version_name = System.getenv('TRAVIS_TAG')
+    if (version_name != null) {
+        rootProject.ext.version_name = version_name
+    } else {
+        rootProject.ext.version_name = 'debugVersion'
+    }
+
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:7.2.1'
     }
 }
-
+configurations {
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+}
 rootProject.allprojects {
     repositories {
         google()
@@ -21,15 +31,52 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 
+ext {
+    compile_sdk_version = 32
+    build_tools_version = "30.0.3"
+    min_sdk_version = 14
+    target_sdk_version = 29
+}
+
 android {
-    compileSdkVersion 31
+    compileSdkVersion compile_sdk_version
+    buildToolsVersion build_tools_version
+
+    defaultConfig {
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
+        versionCode 1
+        versionName version_name
+        buildConfigField "String", "CLIENT_VERSION", "\"$version_name\""
+        multiDexEnabled true
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude 'androidsupportmultidexversion.txt'
+    }
 
-    defaultConfig {
-        minSdkVersion 16
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+
+dependencies {
+    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+    implementation group: 'org.slf4j', name: 'slf4j-android', version: '1.7.25'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10"
+    implementation "com.optimizely.ab:android-sdk:3.13.2"
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation ('com.google.guava:guava:19.0') {
+        exclude group:'com.google.guava', module:'listenablefuture'
     }
 }
