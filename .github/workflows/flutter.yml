@@ -31,8 +31,6 @@ jobs:
           flutter-version: '3.0.5'
       - run: flutter pub get
       - run: flutter test
-      - run: flutter build apk
-      - run: flutter build appbundle
   
   build_test_ios:
     runs-on: macos-latest
@@ -45,4 +43,3 @@ jobs:
         architecture: x64
     - run: flutter pub get
     - run: flutter test
-    - run: flutter build ios --release --no-codesign
