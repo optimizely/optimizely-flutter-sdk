@@ -272,7 +272,7 @@ public class OptimizelyFlutterClient {
     public Map<String, ?> createResponse(Boolean success, Object result, String reason) {
         Map<String, Object> response = new HashMap<>();
         response.put(ResponseKey.SUCCESS, success);
-        response.put(ResponseKey.RESULT"result", result);
+        response.put(ResponseKey.RESULT, result);
         response.put(ResponseKey.REASON, reason);
 
         return response;
