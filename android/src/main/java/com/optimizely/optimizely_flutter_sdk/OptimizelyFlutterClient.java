@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import io.flutter.plugin.common.MethodChannel.Result;
 
 import com.optimizely.ab.OptimizelyUserContext;
+import com.optimizely.ab.OptimizelyDecisionContext;
+import com.optimizely.ab.OptimizelyForcedDecision;
 import com.optimizely.ab.android.sdk.OptimizelyClient;
 
 import java.util.HashMap;
