@@ -123,6 +123,82 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(true, s, ""));
     }
 
+    protected void setForcedDecision(String sdkKey, String flagKey, String ruleKey, String variationKey, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+
+        if (flagKey == null || variationKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+        
+        OptimizelyDecisionContext optimizelyDecisionContext = new OptimizelyDecisionContext(flagKey, ruleKey);
+        OptimizelyForcedDecision optimizelyForcedDecision = new OptimizelyForcedDecision(variationKey);
+        if (userContext.setForcedDecision(optimizelyDecisionContext, optimizelyForcedDecision)) {
+            result.success(createResponse(true, SuccessMessage.FORCED_DECISION_SET));
+        }
+
+        result.success(createResponse(false, ""));
+    }
+
+    protected void getForcedDecision(String sdkKey, String flagKey, String ruleKey, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+
+        if (flagKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+        
+        OptimizelyDecisionContext optimizelyDecisionContext = new OptimizelyDecisionContext(flagKey, ruleKey);
+        OptimizelyForcedDecision forcedDecision = userContext.getForcedDecision(optimizelyDecisionContext);
+        if (forcedDecision != null) {
+            result.success(createResponse(true, forcedDecision.getVariationKey(), ""));
+        }
+
+        result.success(createResponse(false, ""));
+    }
+
+    protected void removeForcedDecision(String sdkKey, String flagKey, String ruleKey, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+
+        if (flagKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+        
+        OptimizelyDecisionContext optimizelyDecisionContext = new OptimizelyDecisionContext(flagKey, ruleKey);
+        if (userContext.removeForcedDecision(optimizelyDecisionContext)) {
+            result.success(createResponse(true, SuccessMessage.REMOVED_FORCED_DECISION));
+        }
+
+        result.success(createResponse(false, ""));
+    }
+
+    protected void removeAllForcedDecisions(String sdkKey, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+
+        if (userContext.removeAllForcedDecisions()) {
+            result.success(createResponse(true, SuccessMessage.REMOVED_ALL_FORCED_DECISION));
+        }
+
+        result.success(createResponse(false, ""));
+    }
+
     protected void trackEvent(String sdkKey, String eventKey, Map<String, Object> eventTags, @NonNull Result result) {
         OptimizelyUserContext userContext = getUserContext(sdkKey);
         if (userContext == null) {
@@ -193,9 +269,9 @@ public class OptimizelyFlutterClient {
 
     public Map<String, ?> createResponse(Boolean success, Object result, String reason) {
         Map<String, Object> response = new HashMap<>();
-        response.put("success", success);
-        response.put("result", result);
-        response.put("reason", reason);
+        response.put(ResponseKey.SUCCESS, success);
+        response.put(ResponseKey.RESULT"result", result);
+        response.put(ResponseKey.REASON, reason);
 
         return response;
     }

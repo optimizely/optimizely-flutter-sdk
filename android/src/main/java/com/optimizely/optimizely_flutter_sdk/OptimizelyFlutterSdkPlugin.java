@@ -105,6 +105,32 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         decide(sdkKey, decideKeys, decideOptions, result);
         break;
       }
+      case APIs.SET_FORCED_DECISION: {
+        String flagKey = (String) arguments.get(RequestParameterKey.FLAG_KEY);
+        String ruleKey = (String) arguments.get(RequestParameterKey.RULE_KEY);
+        String variationKey = (String) arguments.get(RequestParameterKey.VARIATION_KEY);
+
+        setForcedDecision(sdkKey, flagKey, ruleKey, variationKey, result);
+        break;
+      }
+      case APIs.GET_FORCED_DECISION: {
+        String flagKey = (String) arguments.get(RequestParameterKey.FLAG_KEY);
+        String ruleKey = (String) arguments.get(RequestParameterKey.RULE_KEY);
+
+        getForcedDecision(sdkKey, flagKey, ruleKey, result);
+        break;
+      }
+      case APIs.REMOVE_FORCED_DECISION: {
+        String flagKey = (String) arguments.get(RequestParameterKey.FLAG_KEY);
+        String ruleKey = (String) arguments.get(RequestParameterKey.RULE_KEY);
+
+        removeForcedDecision(sdkKey, flagKey, ruleKey, result);
+        break;
+      }
+      case APIs.REMOVE_ALL_FORCED_DECISIONS: {
+        removeAllForcedDecisions(sdkKey, result);
+        break;
+      }
       default:
         result.notImplemented();
     }
