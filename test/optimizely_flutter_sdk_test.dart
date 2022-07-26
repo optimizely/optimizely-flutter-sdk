@@ -81,6 +81,26 @@ void main() {
             "success": true,
             "reason": Constants.decideCalled,
           };
+        case Constants.setForcedDecision:
+          return {
+            "success": true,
+            "reason": Constants.forcedDecisionSet,
+          };
+        case Constants.getForcedDecision:
+          return {
+            "success": true,
+            "variation_key": "123",
+          };
+        case Constants.removeForcedDecision:
+          return {
+            "success": true,
+            "reason": Constants.removeForcedDecision,
+          };
+        case Constants.removeAllForcedDecisions:
+          return {
+            "success": true,
+            "reason": Constants.removeAllForcedDecisions,
+          };
         case Constants.addNotificationListenerMethod:
           return {
             "success": true,
@@ -211,6 +231,50 @@ void main() {
         expect(result[successKey], equals(true));
         expect(result[resultKey], isNull);
         expect(result[reasonKey], equals(Constants.decideCalled));
+      });
+    });
+    group("setForcedDecision()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.setForcedDecision("flagKey", "ruleKey", "123");
+
+        expect(result[successKey], equals(true));
+        expect(result[resultKey], isNull);
+        expect(result[reasonKey], equals(Constants.forcedDecisionSet));
+      });
+    });
+    group("getForcedDecision()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.getForcedDecision();
+
+        expect(result[successKey], equals(true));
+        expect(result[resultKey], isNull);
+        expect(result["variation_key"], equals("123"));
+      });
+    });
+    group("removeForcedDecision()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.removeForcedDecision("flagKey", "ruleKey");
+
+        expect(result[successKey], equals(true));
+        expect(result[resultKey], isNull);
+        expect(result[reasonKey], equals(Constants.removeForcedDecision));
+      });
+    });
+    group("removeAllForcedDecisions()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.removeAllForcedDecisions();
+
+        expect(result[successKey], equals(true));
+        expect(result[resultKey], isNull);
+        expect(result[reasonKey], equals(Constants.removeAllForcedDecisions));
       });
     });
     group("addNotificationListener()", () {

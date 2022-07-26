@@ -90,8 +90,8 @@ class OptimizelyClientWrapper {
   }
 
   /// Sets the forced decision for a given decision context.
-  static Future<Map<String, dynamic>> setForcedDecision(
-      String sdkKey, flagKey, ruleKey, variationKey) async {
+  static Future<Map<String, dynamic>> setForcedDecision(String sdkKey,
+      String flagKey, String ruleKey, String variationKey) async {
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setForcedDecision, {
       Constants.sdkKey: sdkKey,
@@ -111,7 +111,7 @@ class OptimizelyClientWrapper {
 
   /// Removes the forced decision for a given decision context.
   static Future<Map<String, dynamic>> removeForcedDecision(
-      String sdkKey, flagKey, ruleKey) async {
+      String sdkKey, String flagKey, String ruleKey) async {
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeForcedDecision, {
       Constants.sdkKey: sdkKey,

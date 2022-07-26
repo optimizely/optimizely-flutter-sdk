@@ -83,7 +83,10 @@ class OptimizelyFlutterSdk {
 
   /// Sets the forced decision for a given decision context.
   Future<Map<String, dynamic>> setForcedDecision(
-      String variationKey, flagKey, ruleKey) async {
+    String flagKey,
+    String ruleKey,
+    String variationKey,
+  ) async {
     return await OptimizelyClientWrapper.setForcedDecision(
         _sdkKey, flagKey, ruleKey, variationKey);
   }
@@ -95,7 +98,7 @@ class OptimizelyFlutterSdk {
 
   /// Removes the forced decision for a given decision context.
   Future<Map<String, dynamic>> removeForcedDecision(
-      String flagKey, ruleKey) async {
+      String flagKey, String ruleKey) async {
     return await OptimizelyClientWrapper.removeForcedDecision(
         _sdkKey, flagKey, ruleKey);
   }

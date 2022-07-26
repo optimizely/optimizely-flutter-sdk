@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
 
     // Set attributes
     response = await flutterSDK.setAttributes({
-      "age": 20,
+      "age": 5,
       "doubleValue": 12.12,
       "boolValue": false,
       "stringValue": "121"
@@ -56,6 +56,33 @@ class _MyAppState extends State<MyApp> {
 
     // Decide call
     response = await flutterSDK.decide('flag1');
+
+    // should return following response without forced decision
+    // flagKey: flag1
+    // ruleKey: default-rollout-7371-20896892800
+    // variationKey: off
+
+    // Setting forced decision
+    flutterSDK.setForcedDecision("flag1", "flag1_experiment", "variation_a");
+
+    // Decide call
+    response = await flutterSDK.decide('flag1');
+
+    // should return following response with forced decision
+    // flagKey: flag1
+    // ruleKey: flag1_experiment
+    // variationKey: variation_a
+
+    // removing forced decision
+    flutterSDK.removeForcedDecision("flag1", "flag1_experiment");
+
+    // Decide call
+    response = await flutterSDK.decide('flag1');
+
+    // should return original response without forced decision
+    // flagKey: flag1
+    // ruleKey: default-rollout-7371-20896892800
+    // variationKey: off
 
     // To cancel decide listener
     // cancelDecideListener();

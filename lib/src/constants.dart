@@ -63,4 +63,9 @@ class Constants {
   static const String listenerAdded = "Listener added successfully.";
   static const String listenerRemoved = "Listener removed successfully.";
   static const String decideCalled = "Decide called successfully.";
+  static const String forcedDecisionSet = "Forced decision set successfully.";
+  static const String forcedDecisionRemoved =
+      "Forced decision removed successfully.";
+  static const String allForcedDecisionsRemoved =
+      "All Forced decisions removed successfully.";
 }
