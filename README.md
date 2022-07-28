@@ -7,6 +7,44 @@ Android and/or iOS.
 
 ## Getting Started
 
+### Using the SDK
+Refer to the [Flutter SDK developer documentation](https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/install-sdk-flutter) for instructions on getting started with using the SDK.
+
+### Requirements
+
+See the [pubspec.yaml](https://github.com/optimizely/optimizely-flutter-sdk/blob/master/pubspec.yaml) file for Flutter version requirements.
+
+On the Android platform, the SDK requires a minimum SDK version of 21.
+
+On the iOS platform, the SDK requires a minimum version of 10.0.
+
+Other Flutter platforms are not currently supported by this SDK.
+
+### Installing the SDK
+
+To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
+
+```
+   optimizely_flutter_sdk: ^1.0.0
+```
+
+Then, import the package in your application code:
+
+```
+   import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+```
+
+### Samples
+
+A sample code for SDK initialization and experiments:
+
+```
+   var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
+   var response = await flutterSDK.initializeClient();
+```
+
+### Development
+
 1. [Install Dart](https://dart.dev/get-dart#install) for your platform.
 2. Configure your IDE to point to the Dart SDK directory listed from the installation instructions. <br/> e.g. Windows: C:\tools\dart-sdk
 3. [Install Flutter](https://docs.flutter.dev/get-started/install) for your platform.
