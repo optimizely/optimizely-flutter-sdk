@@ -37,10 +37,10 @@ class _MyAppState extends State<MyApp> {
     var randomUserName = "${rng.nextInt(1000)}";
 
     // Create user context
-    response = await flutterSDK.createUserContext(randomUserName);
+    var userContext = await flutterSDK.createUserContext(randomUserName);
 
     // Set attributes
-    response = await flutterSDK.setAttributes({
+    response = await userContext!.setAttributes({
       "age": 5,
       "doubleValue": 12.12,
       "boolValue": false,
@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // Decide call
-    response = await flutterSDK.decide('flag1');
+    response = await userContext.decide('flag1');
 
     // should return following response without forced decision
     // flagKey: flag1
@@ -63,10 +63,12 @@ class _MyAppState extends State<MyApp> {
     // variationKey: off
 
     // Setting forced decision
-    flutterSDK.setForcedDecision("flag1", "flag1_experiment", "variation_a");
+    userContext.setForcedDecision(
+        OptimizelyDecisionContext("flag1", "flag1_experiment"),
+        OptimizelyForcedDecision("variation_a"));
 
     // Decide call
-    response = await flutterSDK.decide('flag1');
+    response = await userContext.decide('flag1');
 
     // should return following response with forced decision
     // flagKey: flag1
@@ -74,10 +76,11 @@ class _MyAppState extends State<MyApp> {
     // variationKey: variation_a
 
     // removing forced decision
-    flutterSDK.removeForcedDecision("flag1", "flag1_experiment");
+    userContext.removeForcedDecision(
+        OptimizelyDecisionContext("flag1", "flag1_experiment"));
 
     // Decide call
-    response = await flutterSDK.decide('flag1');
+    response = await userContext.decide('flag1');
 
     // should return original response without forced decision
     // flagKey: flag1
@@ -95,7 +98,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // Track call
-    response = await flutterSDK.trackEvent("myevent", {
+    response = await userContext.trackEvent("myevent", {
       "age": 20,
       "doubleValue": 12.12,
       "boolValue": false,

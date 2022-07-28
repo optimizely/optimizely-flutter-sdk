@@ -14,26 +14,8 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
-import "package:flutter/services.dart";
-import "package:optimizely_flutter_sdk/src/constants.dart";
+class OptimizelyForcedDecision {
+  String variationKey;
 
-class TestUtils {
-  static sendTestNotifications(
-      Function(MethodCall message) handler, int count) {
-    for (var i = 0; i < count; i++) {
-      handler(MethodCall(Constants.requestCallBackListener, {
-        Constants.requestID: i,
-        Constants.requestPayload: {"payload": i}
-      }));
-    }
-  }
-
-  static bool testNotificationPayload(List notifications) {
-    for (var i = 0; i < notifications.length; i++) {
-      if (notifications[i]["payload"] != i) {
-        return false;
-      }
-    }
-    return true;
-  }
+  OptimizelyForcedDecision(this.variationKey);
 }

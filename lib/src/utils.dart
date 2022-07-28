@@ -30,29 +30,29 @@ class Utils {
     for (MapEntry e in map.entries) {
       if (e.value is String) {
         typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.stringType
+          Constants.requestValue: e.value,
+          Constants.requestType: Constants.stringType
         };
         continue;
       }
       if (e.value is double) {
         typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.doubleType
+          Constants.requestValue: e.value,
+          Constants.requestType: Constants.doubleType
         };
         continue;
       }
       if (e.value is int) {
         typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.intType
+          Constants.requestValue: e.value,
+          Constants.requestType: Constants.intType
         };
         continue;
       }
       if (e.value is bool) {
         typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.boolType
+          Constants.requestValue: e.value,
+          Constants.requestType: Constants.boolType
         };
         continue;
       }
