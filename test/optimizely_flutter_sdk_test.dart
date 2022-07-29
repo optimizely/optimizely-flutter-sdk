@@ -18,6 +18,7 @@ import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart";
 import "package:optimizely_flutter_sdk/src/constants.dart";
+import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -202,11 +203,11 @@ void main() {
         var userContext = await sdk.createUserContext(userId);
         var decideKey = "decide-key";
 
-        var result = await userContext!.decide(decideKey);
+        var response = await userContext!.decide(decideKey);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason], Constants.decideCalled);
+        expect(response.success, equals(true));
+        expect(response.decisions.length, equals(0));
+        expect(response.reason, Constants.decideCalled);
       });
     });
     group("decideForKeys()", () {
@@ -215,12 +216,11 @@ void main() {
         var userContext = await sdk.createUserContext(userId);
         var decideKeys = ["decide-key-1", "decide-key-2"];
 
-        var result = await userContext!.decideForKeys(decideKeys);
+        var response = await userContext!.decideForKeys(decideKeys);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(
-            result[Constants.responseReason], equals(Constants.decideCalled));
+        expect(response.success, equals(true));
+        expect(response.decisions.length, equals(0));
+        expect(response.reason, Constants.decideCalled);
       });
     });
     group("decideAll()", () {
@@ -228,12 +228,11 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var result = await userContext!.decideAll();
+        var response = await userContext!.decideAll();
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(
-            result[Constants.responseReason], equals(Constants.decideCalled));
+        expect(response.success, equals(true));
+        expect(response.decisions.length, equals(0));
+        expect(response.reason, Constants.decideCalled);
       });
     });
     group("setForcedDecision()", () {

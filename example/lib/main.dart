@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // Decide call
-    response = await userContext.decide('flag1');
+    var decideResponse = await userContext.decide('flag1');
 
     // should return following response without forced decision
     // flagKey: flag1
@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
         OptimizelyForcedDecision("variation_a"));
 
     // Decide call
-    response = await userContext.decide('flag1');
+    decideResponse = await userContext.decide('flag1');
 
     // should return following response with forced decision
     // flagKey: flag1
@@ -80,7 +80,7 @@ class _MyAppState extends State<MyApp> {
         OptimizelyDecisionContext("flag1", "flag1_experiment"));
 
     // Decide call
-    response = await userContext.decide('flag1');
+    decideResponse = await userContext.decide('flag1');
 
     // should return original response without forced decision
     // flagKey: flag1

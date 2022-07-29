@@ -15,6 +15,7 @@
 ///**************************************************************************/
 
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
 import '../constants.dart';
 import '../utils.dart';
 import 'optimizely_decision_context.dart';
@@ -50,33 +51,33 @@ class OptimizelyUserContext {
   }
 
   /// Returns a decision result for a given flag key and a user context, which contains all data required to deliver the flag or experiment.
-  Future<Map<String, dynamic>> decide(String key,
+  Future<DecideResponse> decide(String key,
       [List<String> options = const []]) async {
     // passing key as an array since decide has a single generic implementation which takes array of keys as an argument
     return await _decide([key], options);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<Map<String, dynamic>> decideForKeys(
+  Future<DecideResponse> decideForKeys(
       [List<String> keys = const [], List<String> options = const []]) async {
     return await _decide(keys, options);
   }
 
   /// Returns a key-map of decision results for all active flag keys.
-  Future<Map<String, dynamic>> decideAll(
-      [List<String> options = const []]) async {
+  Future<DecideResponse> decideAll([List<String> options = const []]) async {
     return await _decide(options);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<Map<String, dynamic>> _decide(
+  Future<DecideResponse> _decide(
       [List<String> keys = const [], List<String> options = const []]) async {
-    return Map<String, dynamic>.from(
+    var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
       Constants.requestSDKKey: _sdkKey,
       Constants.requestKeys: keys,
       Constants.requestOptimizelyDecideOption: options
     }));
+    return DecideResponse(result);
   }
 
   /// Sets the forced decision for a given decision context.
