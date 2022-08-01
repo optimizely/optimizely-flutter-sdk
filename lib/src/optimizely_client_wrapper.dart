@@ -16,6 +16,7 @@
 
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'constants.dart';
 import 'utils.dart';
@@ -32,10 +33,11 @@ class OptimizelyClientWrapper {
   static Map<int, MultiUseCallback> callbacksById = {};
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
-  static Future<Map<String, dynamic>> initializeClient(String sdkKey) async {
+  static Future<BaseResponse> initializeClient(String sdkKey) async {
     _channel.setMethodCallHandler(methodCallHandler);
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
+    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
         Constants.initializeMethod, {Constants.requestSDKKey: sdkKey}));
+    return BaseResponse(result);
   }
 
   /// Returns a snapshot of the current project configuration.
@@ -51,7 +53,7 @@ class OptimizelyClientWrapper {
   static Future<OptimizelyUserContext?> createUserContext(
       String sdkKey, String userId,
       [Map<String, dynamic> attributes = const {}]) async {
-    var result = Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.createUserContextMethod, {
       Constants.requestSDKKey: sdkKey,
       Constants.requestUserID: userId,
@@ -80,7 +82,7 @@ class OptimizelyClientWrapper {
     callbacksById[currentListenerId] = callback;
     // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
     // and returns the valid string value `logEvent`
-    var listenerTypeStr = listenerType
+    final listenerTypeStr = listenerType
         .toString()
         .substring(listenerType.toString().indexOf('.') + 1);
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
@@ -101,8 +103,8 @@ class OptimizelyClientWrapper {
   static Future<void> methodCallHandler(MethodCall call) async {
     switch (call.method) {
       case Constants.requestCallBackListener:
-        var id = call.arguments[Constants.requestID];
-        var payload = call.arguments[Constants.requestPayload];
+        final id = call.arguments[Constants.requestID];
+        final payload = call.arguments[Constants.requestPayload];
         if (id is int && payload != null && callbacksById.containsKey(id)) {
           callbacksById[id]!(payload);
         }

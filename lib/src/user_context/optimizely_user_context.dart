@@ -15,7 +15,9 @@
 ///**************************************************************************/
 
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
 import '../constants.dart';
 import '../utils.dart';
 import 'optimizely_decision_context.dart';
@@ -30,24 +32,25 @@ class OptimizelyUserContext {
   OptimizelyUserContext(this._sdkKey, this._channel);
 
   /// Sets attributes for the user context.
-  Future<Map<String, dynamic>> setAttributes(
-      Map<String, dynamic> attributes) async {
-    return Map<String, dynamic>.from(
+  Future<BaseResponse> setAttributes(Map<String, dynamic> attributes) async {
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setAttributesMethod, {
       Constants.requestSDKKey: _sdkKey,
       Constants.requestAttributes: Utils.covertToTypedMap(attributes)
     }));
+    return BaseResponse(result);
   }
 
   /// Tracks an event.
-  Future<Map<String, dynamic>> trackEvent(String eventKey,
+  Future<BaseResponse> trackEvent(String eventKey,
       [Map<String, dynamic> eventTags = const {}]) async {
-    return Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.trackEventMethod, {
       Constants.requestSDKKey: _sdkKey,
       Constants.requestEventKey: eventKey,
       Constants.requestEventTags: Utils.covertToTypedMap(eventTags)
     }));
+    return BaseResponse(result);
   }
 
   /// Returns a decision result for a given flag key and a user context, which contains all data required to deliver the flag or experiment.
@@ -81,8 +84,7 @@ class OptimizelyUserContext {
   }
 
   /// Sets the forced decision for a given decision context.
-  Future<Map<String, dynamic>> setForcedDecision(
-      OptimizelyDecisionContext context,
+  Future<BaseResponse> setForcedDecision(OptimizelyDecisionContext context,
       OptimizelyForcedDecision decision) async {
     Map<String, dynamic> request = {
       Constants.requestSDKKey: _sdkKey,
@@ -92,20 +94,22 @@ class OptimizelyUserContext {
     if (context.ruleKey != null) {
       request[Constants.requestRuleKey] = context.ruleKey;
     }
-    return Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setForcedDecision, request));
+    return BaseResponse(result);
   }
 
   /// Returns the forced decision for a given decision context.
-  Future<Map<String, dynamic>> getForcedDecision() async {
-    return Map<String, dynamic>.from(
+  Future<GetForcedDecisionResponse> getForcedDecision() async {
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.getForcedDecision, {
       Constants.requestSDKKey: _sdkKey,
     }));
+    return GetForcedDecisionResponse(result);
   }
 
   /// Removes the forced decision for a given decision context.
-  Future<Map<String, dynamic>> removeForcedDecision(
+  Future<BaseResponse> removeForcedDecision(
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
       Constants.requestSDKKey: _sdkKey,
@@ -114,15 +118,17 @@ class OptimizelyUserContext {
     if (context.ruleKey != null) {
       request[Constants.requestRuleKey] = context.ruleKey;
     }
-    return Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeForcedDecision, request));
+    return BaseResponse(result);
   }
 
   /// Removes all forced decisions bound to this user context.
-  Future<Map<String, dynamic>> removeAllForcedDecisions() async {
-    return Map<String, dynamic>.from(
+  Future<BaseResponse> removeAllForcedDecisions() async {
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
       Constants.requestSDKKey: _sdkKey,
     }));
+    return BaseResponse(result);
   }
 }

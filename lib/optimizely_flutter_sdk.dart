@@ -17,6 +17,8 @@
 library optimizely_flutter_sdk;
 
 import 'dart:async';
+import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+
 import './src/optimizely_client_wrapper.dart';
 import 'src/user_context/optimizely_user_context.dart';
 
@@ -38,7 +40,7 @@ class OptimizelyFlutterSdk {
   OptimizelyFlutterSdk(this._sdkKey);
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
-  Future<Map<String, dynamic>> initializeClient() async {
+  Future<BaseResponse> initializeClient() async {
     return await OptimizelyClientWrapper.initializeClient(_sdkKey);
   }
 

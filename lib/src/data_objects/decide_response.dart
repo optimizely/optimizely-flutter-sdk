@@ -39,18 +39,24 @@ class Decision {
     if (json[Constants.requestEnabled] is bool) {
       enabled = json[Constants.requestEnabled];
     }
-    if (json[Constants.requestUserID] is String) {
-      userContext[Constants.requestUserID] = json[Constants.requestUserID];
+    if (json[Constants.requestUserContext] is Map<dynamic, dynamic>) {
+      Map<String, dynamic> _userContext =
+          Map<String, dynamic>.from(json[Constants.requestUserContext]);
+      if (_userContext[Constants.requestUserID] is String) {
+        userContext[Constants.requestUserID] =
+            _userContext[Constants.requestUserID];
+      }
+      if (_userContext[Constants.requestAttributes] is Map<dynamic, dynamic>) {
+        userContext[Constants.requestAttributes] = Map<String, dynamic>.from(
+            _userContext[Constants.requestAttributes]);
+      }
     }
-    if (json[Constants.requestAttributes] is Map<String, dynamic>) {
-      userContext[Constants.requestAttributes] =
-          json[Constants.requestAttributes];
+
+    if (json[Constants.requestVariables] is Map<dynamic, dynamic>) {
+      variables = Map<String, dynamic>.from(json[Constants.requestVariables]);
     }
-    if (json[Constants.requestVariables] is Map<String, dynamic>) {
-      variables = json[Constants.requestVariables];
-    }
-    if (json[Constants.requestReasons] is List<String>) {
-      reasons = json[Constants.requestReasons];
+    if (json[Constants.requestReasons] is List<dynamic>) {
+      reasons = List<String>.from(json[Constants.requestReasons]);
     }
   }
 }
@@ -59,14 +65,15 @@ class DecideResponse extends BaseResponse {
   List<Decision> decisions = [];
 
   DecideResponse(Map<String, dynamic> json) : super(json) {
-    if (json[Constants.responseResult] is Map<String, dynamic>) {
-      Map<String, dynamic> _decisions = json[Constants.responseResult];
-      _decisions.forEach((key, value) {
-        if (value is Map<String, dynamic>) {
-          var decision = Decision(value);
+    if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
+      var _decisions =
+          Map<String, dynamic>.from(json[Constants.responseResult]);
+      for (final value in _decisions.values) {
+        if (value is Map<dynamic, dynamic>) {
+          var decision = Decision(Map<String, dynamic>.from(value));
           decisions.add(decision);
         }
-      });
+      }
     }
   }
 }
