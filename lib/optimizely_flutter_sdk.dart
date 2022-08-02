@@ -18,8 +18,15 @@ library optimizely_flutter_sdk;
 
 import 'dart:async';
 import './src/optimizely_client_wrapper.dart';
+import 'src/user_context/optimizely_user_context.dart';
 
+export 'src/user_context/optimizely_user_context.dart'
+    show OptimizelyUserContext;
 export './src/optimizely_client_wrapper.dart' show ListenerType;
+export './src/user_context/optimizely_forced_decision.dart'
+    show OptimizelyForcedDecision;
+export 'src/user_context/optimizely_decision_context.dart'
+    show OptimizelyDecisionContext;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
@@ -43,69 +50,10 @@ class OptimizelyFlutterSdk {
   /// Creates a context of the user for which decision APIs will be called.
   ///
   /// A user context will only be created successfully when the SDK is fully configured using initializeClient.
-  Future<Map<String, dynamic>> createUserContext(String userId,
+  Future<OptimizelyUserContext?> createUserContext(String userId,
       [Map<String, dynamic> attributes = const {}]) async {
     return await OptimizelyClientWrapper.createUserContext(
         _sdkKey, userId, attributes);
-  }
-
-  /// Sets attributes for the user context.
-  Future<Map<String, dynamic>> setAttributes(
-      Map<String, dynamic> attributes) async {
-    return await OptimizelyClientWrapper.setAttributes(_sdkKey, attributes);
-  }
-
-  /// Tracks an event.
-  Future<Map<String, dynamic>> trackEvent(String eventKey,
-      [Map<String, dynamic> eventTags = const {}]) async {
-    return await OptimizelyClientWrapper.trackEvent(
-        _sdkKey, eventKey, eventTags);
-  }
-
-  /// Returns a decision result for a given flag key and a user context, which contains all data required to deliver the flag or experiment.
-  Future<Map<String, dynamic>> decide(String key,
-      [List<String> options = const []]) async {
-    // passing key as an array since decide has a single generic implementation which takes array of keys as an argument
-    return await OptimizelyClientWrapper.decide(_sdkKey, [key], options);
-  }
-
-  /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<Map<String, dynamic>> decideForKeys(
-      [List<String> keys = const [], List<String> options = const []]) async {
-    return await OptimizelyClientWrapper.decide(_sdkKey, keys, options);
-  }
-
-  /// Returns a key-map of decision results for all active flag keys.
-  Future<Map<String, dynamic>> decideAll(
-      [List<String> options = const []]) async {
-    return await OptimizelyClientWrapper.decide(_sdkKey, [], options);
-  }
-
-  /// Sets the forced decision for a given decision context.
-  Future<Map<String, dynamic>> setForcedDecision(
-    String flagKey,
-    String ruleKey,
-    String variationKey,
-  ) async {
-    return await OptimizelyClientWrapper.setForcedDecision(
-        _sdkKey, flagKey, ruleKey, variationKey);
-  }
-
-  /// Returns the forced decision for a given decision context.
-  Future<Map<String, dynamic>> getForcedDecision() async {
-    return await OptimizelyClientWrapper.getForcedDecision(_sdkKey);
-  }
-
-  /// Removes the forced decision for a given decision context.
-  Future<Map<String, dynamic>> removeForcedDecision(
-      String flagKey, String ruleKey) async {
-    return await OptimizelyClientWrapper.removeForcedDecision(
-        _sdkKey, flagKey, ruleKey);
-  }
-
-  /// Removes all forced decisions bound to this user context.
-  Future<Map<String, dynamic>> removeAllForcedDecisions() async {
-    return await OptimizelyClientWrapper.removeAllForcedDecisions(_sdkKey);
   }
 
   Future<CancelListening> addDecisionNotificationListener(

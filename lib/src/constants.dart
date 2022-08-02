@@ -38,20 +38,25 @@ class Constants {
 
   // Request parameter keys
   static const String id = "id";
-  static const String sdkKey = "sdk_key";
-  static const String userID = "user_id";
+  static const String sdkKey = "sdkKey";
+  static const String userID = "userID";
   static const String attributes = "attributes";
-  static const String eventKey = "event_key";
-  static const String eventTags = "event_tags";
+  static const String eventKey = "eventKey";
+  static const String eventTags = "eventTags";
   static const String keys = "keys";
-  static const String variationKey = "variation_key";
-  static const String flagKey = "flag_key";
-  static const String ruleKey = "rule_key";
-  static const String optimizelyDecideOption = "optimizely_decide_option";
+  static const String variationKey = "variationKey";
+  static const String flagKey = "flagKey";
+  static const String ruleKey = "ruleKey";
+  static const String optimizelyDecideOption = "optimizelyDecideOption";
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";
   static const String callBackListener = "callbackListener";
+
+  // Response keys
+  static const String responseSuccess = "success";
+  static const String responseResult = "result";
+  static const String responseReason = "reason";
 
   // SuccessMessage from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
   // These are unique only to flutter SDK. This helps in testing if correct native code was called.
