@@ -34,15 +34,14 @@ class OptimizelyClientWrapper {
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   static Future<Map<String, dynamic>> initializeClient(String sdkKey) async {
     _channel.setMethodCallHandler(methodCallHandler);
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.initializeMethod, {Constants.requestSDKKey: sdkKey}));
+    return Map<String, dynamic>.from(await _channel
+        .invokeMethod(Constants.initializeMethod, {Constants.sdkKey: sdkKey}));
   }
 
   /// Returns a snapshot of the current project configuration.
   static Future<Map<String, dynamic>> getOptimizelyConfig(String sdkKey) async {
     return Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.getOptimizelyConfigMethod,
-        {Constants.requestSDKKey: sdkKey}));
+        Constants.getOptimizelyConfigMethod, {Constants.sdkKey: sdkKey}));
   }
 
   /// Creates a context of the user for which decision APIs will be called.
@@ -53,9 +52,9 @@ class OptimizelyClientWrapper {
       [Map<String, dynamic> attributes = const {}]) async {
     var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.createUserContextMethod, {
-      Constants.requestSDKKey: sdkKey,
-      Constants.requestUserID: userId,
-      Constants.requestAttributes: Utils.covertToTypedMap(attributes)
+      Constants.sdkKey: sdkKey,
+      Constants.userID: userId,
+      Constants.attributes: Utils.covertToTypedMap(attributes)
     }));
     if (result[Constants.responseSuccess] == true) {
       return OptimizelyUserContext(sdkKey, _channel);
@@ -84,25 +83,23 @@ class OptimizelyClientWrapper {
         .toString()
         .substring(listenerType.toString().indexOf('.') + 1);
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
-      Constants.requestSDKKey: sdkKey,
-      Constants.requestID: currentListenerId,
-      Constants.requestType: listenerTypeStr
+      Constants.sdkKey: sdkKey,
+      Constants.id: currentListenerId,
+      Constants.type: listenerTypeStr
     });
     // Returning a callback function that allows the user to remove the added notification listener
     return () {
-      _channel.invokeMethod(Constants.removeNotificationListenerMethod, {
-        Constants.requestSDKKey: sdkKey,
-        Constants.requestID: currentListenerId
-      });
+      _channel.invokeMethod(Constants.removeNotificationListenerMethod,
+          {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
       callbacksById.remove(currentListenerId);
     };
   }
 
   static Future<void> methodCallHandler(MethodCall call) async {
     switch (call.method) {
-      case Constants.requestCallBackListener:
-        var id = call.arguments[Constants.requestID];
-        var payload = call.arguments[Constants.requestPayload];
+      case Constants.callBackListener:
+        var id = call.arguments[Constants.id];
+        var payload = call.arguments[Constants.payload];
         if (id is int && payload != null && callbacksById.containsKey(id)) {
           callbacksById[id]!(payload);
         }

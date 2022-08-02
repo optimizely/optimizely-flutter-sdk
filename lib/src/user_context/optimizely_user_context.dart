@@ -33,8 +33,8 @@ class OptimizelyUserContext {
       Map<String, dynamic> attributes) async {
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setAttributesMethod, {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestAttributes: Utils.covertToTypedMap(attributes)
+      Constants.sdkKey: _sdkKey,
+      Constants.attributes: Utils.covertToTypedMap(attributes)
     }));
   }
 
@@ -43,9 +43,9 @@ class OptimizelyUserContext {
       [Map<String, dynamic> eventTags = const {}]) async {
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.trackEventMethod, {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestEventKey: eventKey,
-      Constants.requestEventTags: Utils.covertToTypedMap(eventTags)
+      Constants.sdkKey: _sdkKey,
+      Constants.eventKey: eventKey,
+      Constants.eventTags: Utils.covertToTypedMap(eventTags)
     }));
   }
 
@@ -73,9 +73,9 @@ class OptimizelyUserContext {
       [List<String> keys = const [], List<String> options = const []]) async {
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestKeys: keys,
-      Constants.requestOptimizelyDecideOption: options
+      Constants.sdkKey: _sdkKey,
+      Constants.keys: keys,
+      Constants.optimizelyDecideOption: options
     }));
   }
 
@@ -84,12 +84,12 @@ class OptimizelyUserContext {
       OptimizelyDecisionContext context,
       OptimizelyForcedDecision decision) async {
     Map<String, dynamic> request = {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestFlagKey: context.flagKey,
-      Constants.requestVariationKey: decision.variationKey
+      Constants.sdkKey: _sdkKey,
+      Constants.flagKey: context.flagKey,
+      Constants.variationKey: decision.variationKey
     };
     if (context.ruleKey != null) {
-      request[Constants.requestRuleKey] = context.ruleKey;
+      request[Constants.ruleKey] = context.ruleKey;
     }
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setForcedDecision, request));
@@ -99,7 +99,7 @@ class OptimizelyUserContext {
   Future<Map<String, dynamic>> getForcedDecision() async {
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.getForcedDecision, {
-      Constants.requestSDKKey: _sdkKey,
+      Constants.sdkKey: _sdkKey,
     }));
   }
 
@@ -107,11 +107,11 @@ class OptimizelyUserContext {
   Future<Map<String, dynamic>> removeForcedDecision(
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestFlagKey: context.flagKey,
+      Constants.sdkKey: _sdkKey,
+      Constants.flagKey: context.flagKey,
     };
     if (context.ruleKey != null) {
-      request[Constants.requestRuleKey] = context.ruleKey;
+      request[Constants.ruleKey] = context.ruleKey;
     }
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeForcedDecision, request));
@@ -121,7 +121,7 @@ class OptimizelyUserContext {
   Future<Map<String, dynamic>> removeAllForcedDecisions() async {
     return Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
-      Constants.requestSDKKey: _sdkKey,
+      Constants.sdkKey: _sdkKey,
     }));
   }
 }

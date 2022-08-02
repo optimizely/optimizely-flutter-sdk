@@ -39,19 +39,23 @@ struct NotificationType {
 }
 
 struct RequestParameterKey {
-    static let sdkKey = "sdk_key"
-    static let userId = "user_id"
+    static let sdkKey = "sdkKey"
+    static let userId = "userID"
     static let notificationId = "id"
     static let notificationType = "type"
     static let notificationPayload = "payload"
     static let attributes = "attributes"
     static let decideKeys = "keys"
-    static let variationKey = "variation_key"
-    static let flagKey = "flag_key"
-    static let ruleKey = "rule_key"
-    static let decideOptions = "optimizely_decide_option"
-    static let eventKey = "event_key"
-    static let eventTags = "event_tags"
+    static let variationKey = "variationKey"
+    static let flagKey = "flagKey"
+    static let ruleKey = "ruleKey"
+    static let enabled = "enabled"
+    static let userContext = "userContext"
+    static let variables = "variables"
+    static let eventKey = "eventKey"
+    static let eventTags = "eventTags"
+    static let reasons = "reasons"
+    static let decideOptions = "optimizelyDecideOption"
 }
 
 struct ResponseKey {

@@ -21,9 +21,9 @@ class TestUtils {
   static sendTestNotifications(
       Function(MethodCall message) handler, int count) {
     for (var i = 0; i < count; i++) {
-      handler(MethodCall(Constants.requestCallBackListener, {
-        Constants.requestID: i,
-        Constants.requestPayload: {"payload": i}
+      handler(MethodCall(Constants.callBackListener, {
+        Constants.id: i,
+        Constants.payload: {"payload": i}
       }));
     }
   }

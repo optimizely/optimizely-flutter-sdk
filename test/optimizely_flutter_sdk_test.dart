@@ -86,7 +86,7 @@ void main() {
         case Constants.getForcedDecision:
           return {
             Constants.responseSuccess: true,
-            Constants.responseVariationKey: "123",
+            Constants.variationKey: "123",
           };
         case Constants.removeForcedDecision:
           return {
@@ -260,7 +260,7 @@ void main() {
 
         expect(result[Constants.responseSuccess], equals(true));
         expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseVariationKey], equals("123"));
+        expect(result[Constants.variationKey], equals("123"));
       });
     });
     group("removeForcedDecision()", () {

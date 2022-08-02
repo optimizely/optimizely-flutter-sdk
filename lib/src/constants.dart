@@ -37,28 +37,26 @@ class Constants {
       "removeNotificationListener";
 
   // Request parameter keys
-  static const String requestID = "id";
-  static const String requestSDKKey = "sdk_key";
-  static const String requestUserID = "user_id";
-  static const String requestAttributes = "attributes";
-  static const String requestEventKey = "event_key";
-  static const String requestEventTags = "event_tags";
-  static const String requestKeys = "keys";
-  static const String requestVariationKey = "variation_key";
-  static const String requestFlagKey = "flag_key";
-  static const String requestRuleKey = "rule_key";
-  static const String requestOptimizelyDecideOption =
-      "optimizely_decide_option";
-  static const String requestPayload = "payload";
-  static const String requestValue = "value";
-  static const String requestType = "type";
-  static const String requestCallBackListener = "callbackListener";
+  static const String id = "id";
+  static const String sdkKey = "sdkKey";
+  static const String userID = "userID";
+  static const String attributes = "attributes";
+  static const String eventKey = "eventKey";
+  static const String eventTags = "eventTags";
+  static const String keys = "keys";
+  static const String variationKey = "variationKey";
+  static const String flagKey = "flagKey";
+  static const String ruleKey = "ruleKey";
+  static const String optimizelyDecideOption = "optimizelyDecideOption";
+  static const String payload = "payload";
+  static const String value = "value";
+  static const String type = "type";
+  static const String callBackListener = "callbackListener";
 
   // Response keys
   static const String responseSuccess = "success";
   static const String responseResult = "result";
   static const String responseReason = "reason";
-  static const String responseVariationKey = "variationKey";
 
   // SuccessMessage from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
   // These are unique only to flutter SDK. This helps in testing if correct native code was called.
