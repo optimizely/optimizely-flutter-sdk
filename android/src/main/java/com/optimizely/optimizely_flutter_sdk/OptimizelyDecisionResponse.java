@@ -29,7 +29,7 @@ public class OptimizelyDecisionResponse {
 
     private final Map variables;
 
-    private final String ruleKey;
+    private final String ruleKey;   
 
     private final String flagKey;
 

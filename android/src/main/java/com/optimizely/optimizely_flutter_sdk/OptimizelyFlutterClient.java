@@ -32,10 +32,17 @@ import android.content.Context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
+import com.optimizely.ab.event.LogEvent;
+import com.optimizely.ab.notification.DecisionNotification;
+import com.optimizely.ab.notification.TrackNotification;
+import com.optimizely.ab.notification.UpdateConfigNotification;
 import com.optimizely.ab.optimizelyconfig.OptimizelyConfig;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecision;
+import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
+
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.convertKeysCamelCaseToSnakeCase;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -51,7 +58,12 @@ public class OptimizelyFlutterClient {
     protected static final Map<Integer, Integer> notificationIdsTracker = new HashMap<>();
 
 
-    protected void initializeOptimizely(@NonNull String sdkKey, @NonNull Result result) {
+    protected void initializeOptimizely(@NonNull ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         // Delete old user context
         userContextsTracker.remove(sdkKey);
         // Creating new instance
@@ -70,12 +82,21 @@ public class OptimizelyFlutterClient {
         });
     }
 
-    protected void createUserContext(String sdkKey, String userId, Map<String, Object> attributes, @NonNull Result result) {
+    protected void createUserContext(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
         OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
-        if (optimizelyClient == null) {
+         if (optimizelyClient == null) {
             result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
             return;
         }
+
+        String userId = argumentsParser.getUserID();
+        Map<String, Object> attributes = argumentsParser.getAttributes();
         if (userId == null) {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
@@ -98,12 +119,20 @@ public class OptimizelyFlutterClient {
         }
     }
 
-    protected void decide(String sdkKey, List<String> decideKeys, List<OptimizelyDecideOption> decideOptions, @NonNull Result result) {
+    protected void decide(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
         OptimizelyUserContext userContext = getUserContext(sdkKey);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
         }
+        List<String> decideKeys = argumentsParser.getDecideKeys();
+        List<OptimizelyDecideOption> decideOptions = argumentsParser.getDecideOptions();
 
         Map<String, OptimizelyDecision> optimizelyDecisionsMap;
 
@@ -125,12 +154,20 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(true, s, ""));
     }
 
-    protected void setForcedDecision(String sdkKey, String flagKey, String ruleKey, String variationKey, @NonNull Result result) {
+    protected void setForcedDecision(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         OptimizelyUserContext userContext = getUserContext(sdkKey);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
         }
+        String flagKey = argumentsParser.getFlagKey();
+        String ruleKey = argumentsParser.getRuleKey();
+        String variationKey = argumentsParser.getVariationKey();
 
         if (flagKey == null || variationKey == null) {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
@@ -146,13 +183,19 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(false, ""));
     }
 
-    protected void getForcedDecision(String sdkKey, String flagKey, String ruleKey, @NonNull Result result) {
+    protected void getForcedDecision(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         OptimizelyUserContext userContext = getUserContext(sdkKey);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
         }
-
+        String flagKey = argumentsParser.getFlagKey();
+        String ruleKey = argumentsParser.getRuleKey();
         if (flagKey == null) {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
@@ -167,13 +210,20 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(false, ""));
     }
 
-    protected void removeForcedDecision(String sdkKey, String flagKey, String ruleKey, @NonNull Result result) {
+    protected void removeForcedDecision(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         OptimizelyUserContext userContext = getUserContext(sdkKey);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
         }
 
+        String flagKey = argumentsParser.getFlagKey();
+        String ruleKey = argumentsParser.getRuleKey();
         if (flagKey == null) {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
@@ -187,7 +237,12 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(false, ""));
     }
 
-    protected void removeAllForcedDecisions(String sdkKey, @NonNull Result result) {
+    protected void removeAllForcedDecisions(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         OptimizelyUserContext userContext = getUserContext(sdkKey);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
@@ -201,8 +256,17 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(false, ""));
     }
 
-    protected void trackEvent(String sdkKey, String eventKey, Map<String, Object> eventTags, @NonNull Result result) {
+    protected void trackEvent(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         OptimizelyUserContext userContext = getUserContext(sdkKey);
+
+        String eventKey = argumentsParser.getEventKey();
+        Map<String, Object> eventTags = argumentsParser.getEventTags();
+
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
@@ -222,8 +286,15 @@ public class OptimizelyFlutterClient {
         }
     }
 
-    protected void setAttribute(String sdkKey, Map<String, Object> attributes, @NonNull Result result) {
+    protected void setAttribute(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         OptimizelyUserContext userContext = getUserContext(sdkKey);
+
+        Map<String, Object> attributes = argumentsParser.getAttributes();
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
@@ -239,8 +310,18 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(true, userContext.getAttributes(), SuccessMessage.ATTRIBUTES_ADDED));
     }
 
-    protected void removeNotificationListener(String sdkKey, Integer id, String type, @NonNull Result result) {
+    protected void removeNotificationListener(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
         OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+
+        Integer id = argumentsParser.getNotificaitonID();
+        String type = argumentsParser.getNotificationType();
+
         if (optimizelyClient == null) {
             result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
             return;
@@ -254,7 +335,12 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(true, SuccessMessage.LISTENER_REMOVED));
     }
 
-    protected void getOptimizelyConfig(String sdkKey, @NonNull Result result) {
+    protected void getOptimizelyConfig(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
         OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
         if (optimizelyClient == null) {
             result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
@@ -288,5 +374,89 @@ public class OptimizelyFlutterClient {
 
     public OptimizelyUserContext getUserContext(String SDKKey) {
         return userContextsTracker.get(SDKKey);
+    }
+
+    protected void addNotificationListener(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+        Integer id = argumentsParser.getNotificaitonID();
+        String type = argumentsParser.getNotificationType();
+
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (optimizelyClient == null) {
+            result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
+            return;
+        }
+
+        if (id == null || type == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+        switch (type) {
+            case NotificationType.DECISION: {
+                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(DecisionNotification.class, decisionNotification -> {
+                    Map<String, Object> notificationMap = new HashMap<>();
+                    notificationMap.put(DecisionListenerKeys.TYPE, decisionNotification.getType());
+                    notificationMap.put(DecisionListenerKeys.USER_ID, decisionNotification.getUserId());
+                    notificationMap.put(DecisionListenerKeys.ATTRIBUTES, decisionNotification.getAttributes());
+                    notificationMap.put(DecisionListenerKeys.DECISION_INFO, convertKeysCamelCaseToSnakeCase(decisionNotification.getDecisionInfo()));
+                    invokeNotification(id, NotificationType.DECISION, notificationMap);
+                });
+                notificationIdsTracker.put(id, notificationId);
+                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
+                break;
+            }
+            case NotificationType.TRACK: {
+                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(TrackNotification.class, trackNotification -> {
+                    Map<String, Object> notificationMap = new HashMap<>();
+                    notificationMap.put(TrackListenerKeys.EVENT_KEY, trackNotification.getEventKey());
+                    notificationMap.put(TrackListenerKeys.USER_ID, trackNotification.getUserId());
+                    notificationMap.put(TrackListenerKeys.ATTRIBUTES, trackNotification.getAttributes());
+                    notificationMap.put(TrackListenerKeys.EVENT_TAGS, trackNotification.getEventTags());
+                    invokeNotification(id, NotificationType.TRACK, notificationMap);
+                });
+                notificationIdsTracker.put(id, notificationId);
+                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
+                break;
+            }
+            case NotificationType.LOG_EVENT: {
+                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(LogEvent.class, logEvent -> {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, Object> eventParams = mapper.readValue(logEvent.getBody(), Map.class);
+                    Map<String, Object> listenerMap = new HashMap<>();
+                    listenerMap.put(LogEventListenerKeys.URL, logEvent.getEndpointUrl());
+                    listenerMap.put(LogEventListenerKeys.HTTP_VERB, logEvent.getRequestMethod());
+                    listenerMap.put(LogEventListenerKeys.PARAMS, eventParams);
+                    invokeNotification(id, NotificationType.LOG_EVENT, listenerMap);
+                });
+                notificationIdsTracker.put(id, notificationId);
+                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
+                break;
+            }
+            case NotificationType.CONFIG_UPDATE: {
+                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(UpdateConfigNotification.class, configUpdate -> {
+                    Map<String, Object> listenerMap = new HashMap<>();
+                    listenerMap.put("Config-update", Collections.emptyMap());
+                    invokeNotification(id, NotificationType.CONFIG_UPDATE, listenerMap);
+                });
+                notificationIdsTracker.put(id, notificationId);
+                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
+                break;
+            }
+            default:
+                result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+        }
+    }
+
+    private void invokeNotification(int id, String notificationType, Map notificationMap) {
+        Map<String, Object> listenerResponse = new HashMap<>();
+        listenerResponse.put(RequestParameterKey.NOTIFICATION_ID, id);
+        listenerResponse.put(RequestParameterKey.NOTIFICATION_TYPE, notificationType);
+        listenerResponse.put(RequestParameterKey.NOTIFICATION_PAYLOAD, notificationMap);
+        Map<String, Object> listenerUnmodifiable = Collections.unmodifiableMap(listenerResponse);
+        OptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", listenerUnmodifiable);
     }
 }
