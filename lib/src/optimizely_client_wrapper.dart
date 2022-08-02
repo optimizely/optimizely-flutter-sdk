@@ -16,10 +16,10 @@
 
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
-import 'constants.dart';
-import 'utils.dart';
+import 'package:optimizely_flutter_sdk/src/utils.dart';
 
 enum ListenerType { track, decision, logEvent, projectConfigUpdate }
 

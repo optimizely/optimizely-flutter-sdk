@@ -15,7 +15,8 @@
 ///**************************************************************************/
 
 import 'dart:io' show Platform;
-import 'constants.dart';
+
+import 'package:optimizely_flutter_sdk/src/constants.dart';
 
 class Utils {
   static Map<String, dynamic> covertToTypedMap(Map<String, dynamic> map) {

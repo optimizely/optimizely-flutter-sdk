@@ -15,13 +15,12 @@
 ///**************************************************************************/
 
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:optimizely_flutter_sdk/src/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
-import '../constants.dart';
-import '../utils.dart';
-import 'optimizely_decision_context.dart';
-import 'optimizely_forced_decision.dart';
+import 'package:optimizely_flutter_sdk/src/utils.dart';
 
 /// An object for user contexts that the SDK will use to make decisions for.
 ///

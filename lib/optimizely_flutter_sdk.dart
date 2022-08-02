@@ -18,16 +18,12 @@ library optimizely_flutter_sdk;
 
 import 'dart:async';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
+import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 
-import './src/optimizely_client_wrapper.dart';
-import 'src/user_context/optimizely_user_context.dart';
-
-export 'src/user_context/optimizely_user_context.dart'
-    show OptimizelyUserContext;
-export './src/optimizely_client_wrapper.dart' show ListenerType;
-export './src/user_context/optimizely_forced_decision.dart'
+export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decision.dart'
     show OptimizelyForcedDecision;
-export 'src/user_context/optimizely_decision_context.dart'
+export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_context.dart'
     show OptimizelyDecisionContext;
 
 /// The main client class for the Optimizely Flutter SDK.
