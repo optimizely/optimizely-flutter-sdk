@@ -39,19 +39,19 @@ public class Constants {
     }
 
     public static class RequestParameterKey {
-        public static final String SDK_KEY = "sdk_key";
-        public static final String USER_ID = "user_id";
+        public static final String SDK_KEY = "sdkKey";
+        public static final String USER_ID = "userID";
         public static final String NOTIFICATION_ID = "id";
         public static final String NOTIFICATION_TYPE = "type";
         public static final String NOTIFICATION_PAYLOAD = "payload";
         public static final String ATTRIBUTES = "attributes";
         public static final String DECIDE_KEYS = "keys";
-        public static final String DECIDE_OPTIONS = "optimizely_decide_option";
-        public static final String EVENT_KEY = "event_key";
-        public static final String EVENT_TAGS = "event_tags";
-        public static final String FLAG_KEY = "flag_key";
-        public static final String RULE_KEY = "rule_key";
-        public static final String VARIATION_KEY = "variation_key";
+        public static final String DECIDE_OPTIONS = "optimizelyDecideOption";
+        public static final String EVENT_KEY = "eventKey";
+        public static final String EVENT_TAGS = "eventTags";
+        public static final String FLAG_KEY = "flagKey";
+        public static final String RULE_KEY = "ruleKey";
+        public static final String VARIATION_KEY = "variationKey";
     }
 
     public static class ErrorMessage {
