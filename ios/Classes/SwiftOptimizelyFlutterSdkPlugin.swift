@@ -50,6 +50,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.setAttributes: setAttributes(call, result: result)
         case API.trackEvent: trackEvent(call, result: result)
         case API.decide: decide(call, result: result)
+        case API.setForcedDecision: setForcedDecision(call, result: result)
+        case API.getForcedDecision: getForcedDecision(call, result: result)
+        case API.removeForcedDecision: removeForcedDecision(call, result: result)
+        case API.removeAllForcedDecisions: removeAllForcedDecisions(call, result: result)
         default: result(FlutterMethodNotImplemented)
         }
     }
@@ -246,6 +250,75 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         result(self.createResponse(success: true, result: resultMap, reason: SuccessMessage.decideCalled))
     }
     
+    /// Sets the forced decision for a given decision context.
+    func setForcedDecision(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        
+        guard let parameters = call.arguments as? Dictionary<String, Any?>, let flagKey = parameters[RequestParameterKey.flagKey] as? String, let variationKey = parameters[RequestParameterKey.variationKey] as? String else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
+        }
+        
+        if usrContext.setForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String), decision: OptimizelyForcedDecision(variationKey: variationKey)) {
+            result(self.createResponse(success: true, reason: SuccessMessage.forcedDecisionSet))
+            return
+        }
+        result(self.createResponse(success: false))
+    }
+    
+    /// Returns the forced decision for a given decision context.
+    func getForcedDecision(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        
+        guard let parameters = call.arguments as? Dictionary<String, Any?>, let flagKey = parameters[RequestParameterKey.flagKey] as? String else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
+        }
+        if let variationKey = usrContext.getForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String)) {
+            result(self.createResponse(success: true, result: [ResponseKey.variationKey: variationKey]))
+            return
+        }
+        result(self.createResponse(success: false))
+    }
+    
+    /// Removes the forced decision for a given decision context.
+    func removeForcedDecision(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        
+        guard let parameters = call.arguments as? Dictionary<String, Any?>, let flagKey = parameters[RequestParameterKey.flagKey] as? String else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
+        }
+        if usrContext.removeForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String)) {
+            result(self.createResponse(success: true, reason: SuccessMessage.forcedDecisionRemoved))
+            return
+        }
+        result(self.createResponse(success: false))
+    }
+    
+    /// Removes all forced decisions bound to this user context.
+    func removeAllForcedDecisions(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        
+        if usrContext.removeAllForcedDecisions() {
+            result(self.createResponse(success: true, reason: SuccessMessage.allForcedDecisionsRemoved))
+            return
+        }
+        result(self.createResponse(success: false))
+    }
+    
     /// Returns saved optimizely client
     func getOptimizelyClient(arguments: Any?) -> OptimizelyClient? {
         guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
@@ -263,12 +336,12 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     }
     
     func createResponse(success: Bool, result: Any? = nil, reason: String? = nil) -> [String: Any] {
-        var response: [String: Any] = ["success": success]
+        var response: [String: Any] = [ResponseKey.success: success]
         if let result = result {
-            response["result"] = result
+            response[ResponseKey.result] = result
         }
         if let reason = reason {
-            response["reason"] = reason
+            response[ResponseKey.reason] = reason
         }
         return response
     }

@@ -140,17 +140,17 @@ public class Utils: NSObject {
     
     static func convertDecisionToDictionary(decision: OptimizelyDecision?) -> [String: Any?] {
         let userContext: [String: Any?] =
-        ["user_id" : decision?.userContext.userId,
-         "attributes" : decision?.userContext.attributes]
+        [RequestParameterKey.userId : decision?.userContext.userId,
+         RequestParameterKey.attributes : decision?.userContext.attributes]
         
         let decisionMap: [String: Any?] =
-        ["variation_key": decision?.variationKey,
-         "rule_key": decision?.ruleKey,
-         "enabled": decision?.enabled,
-         "flag_key": decision?.flagKey,
-         "user_context": userContext,
-         "variables": decision?.variables.toMap(),
-         "reasons": decision?.reasons]
+        [RequestParameterKey.variationKey: decision?.variationKey,
+         RequestParameterKey.ruleKey: decision?.ruleKey,
+         RequestParameterKey.enabled: decision?.enabled,
+         RequestParameterKey.flagKey: decision?.flagKey,
+         RequestParameterKey.userContext: userContext,
+         RequestParameterKey.variables: decision?.variables.toMap(),
+         RequestParameterKey.reasons: decision?.reasons]
         return decisionMap
     }
 }

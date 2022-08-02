@@ -16,6 +16,7 @@
 
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'constants.dart';
 import 'utils.dart';
 
@@ -46,47 +47,19 @@ class OptimizelyClientWrapper {
   /// Creates a context of the user for which decision APIs will be called.
   ///
   /// A user context will only be created successfully when the SDK is fully configured using initializeClient.
-  static Future<Map<String, dynamic>> createUserContext(
+  static Future<OptimizelyUserContext?> createUserContext(
       String sdkKey, String userId,
       [Map<String, dynamic> attributes = const {}]) async {
-    return Map<String, dynamic>.from(
+    var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.createUserContextMethod, {
       Constants.sdkKey: sdkKey,
       Constants.userID: userId,
       Constants.attributes: Utils.covertToTypedMap(attributes)
     }));
-  }
-
-  /// Sets attributes for the user context.
-  static Future<Map<String, dynamic>> setAttributes(
-      String sdkKey, Map<String, dynamic> attributes) async {
-    return Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.setAttributesMethod, {
-      Constants.sdkKey: sdkKey,
-      Constants.attributes: Utils.covertToTypedMap(attributes)
-    }));
-  }
-
-  /// Tracks an event.
-  static Future<Map<String, dynamic>> trackEvent(String sdkKey, String eventKey,
-      [Map<String, dynamic> eventTags = const {}]) async {
-    return Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.trackEventMethod, {
-      Constants.sdkKey: sdkKey,
-      Constants.eventKey: eventKey,
-      Constants.eventTags: Utils.covertToTypedMap(eventTags)
-    }));
-  }
-
-  /// Returns a key-map of decision results for multiple flag keys and a user context.
-  static Future<Map<String, dynamic>> decide(String sdkKey,
-      [List<String> keys = const [], List<String> options = const []]) async {
-    return Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.decideMethod, {
-      Constants.sdkKey: sdkKey,
-      Constants.keys: keys,
-      Constants.optimizelyDecideOption: options
-    }));
+    if (result[Constants.responseSuccess] == true) {
+      return OptimizelyUserContext(sdkKey, _channel);
+    }
+    return null;
   }
 
   /// Allows user to listen to supported notifications.

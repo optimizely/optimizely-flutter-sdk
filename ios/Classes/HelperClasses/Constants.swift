@@ -23,6 +23,10 @@ struct API {
     static let setAttributes = "setAttributes"
     static let trackEvent = "trackEvent"
     static let decide = "decide"
+    static let setForcedDecision = "setForcedDecision"
+    static let getForcedDecision = "getForcedDecision"
+    static let removeForcedDecision = "removeForcedDecision"
+    static let removeAllForcedDecisions = "removeAllForcedDecisions"
     static let addNotificationListener = "addNotificationListener"
     static let removeNotificationListener = "removeNotificationListener"
 }
@@ -35,16 +39,30 @@ struct NotificationType {
 }
 
 struct RequestParameterKey {
-    static let sdkKey = "sdk_key"
-    static let userId = "user_id"
+    static let sdkKey = "sdkKey"
+    static let userId = "userID"
     static let notificationId = "id"
     static let notificationType = "type"
     static let notificationPayload = "payload"
     static let attributes = "attributes"
     static let decideKeys = "keys"
-    static let decideOptions = "optimizely_decide_option"
-    static let eventKey = "event_key"
-    static let eventTags = "event_tags"
+    static let variationKey = "variationKey"
+    static let flagKey = "flagKey"
+    static let ruleKey = "ruleKey"
+    static let enabled = "enabled"
+    static let userContext = "userContext"
+    static let variables = "variables"
+    static let eventKey = "eventKey"
+    static let eventTags = "eventTags"
+    static let reasons = "reasons"
+    static let decideOptions = "optimizelyDecideOption"
+}
+
+struct ResponseKey {
+    static let success = "success"
+    static let result = "result"
+    static let reason = "reason"
+    static let variationKey = "variationKey"
 }
 
 struct ErrorMessage {
@@ -62,6 +80,9 @@ struct SuccessMessage {
     static let listenerAdded = "Listener added successfully."
     static let listenerRemoved = "Listener removed successfully."
     static let decideCalled = "Decide called successfully."
+    static let forcedDecisionSet = "Forced decision set successfully."
+    static let forcedDecisionRemoved = "Forced decision removed successfully."
+    static let allForcedDecisionsRemoved = "All Forced decisions removed successfully."
 }
 
 //Sohail: There is one issue, can we make sure the types remain same, probably we will need to write unit test separately for type.

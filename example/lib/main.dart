@@ -37,11 +37,11 @@ class _MyAppState extends State<MyApp> {
     var randomUserName = "${rng.nextInt(1000)}";
 
     // Create user context
-    response = await flutterSDK.createUserContext(randomUserName);
+    var userContext = await flutterSDK.createUserContext(randomUserName);
 
     // Set attributes
-    response = await flutterSDK.setAttributes({
-      "age": 20,
+    response = await userContext!.setAttributes({
+      "age": 5,
       "doubleValue": 12.12,
       "boolValue": false,
       "stringValue": "121"
@@ -55,7 +55,37 @@ class _MyAppState extends State<MyApp> {
     });
 
     // Decide call
-    response = await flutterSDK.decide('flag1');
+    response = await userContext.decide('flag1');
+
+    // should return following response without forced decision
+    // flagKey: flag1
+    // ruleKey: default-rollout-7371-20896892800
+    // variationKey: off
+
+    // Setting forced decision
+    userContext.setForcedDecision(
+        OptimizelyDecisionContext("flag1", "flag1_experiment"),
+        OptimizelyForcedDecision("variation_a"));
+
+    // Decide call
+    response = await userContext.decide('flag1');
+
+    // should return following response with forced decision
+    // flagKey: flag1
+    // ruleKey: flag1_experiment
+    // variationKey: variation_a
+
+    // removing forced decision
+    userContext.removeForcedDecision(
+        OptimizelyDecisionContext("flag1", "flag1_experiment"));
+
+    // Decide call
+    response = await userContext.decide('flag1');
+
+    // should return original response without forced decision
+    // flagKey: flag1
+    // ruleKey: default-rollout-7371-20896892800
+    // variationKey: off
 
     // To cancel decide listener
     // cancelDecideListener();
@@ -68,7 +98,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // Track call
-    response = await flutterSDK.trackEvent("myevent", {
+    response = await userContext.trackEvent("myevent", {
       "age": 20,
       "doubleValue": 12.12,
       "boolValue": false,
