@@ -16,11 +16,11 @@
 
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
-import 'package:optimizely_flutter_sdk/src/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
-import 'package:optimizely_flutter_sdk/src/utils.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
+import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
 /// An object for user contexts that the SDK will use to make decisions for.
 ///
@@ -34,8 +34,8 @@ class OptimizelyUserContext {
   Future<BaseResponse> setAttributes(Map<String, dynamic> attributes) async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setAttributesMethod, {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestAttributes: Utils.covertToTypedMap(attributes)
+      Constants.sdkKey: _sdkKey,
+      Constants.attributes: Utils.covertToTypedMap(attributes)
     }));
     return BaseResponse(result);
   }
@@ -45,9 +45,9 @@ class OptimizelyUserContext {
       [Map<String, dynamic> eventTags = const {}]) async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.trackEventMethod, {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestEventKey: eventKey,
-      Constants.requestEventTags: Utils.covertToTypedMap(eventTags)
+      Constants.sdkKey: _sdkKey,
+      Constants.eventKey: eventKey,
+      Constants.eventTags: Utils.covertToTypedMap(eventTags)
     }));
     return BaseResponse(result);
   }
@@ -75,9 +75,9 @@ class OptimizelyUserContext {
       [List<String> keys = const [], List<String> options = const []]) async {
     var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestKeys: keys,
-      Constants.requestOptimizelyDecideOption: options
+      Constants.sdkKey: _sdkKey,
+      Constants.keys: keys,
+      Constants.optimizelyDecideOption: options
     }));
     return DecideResponse(result);
   }
@@ -86,12 +86,12 @@ class OptimizelyUserContext {
   Future<BaseResponse> setForcedDecision(OptimizelyDecisionContext context,
       OptimizelyForcedDecision decision) async {
     Map<String, dynamic> request = {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestFlagKey: context.flagKey,
-      Constants.requestVariationKey: decision.variationKey
+      Constants.sdkKey: _sdkKey,
+      Constants.flagKey: context.flagKey,
+      Constants.variationKey: decision.variationKey
     };
     if (context.ruleKey != null) {
-      request[Constants.requestRuleKey] = context.ruleKey;
+      request[Constants.ruleKey] = context.ruleKey;
     }
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setForcedDecision, request));
@@ -102,7 +102,7 @@ class OptimizelyUserContext {
   Future<GetForcedDecisionResponse> getForcedDecision() async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.getForcedDecision, {
-      Constants.requestSDKKey: _sdkKey,
+      Constants.sdkKey: _sdkKey,
     }));
     return GetForcedDecisionResponse(result);
   }
@@ -111,11 +111,11 @@ class OptimizelyUserContext {
   Future<BaseResponse> removeForcedDecision(
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
-      Constants.requestSDKKey: _sdkKey,
-      Constants.requestFlagKey: context.flagKey,
+      Constants.sdkKey: _sdkKey,
+      Constants.flagKey: context.flagKey,
     };
     if (context.ruleKey != null) {
-      request[Constants.requestRuleKey] = context.ruleKey;
+      request[Constants.ruleKey] = context.ruleKey;
     }
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeForcedDecision, request));
@@ -126,7 +126,7 @@ class OptimizelyUserContext {
   Future<BaseResponse> removeAllForcedDecisions() async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
-      Constants.requestSDKKey: _sdkKey,
+      Constants.sdkKey: _sdkKey,
     }));
     return BaseResponse(result);
   }

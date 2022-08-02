@@ -14,7 +14,7 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
-import 'package:optimizely_flutter_sdk/src/constants.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class BaseResponse {
   bool success = false;

@@ -14,8 +14,8 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
-import 'package:optimizely_flutter_sdk/src/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class Decision {
   String variationKey = '';
@@ -27,36 +27,35 @@ class Decision {
   List<String> reasons = [];
 
   Decision(Map<String, dynamic> json) {
-    if (json[Constants.requestVariationKey] is String) {
-      variationKey = json[Constants.requestVariationKey];
+    if (json[Constants.variationKey] is String) {
+      variationKey = json[Constants.variationKey];
     }
-    if (json[Constants.requestFlagKey] is String) {
-      flagKey = json[Constants.requestFlagKey];
+    if (json[Constants.flagKey] is String) {
+      flagKey = json[Constants.flagKey];
     }
-    if (json[Constants.requestRuleKey] is String) {
-      ruleKey = json[Constants.requestRuleKey];
+    if (json[Constants.ruleKey] is String) {
+      ruleKey = json[Constants.ruleKey];
     }
-    if (json[Constants.requestEnabled] is bool) {
-      enabled = json[Constants.requestEnabled];
+    if (json[Constants.enabled] is bool) {
+      enabled = json[Constants.enabled];
     }
-    if (json[Constants.requestUserContext] is Map<dynamic, dynamic>) {
+    if (json[Constants.userContext] is Map<dynamic, dynamic>) {
       Map<String, dynamic> _userContext =
-          Map<String, dynamic>.from(json[Constants.requestUserContext]);
-      if (_userContext[Constants.requestUserID] is String) {
-        userContext[Constants.requestUserID] =
-            _userContext[Constants.requestUserID];
+          Map<String, dynamic>.from(json[Constants.userContext]);
+      if (_userContext[Constants.userID] is String) {
+        userContext[Constants.userID] = _userContext[Constants.userID];
       }
-      if (_userContext[Constants.requestAttributes] is Map<dynamic, dynamic>) {
-        userContext[Constants.requestAttributes] = Map<String, dynamic>.from(
-            _userContext[Constants.requestAttributes]);
+      if (_userContext[Constants.attributes] is Map<dynamic, dynamic>) {
+        userContext[Constants.attributes] =
+            Map<String, dynamic>.from(_userContext[Constants.attributes]);
       }
     }
 
-    if (json[Constants.requestVariables] is Map<dynamic, dynamic>) {
-      variables = Map<String, dynamic>.from(json[Constants.requestVariables]);
+    if (json[Constants.variables] is Map<dynamic, dynamic>) {
+      variables = Map<String, dynamic>.from(json[Constants.variables]);
     }
-    if (json[Constants.requestReasons] is List<dynamic>) {
-      reasons = List<String>.from(json[Constants.requestReasons]);
+    if (json[Constants.reasons] is List<dynamic>) {
+      reasons = List<String>.from(json[Constants.reasons]);
     }
   }
 }

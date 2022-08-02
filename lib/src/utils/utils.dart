@@ -16,7 +16,7 @@
 
 import 'dart:io' show Platform;
 
-import 'package:optimizely_flutter_sdk/src/constants.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class Utils {
   static Map<String, dynamic> covertToTypedMap(Map<String, dynamic> map) {
@@ -31,29 +31,29 @@ class Utils {
     for (MapEntry e in map.entries) {
       if (e.value is String) {
         typedMap[e.key] = {
-          Constants.requestValue: e.value,
-          Constants.requestType: Constants.stringType
+          Constants.value: e.value,
+          Constants.type: Constants.stringType
         };
         continue;
       }
       if (e.value is double) {
         typedMap[e.key] = {
-          Constants.requestValue: e.value,
-          Constants.requestType: Constants.doubleType
+          Constants.value: e.value,
+          Constants.type: Constants.doubleType
         };
         continue;
       }
       if (e.value is int) {
         typedMap[e.key] = {
-          Constants.requestValue: e.value,
-          Constants.requestType: Constants.intType
+          Constants.value: e.value,
+          Constants.type: Constants.intType
         };
         continue;
       }
       if (e.value is bool) {
         typedMap[e.key] = {
-          Constants.requestValue: e.value,
-          Constants.requestType: Constants.boolType
+          Constants.value: e.value,
+          Constants.type: Constants.boolType
         };
         continue;
       }

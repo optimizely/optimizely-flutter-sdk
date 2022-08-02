@@ -1,6 +1,3 @@
-import 'package:optimizely_flutter_sdk/src/constants.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
-
 /// **************************************************************************
 /// Copyright 2022, Optimizely, Inc. and contributors                        *
 ///                                                                          *
@@ -17,12 +14,15 @@ import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
+import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
+
 class GetForcedDecisionResponse extends BaseResponse {
   String variationKey = '';
 
   GetForcedDecisionResponse(Map<String, dynamic> json) : super(json) {
-    if (json[Constants.responseVariationKey] is String) {
-      variationKey = json[Constants.responseVariationKey];
+    if (json[Constants.variationKey] is String) {
+      variationKey = json[Constants.variationKey];
     }
   }
 }

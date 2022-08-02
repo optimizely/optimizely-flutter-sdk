@@ -17,8 +17,8 @@
 import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart";
-import "package:optimizely_flutter_sdk/src/constants.dart";
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'dart:io';
 import 'dart:convert';
 
@@ -75,8 +75,7 @@ void main() {
             Constants.responseSuccess: true,
           };
         case Constants.decideMethod:
-          var keys =
-              List<String>.from(methodCall.arguments[Constants.requestKeys]);
+          var keys = List<String>.from(methodCall.arguments[Constants.keys]);
           // for decideAll
           if (keys.isEmpty) {
             keys = ["123", "456", "789"];
@@ -98,7 +97,7 @@ void main() {
         case Constants.getForcedDecision:
           return {
             Constants.responseSuccess: true,
-            Constants.responseVariationKey: "123",
+            Constants.variationKey: "123",
           };
         case Constants.removeForcedDecision:
           return {
@@ -308,8 +307,6 @@ void main() {
     test("should receive 1 notification due to same callback used", () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      var callHandler = OptimizelyClientWrapper.methodCallHandler;
-      tester?.setMockMethodCallHandler(channel, callHandler);
       // ignore: prefer_function_declarations_over_variables
       void Function(dynamic) callback = (msg) {
         notifications.add(msg);
@@ -318,6 +315,8 @@ void main() {
       sdk.addLogEventNotificationListener(callback);
       sdk.addUpdateConfigNotificationListener(callback);
       sdk.addTrackNotificationListener(callback);
+      var callHandler = OptimizelyClientWrapper.methodCallHandler;
+      tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestNotifications(callHandler, 4);
       expect(notifications.length, equals(1));
       expect(TestUtils.testNotificationPayload(notifications), true);
