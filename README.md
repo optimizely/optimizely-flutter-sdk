@@ -1,4 +1,7 @@
-# optimizely_flutter_sdk
+# Optimizely Flutter SDK
+[![Apache 2.0](https://img.shields.io/github/license/nebula-plugins/gradle-extra-configurations-plugin.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/carthage/carthage)
+[![Build Status](https://github.com/optimizely/optimizely-flutter-sdk/actions/workflows/flutter.yml/badge.svg?branch=master)](https://github.com/optimizely/optimizely-flutter-sdk/actions)
 
 This project is a starting point for a Flutter
 [plug-in package](https://flutter.dev/developing-packages/),
@@ -43,35 +46,7 @@ A sample code for SDK initialization and experiments:
    var response = await flutterSDK.initializeClient();
 ```
 
-### Development
-
-1. [Install Dart](https://dart.dev/get-dart#install) for your platform.
-2. Configure your IDE to point to the Dart SDK directory listed from the installation instructions. <br/> e.g. Windows: C:\tools\dart-sdk
-3. [Install Flutter](https://docs.flutter.dev/get-started/install) for your platform.
-*Note*: The download is big. Extract using an archive tool if needed. 
-4. Ensure your PATH includes the `bin` directory of your Flutter installation. <br/> e.g. Windows: `C:\src\flutter\binC:\src\flutter\bin`
-5. For users of IntelliJ, install the following plugins:
-   1. Dart by JetBrains 
-   2. Flutter by flutter.dev
-6. In your IDE and in the path of this repo, open a terminal and run <br/>`flutter packages get`
-7. For users of IntelliJ, configure Flutter settings
-   1. Go to File > Settings...  
-      ![](docs/intellij-settings-menu.png)
-   2. Configure the Flutter SDK and additional settings  
-      ![](docs/intellij-settings-flutter.png)
-
 ## Testing in Terminal
 
 1. To run [unit tests](https://docs.flutter.dev/cookbook/testing/unit/introduction) using terminal, simply use the following command:
 `flutter test test/optimizely_flutter_sdk_test.dart`
-
-## Testing In IntelliJ
-
-1. Click Edit Configurations... in the Run/Debug configurations menu  
-   ![](docs/edit-config.png)
-2. Click the + button and add a Flutter Test configuration  
-   ![](docs/add-flutter-test-config.png)
-3. Configure the settings for the test run  
-   ![](docs/flutter-test-config-values.png)
-4. Run the test suite to ensure correct settings  
-   ![](docs/run-flutter-test.png)
