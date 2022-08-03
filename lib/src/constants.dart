@@ -28,23 +28,35 @@ class Constants {
   static const String setAttributesMethod = "setAttributes";
   static const String trackEventMethod = "trackEvent";
   static const String decideMethod = "decide";
+  static const String setForcedDecision = "setForcedDecision";
+  static const String getForcedDecision = "getForcedDecision";
+  static const String removeForcedDecision = "removeForcedDecision";
+  static const String removeAllForcedDecisions = "removeAllForcedDecisions";
   static const String addNotificationListenerMethod = "addNotificationListener";
   static const String removeNotificationListenerMethod =
       "removeNotificationListener";
 
   // Request parameter keys
   static const String id = "id";
-  static const String sdkKey = "sdk_key";
-  static const String userID = "user_id";
+  static const String sdkKey = "sdkKey";
+  static const String userID = "userID";
   static const String attributes = "attributes";
-  static const String eventKey = "event_key";
-  static const String eventTags = "event_tags";
+  static const String eventKey = "eventKey";
+  static const String eventTags = "eventTags";
   static const String keys = "keys";
-  static const String optimizelyDecideOption = "optimizely_decide_option";
+  static const String variationKey = "variationKey";
+  static const String flagKey = "flagKey";
+  static const String ruleKey = "ruleKey";
+  static const String optimizelyDecideOption = "optimizelyDecideOption";
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";
   static const String callBackListener = "callbackListener";
+
+  // Response keys
+  static const String responseSuccess = "success";
+  static const String responseResult = "result";
+  static const String responseReason = "reason";
 
   // SuccessMessage from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
   // These are unique only to flutter SDK. This helps in testing if correct native code was called.
@@ -56,4 +68,9 @@ class Constants {
   static const String listenerAdded = "Listener added successfully.";
   static const String listenerRemoved = "Listener removed successfully.";
   static const String decideCalled = "Decide called successfully.";
+  static const String forcedDecisionSet = "Forced decision set successfully.";
+  static const String forcedDecisionRemoved =
+      "Forced decision removed successfully.";
+  static const String allForcedDecisionsRemoved =
+      "All Forced decisions removed successfully.";
 }

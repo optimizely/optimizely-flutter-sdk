@@ -19,12 +19,16 @@ public class Constants {
     public static class APIs {
         public static final String INITIALIZE = "initialize";
         public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
-        public static final String CREATE_USER_CONTEXT="createUserContext";
+        public static final String CREATE_USER_CONTEXT = "createUserContext";
         public static final String SET_ATTRIBUTES="setAttributes";
-        public static final String TRACK_EVENT="trackEvent";
-        public static final String DECIDE="decide";
-        public static final String ADD_NOTIFICATION_LISTENER="addNotificationListener";
-        public static final String REMOVE_NOTIFICATION_LISTENER ="removeNotificationListener";
+        public static final String GET_FORCED_DECISION = "getForcedDecision";
+        public static final String REMOVE_FORCED_DECISION = "removeForcedDecision";
+        public static final String REMOVE_ALL_FORCED_DECISIONS = "removeAllForcedDecisions";
+        public static final String SET_FORCED_DECISION = "setForcedDecision";
+        public static final String TRACK_EVENT = "trackEvent";
+        public static final String DECIDE = "decide";
+        public static final String ADD_NOTIFICATION_LISTENER = "addNotificationListener";
+        public static final String REMOVE_NOTIFICATION_LISTENER = "removeNotificationListener";
     }
 
     public static class NotificationType {
@@ -35,16 +39,19 @@ public class Constants {
     }
 
     public static class RequestParameterKey {
-        public static final String SDK_KEY = "sdk_key";
-        public static final String USER_ID = "user_id";
+        public static final String SDK_KEY = "sdkKey";
+        public static final String USER_ID = "userID";
         public static final String NOTIFICATION_ID = "id";
         public static final String NOTIFICATION_TYPE = "type";
         public static final String NOTIFICATION_PAYLOAD = "payload";
         public static final String ATTRIBUTES = "attributes";
         public static final String DECIDE_KEYS = "keys";
-        public static final String DECIDE_OPTIONS = "optimizely_decide_option";
-        public static final String EVENT_KEY= "event_key";
-        public static final String EVENT_TAGS= "event_tags";
+        public static final String DECIDE_OPTIONS = "optimizelyDecideOption";
+        public static final String EVENT_KEY = "eventKey";
+        public static final String EVENT_TAGS = "eventTags";
+        public static final String FLAG_KEY = "flagKey";
+        public static final String RULE_KEY = "ruleKey";
+        public static final String VARIATION_KEY = "variationKey";
     }
 
     public static class ErrorMessage {
@@ -62,6 +69,9 @@ public class Constants {
         public static final String LISTENER_ADDED = "Listener added successfully.";
         public static final String ATTRIBUTES_ADDED = "Attributes added successfully.";
         public static final String EVENT_TRACKED = "Event Tracked successfully.";
+        public static final String FORCED_DECISION_SET = "Forced decision set successfully.";
+        public static final String REMOVED_FORCED_DECISION = "Forced decision removed successfully.";
+        public static final String REMOVED_ALL_FORCED_DECISION = "All Forced decisions removed successfully.";
     }
 
     public static class DecisionListenerKeys {
@@ -82,5 +92,11 @@ public class Constants {
         public static final String URL = "url";
         public static final String HTTP_VERB = "http_verb";
         public static final String PARAMS = "params";
+    }
+
+    public static class ResponseKey {
+        public static final String RESULT = "result";
+        public static final String REASON = "reason";
+        public static final String SUCCESS = "success";
     }
 }
