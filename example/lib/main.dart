@@ -17,7 +17,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String optimizelyConfig = 'Unknown';
+  String uiResponse = 'Unknown';
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _MyAppState extends State<MyApp> {
     var response = await flutterSDK.initializeClient();
 
     setState(() {
-      optimizelyConfig = json.encode(response);
+      uiResponse = "Optimizely Client initialized: ${response.success} ";
     });
 
     var rng = Random();
@@ -55,7 +55,9 @@ class _MyAppState extends State<MyApp> {
     });
 
     // Decide call
-    response = await userContext.decide('flag1');
+    var decideResponse = await userContext.decide('flag1');
+    uiResponse +=
+        "\nFirst decide call variationKey: ${decideResponse.decisions.first.variationKey}";
 
     // should return following response without forced decision
     // flagKey: flag1
@@ -68,7 +70,9 @@ class _MyAppState extends State<MyApp> {
         OptimizelyForcedDecision("variation_a"));
 
     // Decide call
-    response = await userContext.decide('flag1');
+    decideResponse = await userContext.decide('flag1');
+    uiResponse +=
+        "\nSecond decide call variationKey: ${decideResponse.decisions.first.variationKey}";
 
     // should return following response with forced decision
     // flagKey: flag1
@@ -80,7 +84,13 @@ class _MyAppState extends State<MyApp> {
         OptimizelyDecisionContext("flag1", "flag1_experiment"));
 
     // Decide call
-    response = await userContext.decide('flag1');
+    decideResponse = await userContext.decide('flag1');
+    uiResponse +=
+        "\nThird decide call variationKey: ${decideResponse.decisions.first.variationKey}";
+
+    setState(() {
+      uiResponse = uiResponse;
+    });
 
     // should return original response without forced decision
     // flagKey: flag1
@@ -119,7 +129,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('OptimizelyConfig: $optimizelyConfig'),
+          child: Text(uiResponse),
         ),
       ),
     );

@@ -16,9 +16,10 @@
 
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
-import 'constants.dart';
-import 'utils.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
+import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
 enum ListenerType { track, decision, logEvent, projectConfigUpdate }
 
@@ -32,10 +33,11 @@ class OptimizelyClientWrapper {
   static Map<int, MultiUseCallback> callbacksById = {};
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
-  static Future<Map<String, dynamic>> initializeClient(String sdkKey) async {
+  static Future<BaseResponse> initializeClient(String sdkKey) async {
     _channel.setMethodCallHandler(methodCallHandler);
-    return Map<String, dynamic>.from(await _channel
+    final result = Map<String, dynamic>.from(await _channel
         .invokeMethod(Constants.initializeMethod, {Constants.sdkKey: sdkKey}));
+    return BaseResponse(result);
   }
 
   /// Returns a snapshot of the current project configuration.
@@ -50,11 +52,11 @@ class OptimizelyClientWrapper {
   static Future<OptimizelyUserContext?> createUserContext(
       String sdkKey, String userId,
       [Map<String, dynamic> attributes = const {}]) async {
-    var result = Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.createUserContextMethod, {
       Constants.sdkKey: sdkKey,
       Constants.userID: userId,
-      Constants.attributes: Utils.covertToTypedMap(attributes)
+      Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
     if (result[Constants.responseSuccess] == true) {
       return OptimizelyUserContext(sdkKey, _channel);
@@ -79,9 +81,7 @@ class OptimizelyClientWrapper {
     callbacksById[currentListenerId] = callback;
     // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
     // and returns the valid string value `logEvent`
-    var listenerTypeStr = listenerType
-        .toString()
-        .substring(listenerType.toString().indexOf('.') + 1);
+    final listenerTypeStr = listenerType.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,
@@ -98,8 +98,8 @@ class OptimizelyClientWrapper {
   static Future<void> methodCallHandler(MethodCall call) async {
     switch (call.method) {
       case Constants.callBackListener:
-        var id = call.arguments[Constants.id];
-        var payload = call.arguments[Constants.payload];
+        final id = call.arguments[Constants.id];
+        final payload = call.arguments[Constants.payload];
         if (id is int && payload != null && callbacksById.containsKey(id)) {
           callbacksById[id]!(payload);
         }

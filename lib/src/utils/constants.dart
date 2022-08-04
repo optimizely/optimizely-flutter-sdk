@@ -39,14 +39,18 @@ class Constants {
   // Request parameter keys
   static const String id = "id";
   static const String sdkKey = "sdkKey";
+  static const String userContext = "userContext";
   static const String userID = "userID";
   static const String attributes = "attributes";
+  static const String variables = "variables";
+  static const String reasons = "reasons";
   static const String eventKey = "eventKey";
   static const String eventTags = "eventTags";
   static const String keys = "keys";
   static const String variationKey = "variationKey";
   static const String flagKey = "flagKey";
   static const String ruleKey = "ruleKey";
+  static const String enabled = "enabled";
   static const String optimizelyDecideOption = "optimizelyDecideOption";
   static const String payload = "payload";
   static const String value = "value";

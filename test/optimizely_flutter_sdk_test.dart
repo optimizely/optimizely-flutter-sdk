@@ -17,8 +17,9 @@
 import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart";
-import "package:optimizely_flutter_sdk/src/constants.dart";
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
+import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 import 'dart:io';
 import 'dart:convert';
 
@@ -28,6 +29,9 @@ void main() {
   const String testSDKKey = "KZbunNn9bVfBWLpZPq2XC4";
   const String testSDKKey2 = "KZbunNn9bVfBWLpZPq2XC12";
   const String userId = "uid-351ea8";
+  // To check if decide options properly reached the native sdk through channel
+  List<String> decideOptions = [];
+
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
   dynamic mockOptimizelyConfig;
 
@@ -74,9 +78,21 @@ void main() {
             Constants.responseSuccess: true,
           };
         case Constants.decideMethod:
+          var keys = List<String>.from(methodCall.arguments[Constants.keys]);
+          decideOptions.addAll(List<String>.from(
+              methodCall.arguments[Constants.optimizelyDecideOption]));
+          // for decideAll
+          if (keys.isEmpty) {
+            keys = ["123", "456", "789"];
+          }
+          Map<String, dynamic> result = {};
+          for (final key in keys) {
+            result[key] = TestUtils.decideResponseMap;
+          }
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.decideCalled,
+            Constants.responseResult: result,
           };
         case Constants.setForcedDecision:
           return {
@@ -132,12 +148,10 @@ void main() {
       test("with valid SDK Key should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-        var result = await sdk.initializeClient();
+        var response = await sdk.initializeClient();
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason],
-            equals(Constants.instanceCreated));
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.instanceCreated));
       });
     });
     group("getOptimizelyConfig()", () {
@@ -173,14 +187,12 @@ void main() {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
-        var attributes = Map<String, dynamic>();
+        var attributes = <String, dynamic>{};
 
-        var result = await userContext!.setAttributes(attributes);
+        var response = await userContext!.setAttributes(attributes);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason],
-            equals(Constants.attributesAdded));
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.attributesAdded));
       });
     });
     group("trackEvent()", () {
@@ -189,66 +201,97 @@ void main() {
         var userContext = await sdk.createUserContext(userId);
         var eventKey = "event-key";
 
-        var result = await userContext!.trackEvent(eventKey);
+        var response = await userContext!.trackEvent(eventKey);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason], isNull);
+        expect(response.success, equals(true));
       });
     });
     group("decide()", () {
-      test("should succeed", () async {
+      bool assertDecideOptions(
+          Set<OptimizelyDecideOption> options, List<String> convertedOptions) {
+        for (var option in options) {
+          if (!convertedOptions.contains(option.name)) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      Set<OptimizelyDecideOption> options = {
+        OptimizelyDecideOption.disableDecisionEvent,
+        OptimizelyDecideOption.enabledFlagsOnly,
+        OptimizelyDecideOption.ignoreUserProfileService,
+        OptimizelyDecideOption.includeReasons,
+        OptimizelyDecideOption.excludeVariables,
+      };
+
+      test("decide() should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
         var decideKey = "decide-key";
 
-        var result = await userContext!.decide(decideKey);
+        var response = await userContext!.decide(decideKey, options);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason], Constants.decideCalled);
+        expect(response.success, equals(true));
+        expect(response.decisions.length, equals(1));
+        expect(response.reason, Constants.decideCalled);
+        expect(TestUtils.compareDecisions(response), true);
+        expect(decideOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, decideOptions), equals(true));
+        decideOptions = [];
       });
-    });
-    group("decideForKeys()", () {
-      test("should succeed", () async {
+
+      test("decideForKeys should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
         var decideKeys = ["decide-key-1", "decide-key-2"];
 
-        var result = await userContext!.decideForKeys(decideKeys);
+        var response = await userContext!.decideForKeys(decideKeys, options);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(
-            result[Constants.responseReason], equals(Constants.decideCalled));
+        expect(response.success, equals(true));
+        expect(response.decisions.length, equals(2));
+        expect(response.reason, Constants.decideCalled);
+        expect(TestUtils.compareDecisions(response), true);
+        expect(decideOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, decideOptions), equals(true));
+        decideOptions = [];
       });
-    });
-    group("decideAll()", () {
-      test("should succeed", () async {
+
+      test("decideAll() should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var result = await userContext!.decideAll();
+        var response = await userContext!.decideAll(options);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(
-            result[Constants.responseReason], equals(Constants.decideCalled));
+        expect(response.success, equals(true));
+        expect(response.decisions.length, equals(3));
+        expect(response.reason, Constants.decideCalled);
+        expect(TestUtils.compareDecisions(response), true);
+        expect(decideOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, decideOptions), equals(true));
+        decideOptions = [];
+      });
+
+      test("should convert decide options to list", () async {
+        final convertedOptions = Utils.convertDecideOptions(
+          options,
+        );
+        expect(convertedOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, convertedOptions), equals(true));
       });
     });
+
     group("setForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var result = await userContext!.setForcedDecision(
+        var response = await userContext!.setForcedDecision(
             OptimizelyDecisionContext("flagKey", "ruleKey"),
             OptimizelyForcedDecision("123"));
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason],
-            equals(Constants.forcedDecisionSet));
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.forcedDecisionSet));
       });
     });
     group("getForcedDecision()", () {
@@ -256,11 +299,10 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var result = await userContext!.getForcedDecision();
+        var response = await userContext!.getForcedDecision();
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.variationKey], equals("123"));
+        expect(response.success, equals(true));
+        expect(response.variationKey, equals("123"));
       });
     });
     group("removeForcedDecision()", () {
@@ -268,48 +310,38 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var result = await userContext!.removeForcedDecision(
+        var response = await userContext!.removeForcedDecision(
             OptimizelyDecisionContext("flagKey", "ruleKey"));
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason],
-            equals(Constants.removeForcedDecision));
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.removeForcedDecision));
       });
     });
-    group("removeAllForcedDecisions()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
 
-        var result = await userContext!.removeAllForcedDecisions();
+    test("removeAllForcedDecisions() should succeed", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+      var userContext = await sdk.createUserContext(userId);
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNull);
-        expect(result[Constants.responseReason],
-            equals(Constants.removeAllForcedDecisions));
-      });
+      var response = await userContext!.removeAllForcedDecisions();
+
+      expect(response.success, equals(true));
+      expect(response.reason, equals(Constants.removeAllForcedDecisions));
     });
-    group("addNotificationListener()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-        expect(sdk.addDecisionNotificationListener((_) => {}), completes);
-      });
+    test("addNotificationListener() should succeed", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+      expect(sdk.addDecisionNotificationListener((_) => {}), completes);
     });
-    group("removeNotificationListener()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var cancelListener = sdk.addDecisionNotificationListener((_) => {});
-        expect(cancelListener, completes);
-      });
+
+    test("removeNotificationListener() should succeed", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+      var cancelListener = sdk.addDecisionNotificationListener((_) => {});
+      expect(cancelListener, completes);
     });
 
     test("should receive 1 notification due to same callback used", () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      var callHandler = OptimizelyClientWrapper.methodCallHandler;
-      tester?.setMockMethodCallHandler(channel, callHandler);
       // ignore: prefer_function_declarations_over_variables
       void Function(dynamic) callback = (msg) {
         notifications.add(msg);
@@ -318,6 +350,8 @@ void main() {
       sdk.addLogEventNotificationListener(callback);
       sdk.addUpdateConfigNotificationListener(callback);
       sdk.addTrackNotificationListener(callback);
+      var callHandler = OptimizelyClientWrapper.methodCallHandler;
+      tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestNotifications(callHandler, 4);
       expect(notifications.length, equals(1));
       expect(TestUtils.testNotificationPayload(notifications), true);

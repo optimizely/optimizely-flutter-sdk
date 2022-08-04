@@ -15,10 +15,31 @@
 ///**************************************************************************/
 
 import 'package:flutter/services.dart';
-import '../constants.dart';
-import '../utils.dart';
-import 'optimizely_decision_context.dart';
-import 'optimizely_forced_decision.dart';
+import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
+import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
+import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
+
+/// Options controlling flag decisions.
+///
+enum OptimizelyDecideOption {
+  /// disable decision event tracking.
+  disableDecisionEvent,
+
+  /// return decisions only for flags which are enabled (decideAll only).
+  enabledFlagsOnly,
+
+  /// skip user profile service for decision.
+  ignoreUserProfileService,
+
+  /// include info and debug messages in the decision reasons.
+  includeReasons,
+
+  /// exclude variable values from the decision result.
+  excludeVariables
+}
 
 /// An object for user contexts that the SDK will use to make decisions for.
 ///
@@ -29,59 +50,62 @@ class OptimizelyUserContext {
   OptimizelyUserContext(this._sdkKey, this._channel);
 
   /// Sets attributes for the user context.
-  Future<Map<String, dynamic>> setAttributes(
-      Map<String, dynamic> attributes) async {
-    return Map<String, dynamic>.from(
+  Future<BaseResponse> setAttributes(Map<String, dynamic> attributes) async {
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setAttributesMethod, {
       Constants.sdkKey: _sdkKey,
-      Constants.attributes: Utils.covertToTypedMap(attributes)
+      Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
+    return BaseResponse(result);
   }
 
   /// Tracks an event.
-  Future<Map<String, dynamic>> trackEvent(String eventKey,
+  Future<BaseResponse> trackEvent(String eventKey,
       [Map<String, dynamic> eventTags = const {}]) async {
-    return Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.trackEventMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.eventKey: eventKey,
-      Constants.eventTags: Utils.covertToTypedMap(eventTags)
+      Constants.eventTags: Utils.convertToTypedMap(eventTags)
     }));
+    return BaseResponse(result);
   }
 
   /// Returns a decision result for a given flag key and a user context, which contains all data required to deliver the flag or experiment.
-  Future<Map<String, dynamic>> decide(String key,
-      [List<String> options = const []]) async {
+  Future<DecideResponse> decide(String key,
+      [Set<OptimizelyDecideOption> options = const {}]) async {
     // passing key as an array since decide has a single generic implementation which takes array of keys as an argument
     return await _decide([key], options);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<Map<String, dynamic>> decideForKeys(
-      [List<String> keys = const [], List<String> options = const []]) async {
+  Future<DecideResponse> decideForKeys(List<String> keys,
+      [Set<OptimizelyDecideOption> options = const {}]) async {
     return await _decide(keys, options);
   }
 
   /// Returns a key-map of decision results for all active flag keys.
-  Future<Map<String, dynamic>> decideAll(
-      [List<String> options = const []]) async {
-    return await _decide(options);
+  Future<DecideResponse> decideAll(
+      [Set<OptimizelyDecideOption> options = const {}]) async {
+    return await _decide([], options);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<Map<String, dynamic>> _decide(
-      [List<String> keys = const [], List<String> options = const []]) async {
-    return Map<String, dynamic>.from(
+  Future<DecideResponse> _decide(
+      [List<String> keys = const [],
+      Set<OptimizelyDecideOption> options = const {}]) async {
+    final convertedOptions = Utils.convertDecideOptions(options);
+    var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.keys: keys,
-      Constants.optimizelyDecideOption: options
+      Constants.optimizelyDecideOption: convertedOptions,
     }));
+    return DecideResponse(result);
   }
 
   /// Sets the forced decision for a given decision context.
-  Future<Map<String, dynamic>> setForcedDecision(
-      OptimizelyDecisionContext context,
+  Future<BaseResponse> setForcedDecision(OptimizelyDecisionContext context,
       OptimizelyForcedDecision decision) async {
     Map<String, dynamic> request = {
       Constants.sdkKey: _sdkKey,
@@ -91,20 +115,22 @@ class OptimizelyUserContext {
     if (context.ruleKey != null) {
       request[Constants.ruleKey] = context.ruleKey;
     }
-    return Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setForcedDecision, request));
+    return BaseResponse(result);
   }
 
   /// Returns the forced decision for a given decision context.
-  Future<Map<String, dynamic>> getForcedDecision() async {
-    return Map<String, dynamic>.from(
+  Future<GetForcedDecisionResponse> getForcedDecision() async {
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.getForcedDecision, {
       Constants.sdkKey: _sdkKey,
     }));
+    return GetForcedDecisionResponse(result);
   }
 
   /// Removes the forced decision for a given decision context.
-  Future<Map<String, dynamic>> removeForcedDecision(
+  Future<BaseResponse> removeForcedDecision(
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
       Constants.sdkKey: _sdkKey,
@@ -113,15 +139,17 @@ class OptimizelyUserContext {
     if (context.ruleKey != null) {
       request[Constants.ruleKey] = context.ruleKey;
     }
-    return Map<String, dynamic>.from(
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeForcedDecision, request));
+    return BaseResponse(result);
   }
 
   /// Removes all forced decisions bound to this user context.
-  Future<Map<String, dynamic>> removeAllForcedDecisions() async {
-    return Map<String, dynamic>.from(
+  Future<BaseResponse> removeAllForcedDecisions() async {
+    final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
       Constants.sdkKey: _sdkKey,
     }));
+    return BaseResponse(result);
   }
 }
