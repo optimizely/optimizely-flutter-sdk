@@ -16,6 +16,7 @@
 
 import 'dart:io' show Platform;
 
+import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class Utils {
@@ -61,5 +62,13 @@ class Utils {
       print('Unsupported value type for key: ${e.key}.');
     }
     return typedMap;
+  }
+
+  static List<String> covertDecideOptions(Set<OptimizelyDecideOption> options) {
+    List<String> convertedOptions = [];
+    for (var option in options) {
+      convertedOptions.add(option.name);
+    }
+    return convertedOptions;
   }
 }

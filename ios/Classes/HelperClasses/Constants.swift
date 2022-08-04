@@ -38,6 +38,14 @@ struct NotificationType {
     static let projectConfigUpdate = "projectConfigUpdate"
 }
 
+struct DecideOption {
+    static let disableDecisionEvent = "disableDecisionEvent"
+    static let enabledFlagsOnly = "enabledFlagsOnly"
+    static let ignoreUserProfileService = "ignoreUserProfileService"
+    static let includeReasons = "includeReasons"
+    static let excludeVariables = "excludeVariables"
+}
+
 struct RequestParameterKey {
     static let sdkKey = "sdkKey"
     static let userId = "userID"

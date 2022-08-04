@@ -81,9 +81,7 @@ class OptimizelyClientWrapper {
     callbacksById[currentListenerId] = callback;
     // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
     // and returns the valid string value `logEvent`
-    final listenerTypeStr = listenerType
-        .toString()
-        .substring(listenerType.toString().indexOf('.') + 1);
+    final listenerTypeStr = listenerType.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,

@@ -122,15 +122,15 @@ public class Utils: NSObject {
         var convertedOptions = [OptimizelyDecideOption]()
         for option in finalOptions {
             switch option {
-            case "DISABLE_DECISION_EVENT":
+            case DecideOption.disableDecisionEvent:
                 convertedOptions.append(OptimizelyDecideOption.disableDecisionEvent)
-            case "ENABLED_FLAGS_ONLY":
+            case DecideOption.enabledFlagsOnly:
                 convertedOptions.append(OptimizelyDecideOption.enabledFlagsOnly)
-            case "IGNORE_USER_PROFILE_SERVICE":
+            case DecideOption.ignoreUserProfileService:
                 convertedOptions.append(OptimizelyDecideOption.ignoreUserProfileService)
-            case "EXCLUDE_VARIABLES":
+            case DecideOption.excludeVariables:
                 convertedOptions.append(OptimizelyDecideOption.excludeVariables)
-            case "INCLUDE_REASONS":
+            case DecideOption.includeReasons:
                 convertedOptions.append(OptimizelyDecideOption.includeReasons)
             default: break
             }

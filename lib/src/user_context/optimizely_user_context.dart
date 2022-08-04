@@ -22,6 +22,25 @@ import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_resp
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
+/// Options controlling flag decisions.
+///
+enum OptimizelyDecideOption {
+  /// disable decision event tracking.
+  disableDecisionEvent,
+
+  /// return decisions only for flags which are enabled (decideAll only).
+  enabledFlagsOnly,
+
+  /// skip user profile service for decision.
+  ignoreUserProfileService,
+
+  /// include info and debug messages in the decision reasons.
+  includeReasons,
+
+  /// exclude variable values from the decision result.
+  excludeVariables
+}
+
 /// An object for user contexts that the SDK will use to make decisions for.
 ///
 class OptimizelyUserContext {
@@ -54,30 +73,33 @@ class OptimizelyUserContext {
 
   /// Returns a decision result for a given flag key and a user context, which contains all data required to deliver the flag or experiment.
   Future<DecideResponse> decide(String key,
-      [List<String> options = const []]) async {
+      [Set<OptimizelyDecideOption> options = const {}]) async {
     // passing key as an array since decide has a single generic implementation which takes array of keys as an argument
     return await _decide([key], options);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<DecideResponse> decideForKeys(
-      [List<String> keys = const [], List<String> options = const []]) async {
+  Future<DecideResponse> decideForKeys(List<String> keys,
+      [Set<OptimizelyDecideOption> options = const {}]) async {
     return await _decide(keys, options);
   }
 
   /// Returns a key-map of decision results for all active flag keys.
-  Future<DecideResponse> decideAll([List<String> options = const []]) async {
-    return await _decide(options);
+  Future<DecideResponse> decideAll(
+      [Set<OptimizelyDecideOption> options = const {}]) async {
+    return await _decide([], options);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
   Future<DecideResponse> _decide(
-      [List<String> keys = const [], List<String> options = const []]) async {
+      [List<String> keys = const [],
+      Set<OptimizelyDecideOption> options = const {}]) async {
+    final convertedOptions = Utils.covertDecideOptions(options);
     var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.keys: keys,
-      Constants.optimizelyDecideOption: options
+      Constants.optimizelyDecideOption: convertedOptions,
     }));
     return DecideResponse(result);
   }

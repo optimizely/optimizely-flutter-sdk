@@ -19,6 +19,7 @@ import "package:flutter_test/flutter_test.dart";
 import "package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart";
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
+import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 import 'dart:io';
 import 'dart:convert';
 
@@ -28,6 +29,8 @@ void main() {
   const String testSDKKey = "KZbunNn9bVfBWLpZPq2XC4";
   const String testSDKKey2 = "KZbunNn9bVfBWLpZPq2XC12";
   const String userId = "uid-351ea8";
+  // To check if decide options properly reached the native sdk through channel
+  List<String> decideOptions = [];
 
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
   dynamic mockOptimizelyConfig;
@@ -76,6 +79,8 @@ void main() {
           };
         case Constants.decideMethod:
           var keys = List<String>.from(methodCall.arguments[Constants.keys]);
+          decideOptions.addAll(List<String>.from(
+              methodCall.arguments[Constants.optimizelyDecideOption]));
           // for decideAll
           if (keys.isEmpty) {
             keys = ["123", "456", "789"];
@@ -202,46 +207,80 @@ void main() {
       });
     });
     group("decide()", () {
-      test("should succeed", () async {
+      bool assertDecideOptions(
+          Set<OptimizelyDecideOption> options, List<String> convertedOptions) {
+        for (var option in options) {
+          if (!convertedOptions.contains(option.name)) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      Set<OptimizelyDecideOption> options = {
+        OptimizelyDecideOption.disableDecisionEvent,
+        OptimizelyDecideOption.enabledFlagsOnly,
+        OptimizelyDecideOption.ignoreUserProfileService,
+        OptimizelyDecideOption.includeReasons,
+        OptimizelyDecideOption.excludeVariables,
+      };
+
+      test("decide() should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
         var decideKey = "decide-key";
 
-        var response = await userContext!.decide(decideKey);
+        var response = await userContext!.decide(decideKey, options);
 
         expect(response.success, equals(true));
         expect(response.decisions.length, equals(1));
         expect(response.reason, Constants.decideCalled);
         expect(TestUtils.compareDecisions(response), true);
+        expect(decideOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, decideOptions), equals(true));
+        decideOptions = [];
       });
-    });
-    group("decideForKeys()", () {
-      test("should succeed", () async {
+
+      test("decideForKeys should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
         var decideKeys = ["decide-key-1", "decide-key-2"];
 
-        var response = await userContext!.decideForKeys(decideKeys);
+        var response = await userContext!.decideForKeys(decideKeys, options);
 
         expect(response.success, equals(true));
         expect(response.decisions.length, equals(2));
         expect(response.reason, Constants.decideCalled);
         expect(TestUtils.compareDecisions(response), true);
+        expect(decideOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, decideOptions), equals(true));
+        decideOptions = [];
       });
-    });
-    group("decideAll()", () {
-      test("should succeed", () async {
+
+      test("decideAll() should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var response = await userContext!.decideAll();
+        var response = await userContext!.decideAll(options);
 
         expect(response.success, equals(true));
         expect(response.decisions.length, equals(3));
         expect(response.reason, Constants.decideCalled);
         expect(TestUtils.compareDecisions(response), true);
+        expect(decideOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, decideOptions), equals(true));
+        decideOptions = [];
+      });
+
+      test("should convert decide options to list", () async {
+        final convertedOptions = Utils.covertDecideOptions(
+          options,
+        );
+        expect(convertedOptions.length == 5, equals(true));
+        expect(assertDecideOptions(options, convertedOptions), equals(true));
       });
     });
+
     group("setForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
@@ -278,30 +317,26 @@ void main() {
         expect(response.reason, equals(Constants.removeForcedDecision));
       });
     });
-    group("removeAllForcedDecisions()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
 
-        var response = await userContext!.removeAllForcedDecisions();
+    test("removeAllForcedDecisions() should succeed", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+      var userContext = await sdk.createUserContext(userId);
 
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.removeAllForcedDecisions));
-      });
+      var response = await userContext!.removeAllForcedDecisions();
+
+      expect(response.success, equals(true));
+      expect(response.reason, equals(Constants.removeAllForcedDecisions));
     });
-    group("addNotificationListener()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-        expect(sdk.addDecisionNotificationListener((_) => {}), completes);
-      });
+    test("addNotificationListener() should succeed", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+      expect(sdk.addDecisionNotificationListener((_) => {}), completes);
     });
-    group("removeNotificationListener()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var cancelListener = sdk.addDecisionNotificationListener((_) => {});
-        expect(cancelListener, completes);
-      });
+
+    test("removeNotificationListener() should succeed", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+      var cancelListener = sdk.addDecisionNotificationListener((_) => {});
+      expect(cancelListener, completes);
     });
 
     test("should receive 1 notification due to same callback used", () async {
