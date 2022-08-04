@@ -273,7 +273,7 @@ void main() {
       });
 
       test("should convert decide options to list", () async {
-        final convertedOptions = Utils.covertDecideOptions(
+        final convertedOptions = Utils.convertDecideOptions(
           options,
         );
         expect(convertedOptions.length == 5, equals(true));

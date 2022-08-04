@@ -20,7 +20,7 @@ import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class Utils {
-  static Map<String, dynamic> covertToTypedMap(Map<String, dynamic> map) {
+  static Map<String, dynamic> convertToTypedMap(Map<String, dynamic> map) {
     // No alterations required for Android since types are successfully passed to its native code
     if (map.isEmpty || Platform.isAndroid) {
       return map;
@@ -64,7 +64,8 @@ class Utils {
     return typedMap;
   }
 
-  static List<String> covertDecideOptions(Set<OptimizelyDecideOption> options) {
+  static List<String> convertDecideOptions(
+      Set<OptimizelyDecideOption> options) {
     List<String> convertedOptions = [];
     for (var option in options) {
       convertedOptions.add(option.name);

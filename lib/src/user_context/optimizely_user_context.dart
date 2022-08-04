@@ -54,7 +54,7 @@ class OptimizelyUserContext {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setAttributesMethod, {
       Constants.sdkKey: _sdkKey,
-      Constants.attributes: Utils.covertToTypedMap(attributes)
+      Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
     return BaseResponse(result);
   }
@@ -66,7 +66,7 @@ class OptimizelyUserContext {
         await _channel.invokeMethod(Constants.trackEventMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.eventKey: eventKey,
-      Constants.eventTags: Utils.covertToTypedMap(eventTags)
+      Constants.eventTags: Utils.convertToTypedMap(eventTags)
     }));
     return BaseResponse(result);
   }
@@ -94,7 +94,7 @@ class OptimizelyUserContext {
   Future<DecideResponse> _decide(
       [List<String> keys = const [],
       Set<OptimizelyDecideOption> options = const {}]) async {
-    final convertedOptions = Utils.covertDecideOptions(options);
+    final convertedOptions = Utils.convertDecideOptions(options);
     var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
       Constants.sdkKey: _sdkKey,

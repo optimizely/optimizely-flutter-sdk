@@ -56,7 +56,7 @@ class OptimizelyClientWrapper {
         await _channel.invokeMethod(Constants.createUserContextMethod, {
       Constants.sdkKey: sdkKey,
       Constants.userID: userId,
-      Constants.attributes: Utils.covertToTypedMap(attributes)
+      Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
     if (result[Constants.responseSuccess] == true) {
       return OptimizelyUserContext(sdkKey, _channel);
