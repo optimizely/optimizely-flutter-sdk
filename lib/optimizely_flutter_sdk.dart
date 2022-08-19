@@ -27,6 +27,8 @@ export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_cont
     show OptimizelyDecisionContext;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart'
     show OptimizelyDecideOption;
+export 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart'
+    show Decision;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///

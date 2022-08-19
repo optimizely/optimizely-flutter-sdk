@@ -71,11 +71,11 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         
         // Creating new instance
         let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey)
-        optimizelyClientsTracker[sdkKey] = optimizelyInstance
         
         optimizelyInstance.start{ [weak self] res in
             switch res {
             case .success(_):
+                self?.optimizelyClientsTracker[sdkKey] = optimizelyInstance
                 result(self?.createResponse(success: true, reason: SuccessMessage.instanceCreated))
             case .failure(let err):
                 result(self?.createResponse(success: false, reason: err.localizedDescription))

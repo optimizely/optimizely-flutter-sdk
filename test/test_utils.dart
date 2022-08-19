@@ -23,21 +23,21 @@ import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 class TestUtils {
   static const collectionEquality = DeepCollectionEquality();
   static const Map<String, dynamic> decideResponseMap = {
-    "enabled": true,
-    "variables": {
+    Constants.enabled: true,
+    Constants.variables: {
       "bool_var": true,
       "str_var": "hello",
       "int_var": 1,
       "double_var": 5.5999999999999996
     },
-    "reasons": ["test_reason"],
-    "variation_key": "16906801184",
-    "user_context": {
-      "user_id": "934391.0003922911",
-      "attributes": {"attr_1": "hola"}
+    Constants.reasons: ["test_reason"],
+    Constants.variationKey: "16906801184",
+    Constants.userContext: {
+      Constants.userID: "934391.0003922911",
+      Constants.attributes: {"attr_1": "hola"}
     },
-    "rule_key": "16941022436",
-    "flag_key": "feature_1"
+    Constants.ruleKey: "16941022436",
+    Constants.flagKey: "feature_1"
   };
 
   static bool compareDecisions(DecideResponse response) {
