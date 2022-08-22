@@ -20,6 +20,14 @@ import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class Utils {
+  static Map<OptimizelyDecideOption, String> decideOptions = {
+    OptimizelyDecideOption.disableDecisionEvent: "disableDecisionEvent",
+    OptimizelyDecideOption.enabledFlagsOnly: "enabledFlagsOnly",
+    OptimizelyDecideOption.ignoreUserProfileService: "ignoreUserProfileService",
+    OptimizelyDecideOption.includeReasons: "includeReasons",
+    OptimizelyDecideOption.excludeVariables: "excludeVariables",
+  };
+
   static Map<String, dynamic> convertToTypedMap(Map<String, dynamic> map) {
     // No alterations required for Android since types are successfully passed to its native code
     if (map.isEmpty || Platform.isAndroid) {
@@ -68,7 +76,7 @@ class Utils {
       Set<OptimizelyDecideOption> options) {
     List<String> convertedOptions = [];
     for (var option in options) {
-      convertedOptions.add(option.name);
+      convertedOptions.add(Utils.decideOptions[option]!);
     }
     return convertedOptions;
   }

@@ -346,10 +346,10 @@ void main() {
       void Function(dynamic) callback = (msg) {
         notifications.add(msg);
       };
-      sdk.addDecisionNotificationListener(callback);
-      sdk.addLogEventNotificationListener(callback);
-      sdk.addUpdateConfigNotificationListener(callback);
-      sdk.addTrackNotificationListener(callback);
+      await sdk.addDecisionNotificationListener(callback);
+      await sdk.addLogEventNotificationListener(callback);
+      await sdk.addUpdateConfigNotificationListener(callback);
+      await sdk.addTrackNotificationListener(callback);
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestNotifications(callHandler, 4);
@@ -361,16 +361,16 @@ void main() {
         () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
@@ -383,28 +383,28 @@ void main() {
     test("should receive notifications with several ListenerTypes", () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
@@ -419,29 +419,29 @@ void main() {
       var sdk1 = OptimizelyFlutterSdk(testSDKKey);
       var sdk2 = OptimizelyFlutterSdk(testSDKKey2);
 
-      sdk1.addDecisionNotificationListener((msg) {
+      await sdk1.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk1.addLogEventNotificationListener((msg) {
+      await sdk1.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk1.addUpdateConfigNotificationListener((msg) {
+      await sdk1.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk1.addTrackNotificationListener((msg) {
+      await sdk1.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
 
-      sdk2.addDecisionNotificationListener((msg) {
+      await sdk2.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk2.addLogEventNotificationListener((msg) {
+      await sdk2.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk2.addUpdateConfigNotificationListener((msg) {
+      await sdk2.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk2.addTrackNotificationListener((msg) {
+      await sdk2.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
 
@@ -457,16 +457,16 @@ void main() {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
 
