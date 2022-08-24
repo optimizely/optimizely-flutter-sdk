@@ -66,6 +66,7 @@ public class Constants {
         public static final String OPTIMIZELY_CONFIG_FOUND = "Optimizely config found.";
         public static final String USER_CONTEXT_CREATED = "User context created successfully.";
         public static final String LISTENER_REMOVED = "Listener removed successfully.";
+        public static final String DECIDE_CALLED = "Decide called successfully.";
         public static final String LISTENER_ADDED = "Listener added successfully.";
         public static final String ATTRIBUTES_ADDED = "Attributes added successfully.";
         public static final String EVENT_TRACKED = "Event Tracked successfully.";
@@ -98,5 +99,13 @@ public class Constants {
         public static final String RESULT = "result";
         public static final String REASON = "reason";
         public static final String SUCCESS = "success";
+    }
+
+    public static class DecideOption {
+        public static final String DISABLE_DECISION_EVENT = "disableDecisionEvent";
+        public static final String ENABLED_FLAGS_ONLY = "enabledFlagsOnly";
+        public static final String IGNORE_USER_PROFILE_SERVICE = "ignoreUserProfileService";
+        public static final String INCLUDE_REASONS = "includeReasons";
+        public static final String EXCLUDE_VARIABLES = "excludeVariables";
     }
 }

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 public class OptimizelyDecisionResponse {
-    @JsonProperty("variation_key")
     private final String variationKey;
 
     private final boolean enabled;

@@ -22,6 +22,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import com.optimizely.ab.OptimizelyUserContext;
 import com.optimizely.ab.OptimizelyDecisionContext;
 import com.optimizely.ab.OptimizelyForcedDecision;
+import com.optimizely.ab.UnknownEventTypeException;
 import com.optimizely.ab.android.sdk.OptimizelyClient;
 
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import android.content.Context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
+import com.optimizely.ab.error.RaiseExceptionErrorHandler;
 import com.optimizely.ab.event.LogEvent;
 import com.optimizely.ab.notification.DecisionNotification;
 import com.optimizely.ab.notification.TrackNotification;
@@ -70,6 +72,7 @@ public class OptimizelyFlutterClient {
         OptimizelyManager optimizelyManager = OptimizelyManager.builder()
                 .withEventDispatchInterval(60L, TimeUnit.SECONDS)
                 .withDatafileDownloadInterval(15, TimeUnit.MINUTES)
+                .withErrorHandler(new RaiseExceptionErrorHandler())
                 .withSDKKey(sdkKey)
                 .build(context);
         optimizelyManager.initialize(context, null, (OptimizelyClient client) -> {
@@ -151,7 +154,7 @@ public class OptimizelyFlutterClient {
         }
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> s = mapper.convertValue(optimizelyDecisionResponseMap, LinkedHashMap.class);
-        result.success(createResponse(true, s, ""));
+        result.success(createResponse(true, s, SuccessMessage.DECIDE_CALLED));
     }
 
     protected void setForcedDecision(ArgumentsParser argumentsParser, @NonNull Result result) {
@@ -271,7 +274,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
         }
-        if (eventKey == null) {
+        if (eventKey == null || eventKey.trim().isEmpty()) {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
@@ -281,7 +284,7 @@ public class OptimizelyFlutterClient {
         try {
             userContext.trackEvent(eventKey, eventTags);
             result.success(createResponse(true, SuccessMessage.EVENT_TRACKED));
-        } catch (Exception ex) {
+        } catch (UnknownEventTypeException ex) {
             result.success(createResponse(false, ex.getMessage()));
         }
     }
@@ -352,7 +355,10 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CONFIG_NOT_FOUND));
             return;
         }
-        result.success(createResponse(true, SuccessMessage.OPTIMIZELY_CONFIG_FOUND));
+        ObjectMapper objMapper = new ObjectMapper();
+        Map optimizelyConfigMap = objMapper.convertValue(optimizelyConfig, Map.class);
+        optimizelyConfigMap.remove("datafile");
+        result.success(createResponse(true, optimizelyConfigMap, SuccessMessage.OPTIMIZELY_CONFIG_FOUND));
     }
 
     public Map<String, ?> createResponse(Boolean success, Object result, String reason) {
@@ -369,7 +375,7 @@ public class OptimizelyFlutterClient {
     }
 
     public OptimizelyClient getOptimizelyClient(String SDKKey) {
-        return optimizelyManagerTracker.get(SDKKey).getOptimizely();
+        return optimizelyManagerTracker.get(SDKKey) == null? null : optimizelyManagerTracker.get(SDKKey).getOptimizely();
     }
 
     public OptimizelyUserContext getUserContext(String SDKKey) {
