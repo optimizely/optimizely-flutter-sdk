@@ -17,6 +17,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
@@ -41,9 +42,11 @@ class OptimizelyClientWrapper {
   }
 
   /// Returns a snapshot of the current project configuration.
-  static Future<Map<String, dynamic>> getOptimizelyConfig(String sdkKey) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
+  static Future<OptimizelyConfigResponse> getOptimizelyConfig(
+      String sdkKey) async {
+    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
         Constants.getOptimizelyConfigMethod, {Constants.sdkKey: sdkKey}));
+    return OptimizelyConfigResponse(result);
   }
 
   /// Creates a context of the user for which decision APIs will be called.

@@ -159,12 +159,11 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
         var result = await sdk.getOptimizelyConfig();
-        var config = result[Constants.responseResult];
+        var config = result.optimizelyConfig;
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNotNull);
-        expect(result[Constants.responseReason],
-            equals(Constants.optimizelyConfigFound));
+        expect(result.success, equals(true));
+        expect(result.optimizelyConfig, isNotNull);
+        expect(result.reason, equals(Constants.optimizelyConfigFound));
 
         expect(config["sdkKey"], equals(testSDKKey));
         expect(config["environmentKey"], equals("production"));
