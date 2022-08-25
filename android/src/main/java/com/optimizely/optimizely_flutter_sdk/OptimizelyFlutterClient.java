@@ -45,6 +45,7 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.convertKeysCamelCaseToSnakeCase;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.isValidAttribute;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -207,7 +208,7 @@ public class OptimizelyFlutterClient {
         OptimizelyDecisionContext optimizelyDecisionContext = new OptimizelyDecisionContext(flagKey, ruleKey);
         OptimizelyForcedDecision forcedDecision = userContext.getForcedDecision(optimizelyDecisionContext);
         if (forcedDecision != null) {
-            result.success(createResponse(true, forcedDecision.getVariationKey(), ""));
+            result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VARIATION_KEY, forcedDecision.getVariationKey()), ""));
         }
 
         result.success(createResponse(false, ""));

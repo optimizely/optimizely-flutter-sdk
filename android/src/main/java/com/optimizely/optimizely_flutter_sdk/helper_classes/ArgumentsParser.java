@@ -15,8 +15,11 @@
  ***************************************************************************/
 package com.optimizely.optimizely_flutter_sdk.helper_classes;
 
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.isValidAttribute;
+
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +47,14 @@ public class ArgumentsParser {
     }
 
     public Map<String, Object> getAttributes() {
-        return (Map<String, Object>) arguments.get(Constants.RequestParameterKey.ATTRIBUTES);
+        Map<String, Object> attributes = (Map<String, Object>) arguments.get(Constants.RequestParameterKey.ATTRIBUTES);
+        Map<String, Object> validAttributes = new HashMap<>();
+        for (String attributeKey : attributes.keySet()) {
+            if (isValidAttribute(attributes.get(attributeKey))) {
+                validAttributes.put(attributeKey, attributes.get(attributeKey));
+            }
+        }
+        return validAttributes;
     }
 
     public String getEventKey() {
