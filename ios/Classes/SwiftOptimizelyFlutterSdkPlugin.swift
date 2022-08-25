@@ -280,7 +280,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
-        if let variationKey = usrContext.getForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String)) {
+        if let variationKey = usrContext.getForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String))?.variationKey {
             result(self.createResponse(success: true, result: [ResponseKey.variationKey: variationKey]))
             return
         }

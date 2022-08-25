@@ -102,7 +102,7 @@ void main() {
         case Constants.getForcedDecision:
           return {
             Constants.responseSuccess: true,
-            Constants.variationKey: "123",
+            Constants.responseResult: {Constants.variationKey: "123"},
           };
         case Constants.removeForcedDecision:
           return {
@@ -298,7 +298,8 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var response = await userContext!.getForcedDecision();
+        var response = await userContext!
+            .getForcedDecision(OptimizelyDecisionContext("flagKey", "ruleKey"));
 
         expect(response.success, equals(true));
         expect(response.variationKey, equals("123"));

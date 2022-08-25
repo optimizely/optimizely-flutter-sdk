@@ -21,8 +21,11 @@ class GetForcedDecisionResponse extends BaseResponse {
   String variationKey = '';
 
   GetForcedDecisionResponse(Map<String, dynamic> json) : super(json) {
-    if (json[Constants.variationKey] is String) {
-      variationKey = json[Constants.variationKey];
+    if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
+      var response = Map<String, dynamic>.from(json[Constants.responseResult]);
+      if (response[Constants.variationKey] is String) {
+        variationKey = response[Constants.variationKey];
+      }
     }
   }
 }

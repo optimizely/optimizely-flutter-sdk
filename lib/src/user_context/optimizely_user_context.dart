@@ -121,11 +121,18 @@ class OptimizelyUserContext {
   }
 
   /// Returns the forced decision for a given decision context.
-  Future<GetForcedDecisionResponse> getForcedDecision() async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getForcedDecision, {
+  Future<GetForcedDecisionResponse> getForcedDecision(
+      OptimizelyDecisionContext context) async {
+    Map<String, dynamic> request = {
       Constants.sdkKey: _sdkKey,
-    }));
+      Constants.flagKey: context.flagKey,
+    };
+    if (context.ruleKey != null) {
+      request[Constants.ruleKey] = context.ruleKey;
+    }
+
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getForcedDecision, request));
     return GetForcedDecisionResponse(result);
   }
 
