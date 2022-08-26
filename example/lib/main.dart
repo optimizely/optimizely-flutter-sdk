@@ -115,6 +115,11 @@ class _MyAppState extends State<MyApp> {
       "stringValue": "121"
     });
 
+    var cancelLogEventListener =
+        await flutterSDK.addLogEventNotificationListener((notification) {
+      print("logevent notification received");
+    });
+
     // To cancel track listener
     // cancelTrackListener();
 

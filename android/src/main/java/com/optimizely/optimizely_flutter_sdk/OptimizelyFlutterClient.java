@@ -30,6 +30,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
@@ -181,6 +182,7 @@ public class OptimizelyFlutterClient {
         OptimizelyForcedDecision optimizelyForcedDecision = new OptimizelyForcedDecision(variationKey);
         if (userContext.setForcedDecision(optimizelyDecisionContext, optimizelyForcedDecision)) {
             result.success(createResponse(true, SuccessMessage.FORCED_DECISION_SET));
+            return;
         }
 
         result.success(createResponse(false, ""));
@@ -235,6 +237,7 @@ public class OptimizelyFlutterClient {
         OptimizelyDecisionContext optimizelyDecisionContext = new OptimizelyDecisionContext(flagKey, ruleKey);
         if (userContext.removeForcedDecision(optimizelyDecisionContext)) {
             result.success(createResponse(true, SuccessMessage.REMOVED_FORCED_DECISION));
+            return;
         }
 
         result.success(createResponse(false, ""));
@@ -482,6 +485,9 @@ public class OptimizelyFlutterClient {
         listenerResponse.put(RequestParameterKey.NOTIFICATION_TYPE, notificationType);
         listenerResponse.put(RequestParameterKey.NOTIFICATION_PAYLOAD, notificationMap);
         Map<String, Object> listenerUnmodifiable = Collections.unmodifiableMap(listenerResponse);
-        OptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", listenerUnmodifiable);
+        // Get a handler that can be used to post to the main thread
+        Handler mainHandler = new Handler(context.getMainLooper());
+        Runnable myRunnable = () -> OptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", listenerUnmodifiable);
+        mainHandler.post(myRunnable);
     }
 }
