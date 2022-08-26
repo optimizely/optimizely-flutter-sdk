@@ -29,16 +29,17 @@ class Utils {
   };
 
   static Map<String, dynamic> convertToTypedMap(Map<String, dynamic> map) {
-    // No alterations required for Android since types are successfully passed to its native code
-    if (map.isEmpty || Platform.isAndroid) {
+    if (map.isEmpty) {
       return map;
     }
 
-    // Send type along with value so typecasting is easily possible
-    // Can you add logging here, in case any type we are missing here.
+    // Send type along with value so typecasting is easily possible (only for iOS)
     Map<String, dynamic> typedMap = {};
+    // Only keep primitive values
+    Map<String, dynamic> primitiveMap = {};
     for (MapEntry e in map.entries) {
       if (e.value is String) {
+        primitiveMap[e.key] = e.value;
         typedMap[e.key] = {
           Constants.value: e.value,
           Constants.type: Constants.stringType
@@ -46,6 +47,7 @@ class Utils {
         continue;
       }
       if (e.value is double) {
+        primitiveMap[e.key] = e.value;
         typedMap[e.key] = {
           Constants.value: e.value,
           Constants.type: Constants.doubleType
@@ -53,6 +55,7 @@ class Utils {
         continue;
       }
       if (e.value is int) {
+        primitiveMap[e.key] = e.value;
         typedMap[e.key] = {
           Constants.value: e.value,
           Constants.type: Constants.intType
@@ -60,6 +63,7 @@ class Utils {
         continue;
       }
       if (e.value is bool) {
+        primitiveMap[e.key] = e.value;
         typedMap[e.key] = {
           Constants.value: e.value,
           Constants.type: Constants.boolType
@@ -69,7 +73,11 @@ class Utils {
       // ignore: avoid_print
       print('Unsupported value type for key: ${e.key}.');
     }
-    return typedMap;
+
+    if (Platform.isIOS) {
+      return typedMap;
+    }
+    return primitiveMap;
   }
 
   static List<String> convertDecideOptions(
