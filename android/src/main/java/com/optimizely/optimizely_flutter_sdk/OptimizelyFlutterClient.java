@@ -373,6 +373,10 @@ public class OptimizelyFlutterClient {
             return;
         }
         optimizelyClient.close();
+
+        optimizelyManagerTracker.remove(sdkKey);
+        userContextsTracker.remove(sdkKey);
+        
         result.success(createResponse(true, SuccessMessage.OPTIMIZELY_CLIENT_CLOSED));
     }
 
