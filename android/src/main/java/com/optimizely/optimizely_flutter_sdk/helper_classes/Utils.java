@@ -45,25 +45,6 @@ public class Utils {
         return decisionInfoCopy;
     }
 
-    public static boolean isValidAttribute(Object attribute) {
-        if (attribute == null) {
-            return false;
-        }
-        if (attribute instanceof String) {
-            return true;
-        }
-        if (attribute instanceof Integer) {
-            return true;
-        }
-        if (attribute instanceof Double) {
-            return true;
-        }
-        if (attribute instanceof Boolean) {
-            return true;
-        }
-        return false;
-    }
-
     public static List<OptimizelyDecideOption> getDecideOptions(List<String> options) {
         if(options == null || options.isEmpty()) {
             return null;

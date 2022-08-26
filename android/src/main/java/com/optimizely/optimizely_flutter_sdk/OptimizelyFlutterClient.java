@@ -45,7 +45,6 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.convertKeysCamelCaseToSnakeCase;
-import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.isValidAttribute;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
