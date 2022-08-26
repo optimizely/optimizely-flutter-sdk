@@ -456,7 +456,6 @@ public class OptimizelyFlutterClient {
                     Map<String, Object> eventParams = mapper.readValue(logEvent.getBody(), Map.class);
                     Map<String, Object> listenerMap = new HashMap<>();
                     listenerMap.put(LogEventListenerKeys.URL, logEvent.getEndpointUrl());
-                    listenerMap.put(LogEventListenerKeys.HTTP_VERB, logEvent.getRequestMethod());
                     listenerMap.put(LogEventListenerKeys.PARAMS, eventParams);
                     invokeNotification(id, NotificationType.LOG_EVENT, listenerMap);
                 });
