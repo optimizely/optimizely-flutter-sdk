@@ -364,25 +364,6 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(true, optimizelyConfigMap, SuccessMessage.OPTIMIZELY_CONFIG_FOUND));
     }
 
-    protected void close(ArgumentsParser argumentsParser, @NonNull Result result) {
-        String sdkKey = argumentsParser.getSdkKey();
-        if (sdkKey == null) {
-            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
-            return;
-        }
-        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
-        if (optimizelyClient == null) {
-            result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
-            return;
-        }
-        optimizelyClient.close();
-
-        optimizelyManagerTracker.remove(sdkKey);
-        userContextsTracker.remove(sdkKey);
-        
-        result.success(createResponse(true, SuccessMessage.OPTIMIZELY_CLIENT_CLOSED));
-    }
-
     public Map<String, ?> createResponse(Boolean success, Object result, String reason) {
         Map<String, Object> response = new HashMap<>();
         response.put(ResponseKey.SUCCESS, success);

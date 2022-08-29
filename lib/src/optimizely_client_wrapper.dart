@@ -49,14 +49,6 @@ class OptimizelyClientWrapper {
     return OptimizelyConfigResponse(result);
   }
 
-  /// Returns a success true if optimizely client closed successfully.
-  static Future<BaseResponse> close(
-      String sdkKey) async {
-    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.close, {Constants.sdkKey: sdkKey}));
-    return BaseResponse(result);
-  }
-
   /// Creates a context of the user for which decision APIs will be called.
   ///
   /// A user context will only be created successfully when the SDK is fully configured using initializeClient.
