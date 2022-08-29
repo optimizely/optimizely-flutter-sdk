@@ -232,9 +232,9 @@ void main() {
         var response = await userContext!.decide(decideKey, options);
 
         expect(response.success, equals(true));
-        expect(response.decisions.length, equals(1));
+        expect(response.decision != null, equals(true));
         expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response), equals(true));
+        expect(TestUtils.compareDecisions([response.decision!]), equals(true));
         expect(decideOptions.length == 5, equals(true));
         expect(assertDecideOptions(options, decideOptions), equals(true));
         decideOptions = [];
@@ -250,7 +250,7 @@ void main() {
         expect(response.success, equals(true));
         expect(response.decisions.length, equals(2));
         expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response), equals(true));
+        expect(TestUtils.compareDecisions(response.decisions), equals(true));
         expect(decideOptions.length == 5, equals(true));
         expect(assertDecideOptions(options, decideOptions), equals(true));
         decideOptions = [];
@@ -265,7 +265,7 @@ void main() {
         expect(response.success, equals(true));
         expect(response.decisions.length, equals(3));
         expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response), equals(true));
+        expect(TestUtils.compareDecisions(response.decisions), equals(true));
         expect(decideOptions.length == 5, equals(true));
         expect(assertDecideOptions(options, decideOptions), equals(true));
         decideOptions = [];

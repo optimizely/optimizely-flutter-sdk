@@ -40,10 +40,10 @@ class TestUtils {
     Constants.flagKey: "feature_1"
   };
 
-  static bool compareDecisions(DecideResponse response) {
+  static bool compareDecisions(List<Decision> decisions) {
     final correctDecision = Decision(decideResponseMap);
-    for (var i = 0; i < response.decisions.length; i++) {
-      final decision = response.decisions[i];
+    for (var i = 0; i < decisions.length; i++) {
+      final decision = decisions[i];
       if (decision.variationKey != correctDecision.variationKey) {
         return false;
       }
