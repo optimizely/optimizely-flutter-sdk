@@ -59,6 +59,11 @@ class OptimizelyFlutterSdk {
         _sdkKey, userId, attributes);
   }
 
+  /// Checks if eventHandler are Closeable and calls close on them.
+  Future<BaseResponse> close() async {
+    return await OptimizelyClientWrapper.close(_sdkKey);
+  }
+
   Future<CancelListening> addDecisionNotificationListener(
       MultiUseCallback callback) async {
     return await _addNotificationListener(callback, ListenerType.decision);

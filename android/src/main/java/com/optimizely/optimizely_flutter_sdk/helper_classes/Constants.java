@@ -17,6 +17,7 @@ package com.optimizely.optimizely_flutter_sdk.helper_classes;
 
 public class Constants {
     public static class APIs {
+        public static final String CLOSE = "close";
         public static final String INITIALIZE = "initialize";
         public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
         public static final String CREATE_USER_CONTEXT = "createUserContext";
@@ -64,6 +65,7 @@ public class Constants {
     public static class SuccessMessage {
         public static final String INSTANCE_CREATED = "Optimizely instance created successfully.";
         public static final String OPTIMIZELY_CONFIG_FOUND = "Optimizely config found.";
+        public static final String OPTIMIZELY_CLIENT_CLOSED = "Optimizely client closed successfully.";
         public static final String USER_CONTEXT_CREATED = "User context created successfully.";
         public static final String LISTENER_REMOVED = "Listener removed successfully.";
         public static final String DECIDE_CALLED = "Decide called successfully.";

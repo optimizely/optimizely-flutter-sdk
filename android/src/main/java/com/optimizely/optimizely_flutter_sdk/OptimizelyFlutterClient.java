@@ -262,6 +262,25 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(false, ""));
     }
 
+    protected void close(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (optimizelyClient == null) {
+            result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
+            return;
+        }
+        optimizelyClient.close();
+
+        optimizelyManagerTracker.remove(sdkKey);
+        userContextsTracker.remove(sdkKey);
+
+        result.success(createResponse(true, SuccessMessage.OPTIMIZELY_CLIENT_CLOSED));
+    }
+
     protected void trackEvent(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         if (sdkKey == null) {
