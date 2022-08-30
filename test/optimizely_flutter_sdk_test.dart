@@ -124,6 +124,11 @@ void main() {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.listenerRemoved,
           };
+        case Constants.close:
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseReason: Constants.optimizelyClientClosed,
+          };
         default:
           return null;
       }
@@ -152,6 +157,14 @@ void main() {
 
         expect(response.success, equals(true));
         expect(response.reason, equals(Constants.instanceCreated));
+      });
+    });
+    group("close()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var response = await sdk.close();
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.optimizelyClientClosed));
       });
     });
     group("getOptimizelyConfig()", () {

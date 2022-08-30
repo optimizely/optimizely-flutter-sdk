@@ -68,6 +68,8 @@ class Constants {
   static const String instanceCreated =
       "Optimizely instance created successfully.";
   static const String optimizelyConfigFound = "Optimizely config found.";
+  static const String optimizelyClientClosed =
+      "Optimizely client closed successfully.";
   static const String userContextCreated = "User context created successfully.";
   static const String attributesAdded = "Attributes added successfully.";
   static const String listenerAdded = "Listener added successfully.";
