@@ -44,7 +44,10 @@ void main() {
         jsonDecode(await optimizelyConfigJsonFile.readAsString());
 
     TestWidgetsFlutterBinding.ensureInitialized();
-    OptimizelyClientWrapper.callbacksById = {};
+    OptimizelyClientWrapper.decisionCallbacksById = {};
+    OptimizelyClientWrapper.trackCallbacksById = {};
+    OptimizelyClientWrapper.configUpdateCallbacksById = {};
+    OptimizelyClientWrapper.logEventCallbacksById = {};
     OptimizelyClientWrapper.nextCallbackId = 0;
     tester = TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger;
 

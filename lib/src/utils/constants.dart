@@ -43,10 +43,14 @@ class Constants {
   static const String userContext = "userContext";
   static const String userID = "userID";
   static const String attributes = "attributes";
+  static const String decisionInfo = "decisionInfo";
   static const String variables = "variables";
   static const String reasons = "reasons";
   static const String eventKey = "eventKey";
+  static const String url = "url";
+  static const String params = "params";
   static const String eventTags = "eventTags";
+  static const String event = "event";
   static const String keys = "keys";
   static const String variationKey = "variationKey";
   static const String flagKey = "flagKey";
@@ -57,6 +61,11 @@ class Constants {
   static const String value = "value";
   static const String type = "type";
   static const String callBackListener = "callbackListener";
+  static const String trackCallBackListener = "trackCallbackListener";
+  static const String decisionCallBackListener = "decisionCallbackListener";
+  static const String logEventCallbackListener = "logEventCallbackListener";
+  static const String configUpdateCallBackListener =
+      "configUpdateCallBackListener";
 
   // Response keys
   static const String responseSuccess = "success";
