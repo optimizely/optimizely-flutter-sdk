@@ -23,6 +23,7 @@ class Constants {
 
   // Supported Method Names
   static const String initializeMethod = "initialize";
+  static const String close = "close";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
   static const String createUserContextMethod = "createUserContext";
   static const String setAttributesMethod = "setAttributes";

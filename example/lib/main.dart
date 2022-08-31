@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
     // Decide call
     var decideResponse = await userContext.decide('flag1');
     uiResponse +=
-        "\nFirst decide call variationKey: ${decideResponse.decisions.first.variationKey}";
+        "\nFirst decide call variationKey: ${decideResponse.decision!.variationKey}";
 
     // should return following response without forced decision
     // flagKey: flag1
@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> {
     // Decide call
     decideResponse = await userContext.decide('flag1');
     uiResponse +=
-        "\nSecond decide call variationKey: ${decideResponse.decisions.first.variationKey}";
+        "\nSecond decide call variationKey: ${decideResponse.decision!.variationKey}";
 
     // should return following response with forced decision
     // flagKey: flag1
@@ -86,7 +86,7 @@ class _MyAppState extends State<MyApp> {
     // Decide call
     decideResponse = await userContext.decide('flag1');
     uiResponse +=
-        "\nThird decide call variationKey: ${decideResponse.decisions.first.variationKey}";
+        "\nThird decide call variationKey: ${decideResponse.decision!.variationKey}";
 
     setState(() {
       uiResponse = uiResponse;

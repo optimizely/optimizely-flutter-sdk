@@ -18,6 +18,7 @@ library optimizely_flutter_sdk;
 
 import 'dart:async';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 
@@ -27,6 +28,8 @@ export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_cont
     show OptimizelyDecisionContext;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart'
     show OptimizelyDecideOption;
+export 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart'
+    show Decision;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
@@ -43,7 +46,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Returns a snapshot of the current project configuration.
-  Future<Map<String, dynamic>> getOptimizelyConfig() async {
+  Future<OptimizelyConfigResponse> getOptimizelyConfig() async {
     return await OptimizelyClientWrapper.getOptimizelyConfig(_sdkKey);
   }
 
