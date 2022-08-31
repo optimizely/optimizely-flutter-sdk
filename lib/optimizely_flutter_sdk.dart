@@ -90,28 +90,28 @@ class OptimizelyFlutterSdk {
     return await _addLogEventNotificationListener(callback);
   }
 
-  /// Allows user to listen to supported notifications.
+  /// Allows user to listen to supported Decision notifications.
   Future<CancelListening> _addDecisionNotificationListener(
       DecisionNotificationCallback callback) async {
     return await OptimizelyClientWrapper.addDecisionNotificationListener(
         _sdkKey, callback);
   }
 
-  /// Allows user to listen to supported notifications.
+  /// Allows user to listen to supported Track notifications.
   Future<CancelListening> _addTrackNotificationListener(
       TrackNotificationCallback callback) async {
     return await OptimizelyClientWrapper.addTrackNotificationListener(
         _sdkKey, callback);
   }
 
-  /// Allows user to listen to supported notifications.
+  /// Allows user to listen to supported LogEvent notifications.
   Future<CancelListening> _addLogEventNotificationListener(
       LogEventNotificationCallback callback) async {
     return await OptimizelyClientWrapper.addLogEventNotificationListener(
         _sdkKey, callback);
   }
 
-  /// Allows user to listen to supported notifications.
+  /// Allows user to listen to supported Project Config Update notifications.
   Future<CancelListening> _addConfigUpdateNotificationListener(
       MultiUseCallback callback) async {
     return await OptimizelyClientWrapper.addConfigUpdateNotificationListener(

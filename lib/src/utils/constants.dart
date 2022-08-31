@@ -65,7 +65,7 @@ class Constants {
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";
   static const String configUpdateCallBackListener =
-      "configUpdateCallBackListener";
+      "projectConfigUpdateCallBackListener";
 
   // Response keys
   static const String responseSuccess = "success";
