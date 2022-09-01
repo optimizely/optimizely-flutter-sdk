@@ -50,7 +50,6 @@ class Constants {
   static const String url = "url";
   static const String params = "params";
   static const String eventTags = "eventTags";
-  static const String event = "event";
   static const String keys = "keys";
   static const String variationKey = "variationKey";
   static const String flagKey = "flagKey";

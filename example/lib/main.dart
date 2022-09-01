@@ -50,6 +50,7 @@ class _MyAppState extends State<MyApp> {
     // To add decide listener
     var cancelDecideListener =
         await flutterSDK.addDecisionNotificationListener((notification) {
+      print("Parsed decision event ....................");
       print(notification.type);
       print(notification.userID);
       print(notification);
@@ -111,7 +112,7 @@ class _MyAppState extends State<MyApp> {
       print("track notification received");
     });
 
-    // To add track listener
+    // To add logEvent listener
     var cancelLogEventListener =
         await flutterSDK.addLogEventNotificationListener((notification) {
       print("Parsed log event ....................");

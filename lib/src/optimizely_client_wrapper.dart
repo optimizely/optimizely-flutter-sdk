@@ -27,12 +27,12 @@ import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
 enum ListenerType { track, decision, logEvent, projectConfigUpdate }
 
-typedef MultiUseCallback = void Function(dynamic msg);
 typedef DecisionNotificationCallback = void Function(
     DecisionListenerResponse msg);
 typedef TrackNotificationCallback = void Function(TrackListenerResponse msg);
 typedef LogEventNotificationCallback = void Function(
     LogEventListenerResponse msg);
+typedef MultiUseCallback = void Function(dynamic msg);
 typedef CancelListening = void Function();
 
 /// The internal client class for the Optimizely Flutter SDK used by the main OptimizelyFlutterSdk class.
@@ -61,10 +61,9 @@ class OptimizelyClientWrapper {
   }
 
   /// Returns a success true if optimizely client closed successfully.
-  static Future<BaseResponse> close(
-      String sdkKey) async {
-    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.close, {Constants.sdkKey: sdkKey}));
+  static Future<BaseResponse> close(String sdkKey) async {
+    final result = Map<String, dynamic>.from(await _channel
+        .invokeMethod(Constants.close, {Constants.sdkKey: sdkKey}));
     return BaseResponse(result);
   }
 
@@ -100,8 +99,6 @@ class OptimizelyClientWrapper {
 
     int currentListenerId = nextCallbackId++;
     decisionCallbacksById[currentListenerId] = callback;
-    // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
-    // and returns the valid string value `logEvent`
     final listenerTypeStr = ListenerType.decision.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -130,8 +127,6 @@ class OptimizelyClientWrapper {
 
     int currentListenerId = nextCallbackId++;
     trackCallbacksById[currentListenerId] = callback;
-    // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
-    // and returns the valid string value `logEvent`
     final listenerTypeStr = ListenerType.track.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -160,8 +155,6 @@ class OptimizelyClientWrapper {
 
     int currentListenerId = nextCallbackId++;
     logEventCallbacksById[currentListenerId] = callback;
-    // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
-    // and returns the valid string value `logEvent`
     final listenerTypeStr = ListenerType.logEvent.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -191,8 +184,6 @@ class OptimizelyClientWrapper {
 
     int currentListenerId = nextCallbackId++;
     configUpdateCallbacksById[currentListenerId] = callback;
-    // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
-    // and returns the valid string value `logEvent`
     final listenerTypeStr = ListenerType.projectConfigUpdate.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -208,41 +199,40 @@ class OptimizelyClientWrapper {
   }
 
   static Future<void> methodCallHandler(MethodCall call) async {
-    switch (call.method) {
-      case Constants.decisionCallBackListener:
-        final id = call.arguments[Constants.id];
-        final payload = DecisionListenerResponse(
-            Map<String, dynamic>.from(call.arguments[Constants.payload]));
-        if (id is int && decisionCallbacksById.containsKey(id)) {
-          decisionCallbacksById[id]!(payload);
-        }
-        break;
-      case Constants.trackCallBackListener:
-        final id = call.arguments[Constants.id];
-        final payload = TrackListenerResponse(
-            Map<String, dynamic>.from(call.arguments[Constants.payload]));
-        if (id is int && trackCallbacksById.containsKey(id)) {
-          trackCallbacksById[id]!(payload);
-        }
-        break;
-      case Constants.logEventCallbackListener:
-        final id = call.arguments[Constants.id];
-        final payload = LogEventListenerResponse(
-            Map<String, dynamic>.from(call.arguments[Constants.payload]));
-        if (id is int && logEventCallbacksById.containsKey(id)) {
-          logEventCallbacksById[id]!(payload);
-        }
-        break;
-      case Constants.configUpdateCallBackListener:
-        final id = call.arguments[Constants.id];
-        final payload = call.arguments[Constants.payload];
-        if (id is int && configUpdateCallbacksById.containsKey(id)) {
-          configUpdateCallbacksById[id]!(payload);
-        }
-        break;
-      default:
-        // ignore: avoid_print
-        print('Method ${call.method} not implemented.');
+    final id = call.arguments[Constants.id];
+    final payload = call.arguments[Constants.payload];
+    if (id is int && payload != null) {
+      switch (call.method) {
+        case Constants.decisionCallBackListener:
+          final response =
+              DecisionListenerResponse(Map<String, dynamic>.from(payload));
+          if (decisionCallbacksById.containsKey(id)) {
+            decisionCallbacksById[id]!(response);
+          }
+          break;
+        case Constants.trackCallBackListener:
+          final response =
+              TrackListenerResponse(Map<String, dynamic>.from(payload));
+          if (trackCallbacksById.containsKey(id)) {
+            trackCallbacksById[id]!(response);
+          }
+          break;
+        case Constants.logEventCallbackListener:
+          final response =
+              LogEventListenerResponse(Map<String, dynamic>.from(payload));
+          if (logEventCallbacksById.containsKey(id)) {
+            logEventCallbacksById[id]!(response);
+          }
+          break;
+        case Constants.configUpdateCallBackListener:
+          if (configUpdateCallbacksById.containsKey(id)) {
+            configUpdateCallbacksById[id]!(payload);
+          }
+          break;
+        default:
+          // ignore: avoid_print
+          print('Method ${call.method} not implemented.');
+      }
     }
   }
 }

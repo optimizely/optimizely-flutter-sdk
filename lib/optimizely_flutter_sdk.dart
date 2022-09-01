@@ -76,7 +76,7 @@ class OptimizelyFlutterSdk {
   }
 
   Future<CancelListening> addTrackNotificationListener(
-      MultiUseCallback callback) async {
+      TrackNotificationCallback callback) async {
     return await _addTrackNotificationListener(callback);
   }
 

@@ -21,7 +21,6 @@ class TrackListenerResponse {
   String userId = '';
   Map<String, dynamic> attributes = {};
   Map<String, dynamic> eventTags = {};
-  Map<String, dynamic> event = {};
 
   TrackListenerResponse(Map<String, dynamic> json) {
     if (json[Constants.eventKey] is String) {
@@ -37,10 +36,6 @@ class TrackListenerResponse {
 
     if (json[Constants.eventTags] is Map<dynamic, dynamic>) {
       eventTags = Map<String, dynamic>.from(json[Constants.eventTags]);
-    }
-
-    if (json[Constants.event] is Map<dynamic, dynamic>) {
-      event = Map<String, dynamic>.from(json[Constants.event]);
     }
   }
 }
