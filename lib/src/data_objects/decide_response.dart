@@ -61,21 +61,20 @@ class Decision {
 }
 
 class BaseDecideResponse extends BaseResponse {
-  final List<Decision> _decisions = [];
+  final Map<String, Decision> _decisions = {};
 
   BaseDecideResponse(Map<String, dynamic> json) : super(json) {
     if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
-      for (final value
-          in Map<String, dynamic>.from(json[Constants.responseResult]).values) {
-        if (value is Map<dynamic, dynamic>) {
-          var decision = Decision(Map<String, dynamic>.from(value));
-          _decisions.add(decision);
-        }
-      }
+      final decisionsMap =
+          Map<String, dynamic>.from(json[Constants.responseResult]);
+      decisionsMap.forEach((k, v) => {
+            if (v is Map<dynamic, dynamic>)
+              {_decisions[k] = Decision(Map<String, dynamic>.from(v))}
+          });
     }
   }
 
-  List<Decision> getDecisions() {
+  Map<String, Decision> getDecisions() {
     return _decisions;
   }
 }
@@ -86,13 +85,13 @@ class DecideResponse extends BaseDecideResponse {
   DecideResponse(Map<String, dynamic> json) : super(json) {
     final decisions = getDecisions();
     if (decisions.isNotEmpty) {
-      decision = decisions.first;
+      decision = decisions.values.first;
     }
   }
 }
 
 class DecideForKeysResponse extends BaseDecideResponse {
-  List<Decision> decisions = [];
+  Map<String, Decision> decisions = {};
 
   DecideForKeysResponse(Map<String, dynamic> json) : super(json) {
     decisions = getDecisions();

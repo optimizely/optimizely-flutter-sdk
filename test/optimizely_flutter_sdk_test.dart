@@ -234,7 +234,10 @@ void main() {
         expect(response.success, equals(true));
         expect(response.decision != null, equals(true));
         expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions([response.decision!]), equals(true));
+        expect(
+            TestUtils.compareDecisions(
+                {response.decision!.flagKey: response.decision!}),
+            equals(true));
         expect(decideOptions.length == 5, equals(true));
         expect(assertDecideOptions(options, decideOptions), equals(true));
         decideOptions = [];
