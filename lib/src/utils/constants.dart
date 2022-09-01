@@ -59,7 +59,6 @@ class Constants {
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";
-  static const String callBackListener = "callbackListener";
   static const String trackCallBackListener = "trackCallbackListener";
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";

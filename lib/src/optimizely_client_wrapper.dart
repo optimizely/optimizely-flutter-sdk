@@ -85,16 +85,38 @@ class OptimizelyClientWrapper {
     return null;
   }
 
+  static bool checkCallBackExist(dynamic callback) {
+    for (var k in decisionCallbacksById.keys) {
+      if (decisionCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    for (var k in trackCallbacksById.keys) {
+      if (trackCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    for (var k in logEventCallbacksById.keys) {
+      if (logEventCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    for (var k in configUpdateCallbacksById.keys) {
+      if (configUpdateCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static Future<CancelListening> addDecisionNotificationListener(
       String sdkKey, DecisionNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    for (var k in decisionCallbacksById.keys) {
-      if (decisionCallbacksById[k] == callback) {
-        // ignore: avoid_print
-        print("callback already exists.");
-        return () {};
-      }
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
     }
 
     int currentListenerId = nextCallbackId++;
@@ -117,12 +139,10 @@ class OptimizelyClientWrapper {
       String sdkKey, TrackNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    for (var k in trackCallbacksById.keys) {
-      if (trackCallbacksById[k] == callback) {
-        // ignore: avoid_print
-        print("callback already exists.");
-        return () {};
-      }
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
     }
 
     int currentListenerId = nextCallbackId++;
@@ -145,12 +165,10 @@ class OptimizelyClientWrapper {
       String sdkKey, LogEventNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    for (var k in logEventCallbacksById.keys) {
-      if (logEventCallbacksById[k] == callback) {
-        // ignore: avoid_print
-        print("callback already exists.");
-        return () {};
-      }
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
     }
 
     int currentListenerId = nextCallbackId++;
@@ -174,12 +192,10 @@ class OptimizelyClientWrapper {
       String sdkKey, MultiUseCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    for (var k in configUpdateCallbacksById.keys) {
-      if (configUpdateCallbacksById[k] == callback) {
-        // ignore: avoid_print
-        print("callback already exists.");
-        return () {};
-      }
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
     }
 
     int currentListenerId = nextCallbackId++;
