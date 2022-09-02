@@ -30,6 +30,12 @@ export 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.
     show OptimizelyDecideOption;
 export 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart'
     show Decision;
+export 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart'
+    show TrackListenerResponse;
+export 'package:optimizely_flutter_sdk/src/data_objects/decision_listener_response.dart'
+    show DecisionListenerResponse;
+export 'package:optimizely_flutter_sdk/src/data_objects/logevent_listener_response.dart'
+    show LogEventListenerResponse;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
@@ -59,31 +65,56 @@ class OptimizelyFlutterSdk {
         _sdkKey, userId, attributes);
   }
 
+  /// Checks if eventHandler are Closeable and calls close on them.
+  Future<BaseResponse> close() async {
+    return await OptimizelyClientWrapper.close(_sdkKey);
+  }
+
   Future<CancelListening> addDecisionNotificationListener(
-      MultiUseCallback callback) async {
-    return await _addNotificationListener(callback, ListenerType.decision);
+      DecisionNotificationCallback callback) async {
+    return await _addDecisionNotificationListener(callback);
   }
 
   Future<CancelListening> addTrackNotificationListener(
-      MultiUseCallback callback) async {
-    return await _addNotificationListener(callback, ListenerType.track);
+      TrackNotificationCallback callback) async {
+    return await _addTrackNotificationListener(callback);
   }
 
   Future<CancelListening> addUpdateConfigNotificationListener(
       MultiUseCallback callback) async {
-    return await _addNotificationListener(
-        callback, ListenerType.projectConfigUpdate);
+    return await _addConfigUpdateNotificationListener(callback);
   }
 
   Future<CancelListening> addLogEventNotificationListener(
-      MultiUseCallback callback) async {
-    return await _addNotificationListener(callback, ListenerType.logEvent);
+      LogEventNotificationCallback callback) async {
+    return await _addLogEventNotificationListener(callback);
   }
 
-  /// Allows user to listen to supported notifications.
-  Future<CancelListening> _addNotificationListener(
-      MultiUseCallback callback, ListenerType listenerType) async {
-    return await OptimizelyClientWrapper.addNotificationListener(
-        _sdkKey, callback, listenerType);
+  /// Allows user to listen to supported Decision notifications.
+  Future<CancelListening> _addDecisionNotificationListener(
+      DecisionNotificationCallback callback) async {
+    return await OptimizelyClientWrapper.addDecisionNotificationListener(
+        _sdkKey, callback);
+  }
+
+  /// Allows user to listen to supported Track notifications.
+  Future<CancelListening> _addTrackNotificationListener(
+      TrackNotificationCallback callback) async {
+    return await OptimizelyClientWrapper.addTrackNotificationListener(
+        _sdkKey, callback);
+  }
+
+  /// Allows user to listen to supported LogEvent notifications.
+  Future<CancelListening> _addLogEventNotificationListener(
+      LogEventNotificationCallback callback) async {
+    return await OptimizelyClientWrapper.addLogEventNotificationListener(
+        _sdkKey, callback);
+  }
+
+  /// Allows user to listen to supported Project Config Update notifications.
+  Future<CancelListening> _addConfigUpdateNotificationListener(
+      MultiUseCallback callback) async {
+    return await OptimizelyClientWrapper.addConfigUpdateNotificationListener(
+        _sdkKey, callback);
   }
 }

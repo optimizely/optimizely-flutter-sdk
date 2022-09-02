@@ -90,6 +90,10 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         removeAllForcedDecisions(argumentsParser, result);
         break;
       }
+      case APIs.CLOSE: {
+        close(argumentsParser, result);
+        break;
+      }
       default:
         result.notImplemented();
     }

@@ -27,6 +27,7 @@ struct API {
     static let getForcedDecision = "getForcedDecision"
     static let removeForcedDecision = "removeForcedDecision"
     static let removeAllForcedDecisions = "removeAllForcedDecisions"
+    static let close = "close"
     static let addNotificationListener = "addNotificationListener"
     static let removeNotificationListener = "removeNotificationListener"
 }
@@ -83,6 +84,7 @@ struct ErrorMessage {
 struct SuccessMessage {
     static let instanceCreated = "Optimizely instance created successfully."
     static let optimizelyConfigFound = "Optimizely config found."
+    static let optimizelyClientClosed = "Optimizely client closed successfully."
     static let userContextCreated = "User context created successfully."
     static let attributesAdded = "Attributes added successfully."
     static let listenerAdded = "Listener added successfully."

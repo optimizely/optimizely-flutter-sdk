@@ -70,21 +70,73 @@ class TestUtils {
     return true;
   }
 
-  static sendTestNotifications(
-      Function(MethodCall message) handler, int count) {
-    for (var i = 0; i < count; i++) {
-      handler(MethodCall(Constants.callBackListener, {
-        Constants.id: i,
-        Constants.payload: {"payload": i}
-      }));
-    }
+  static sendTestDecisionNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.decisionCallBackListener, {
+      Constants.id: id,
+      Constants.payload: {Constants.type: "$id", Constants.userID: "test"}
+    }));
   }
 
-  static bool testNotificationPayload(List notifications) {
-    for (var i = 0; i < notifications.length; i++) {
-      if (notifications[i]["payload"] != i) {
-        return false;
+  static sendTestLogEventNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.logEventCallbackListener, {
+      Constants.id: id,
+      Constants.payload: {
+        Constants.url: "$id",
+        Constants.params: {"test", id}
       }
+    }));
+  }
+
+  static sendTestTrackNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.trackCallBackListener, {
+      Constants.id: id,
+      Constants.payload: {
+        Constants.eventKey: "$id",
+        Constants.userID: "test",
+        Constants.attributes: {"test", id},
+        Constants.eventTags: {"testTag", id}
+      }
+    }));
+  }
+
+  static sendTestUpdateConfigNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.configUpdateCallBackListener, {
+      Constants.id: id,
+      Constants.payload: {"payload": id}
+    }));
+  }
+
+  static bool testDecisionNotificationPayload(List notifications, int id) {
+    if (notifications[id].type != "$id" && notifications[id].userID != "test") {
+      return false;
+    }
+    return true;
+  }
+
+  static bool testTrackNotificationPayload(List notifications, int id) {
+    if (notifications[id].eventKey != "$id" &&
+        notifications[id].userID != "test" &&
+        notifications[id].attributes != {"test", id}) {
+      return false;
+    }
+    return true;
+  }
+
+  static bool testLogEventNotificationPayload(List notifications, int id) {
+    if (notifications[id].url != "$id" &&
+        notifications[id].payload != {"payload": id}) {
+      return false;
+    }
+    return true;
+  }
+
+  static bool testUpdateConfigNotificationPayload(List notifications, int id) {
+    if (notifications[id]["payload"] != id) {
+      return false;
     }
     return true;
   }
