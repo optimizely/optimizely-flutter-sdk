@@ -486,7 +486,8 @@ public class OptimizelyFlutterClient {
         Map<String, Object> listenerUnmodifiable = Collections.unmodifiableMap(listenerResponse);
         // Get a handler that can be used to post to the main thread
         Handler mainHandler = new Handler(context.getMainLooper());
-        Runnable myRunnable = () -> OptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", listenerUnmodifiable);
+
+        Runnable myRunnable = () -> OptimizelyFlutterSdkPlugin.channel.invokeMethod(notificationType+"CallbackListener", listenerUnmodifiable);
         mainHandler.post(myRunnable);
     }
 }

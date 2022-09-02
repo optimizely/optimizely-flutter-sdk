@@ -79,16 +79,16 @@ public class Constants {
 
     public static class DecisionListenerKeys {
         public static final String TYPE = "type";
-        public static final String USER_ID = "user_id";
+        public static final String USER_ID = "userID";
         public static final String ATTRIBUTES = "attributes";
-        public static final String DECISION_INFO = "decision_info";
+        public static final String DECISION_INFO = "decisionInfo";
     }
 
     public static class TrackListenerKeys {
-        public static final String EVENT_KEY = "event_key";
-        public static final String USER_ID = "user_id";
+        public static final String EVENT_KEY = "eventKey";
+        public static final String USER_ID = "userID";
         public static final String ATTRIBUTES = "attributes";
-        public static final String EVENT_TAGS = "event_tags";
+        public static final String EVENT_TAGS = "eventTags";
     }
 
     public static class LogEventListenerKeys {
