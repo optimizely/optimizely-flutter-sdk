@@ -45,7 +45,6 @@ import com.optimizely.ab.optimizelydecision.OptimizelyDecision;
 import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
-import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.convertKeysCamelCaseToSnakeCase;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -430,7 +429,7 @@ public class OptimizelyFlutterClient {
                     notificationMap.put(DecisionListenerKeys.TYPE, decisionNotification.getType());
                     notificationMap.put(DecisionListenerKeys.USER_ID, decisionNotification.getUserId());
                     notificationMap.put(DecisionListenerKeys.ATTRIBUTES, decisionNotification.getAttributes());
-                    notificationMap.put(DecisionListenerKeys.DECISION_INFO, convertKeysCamelCaseToSnakeCase(decisionNotification.getDecisionInfo()));
+                    notificationMap.put(DecisionListenerKeys.DECISION_INFO, decisionNotification.getDecisionInfo());
                     invokeNotification(id, NotificationType.DECISION, notificationMap);
                 });
                 notificationIdsTracker.put(id, notificationId);

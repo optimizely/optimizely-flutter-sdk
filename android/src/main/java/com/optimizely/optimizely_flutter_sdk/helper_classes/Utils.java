@@ -25,25 +25,6 @@ import com.google.common.base.CaseFormat;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 
 public class Utils {
-    public static Map<String, ?> convertKeysCamelCaseToSnakeCase(Map<String, ?> decisionInfo) {
-        Map<String, Object> decisionInfoCopy = new HashMap<>(decisionInfo);
-
-        if (decisionInfo.containsKey(SOURCE_INFO) && decisionInfo.get(SOURCE_INFO) instanceof Map) {
-            Map<String, String> sourceInfo = (Map<String, String>) decisionInfoCopy.get(SOURCE_INFO);
-            Map<String, String> sourceInfoCopy = new HashMap<>(sourceInfo);
-
-            for (String key : sourceInfo.keySet()) {
-                sourceInfoCopy.put(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key), sourceInfoCopy.remove(key));
-            }
-            decisionInfoCopy.remove(SOURCE_INFO);
-            decisionInfoCopy.put(SOURCE_INFO, sourceInfoCopy);
-        }
-
-        for (String key : decisionInfo.keySet()) {
-            decisionInfoCopy.put(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key), decisionInfoCopy.remove(key));
-        }
-        return decisionInfoCopy;
-    }
 
     public static List<OptimizelyDecideOption> getDecideOptions(List<String> options) {
         if(options == null || options.isEmpty()) {
