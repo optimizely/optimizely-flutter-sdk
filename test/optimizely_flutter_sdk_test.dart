@@ -31,6 +31,9 @@ void main() {
   const String userId = "uid-351ea8";
   // To check if decide options properly reached the native sdk through channel
   List<String> decideOptions = [];
+  // To check if event options and periodicDownloadInterval properly reached the native sdk through channel
+  EventOptions eventOptions = const EventOptions();
+  int periodicDownloadInterval = 0;
 
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
   dynamic mockOptimizelyConfig;
@@ -56,6 +59,13 @@ void main() {
       // reason from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
       switch (methodCall.method) {
         case Constants.initializeMethod:
+          // To Check if eventOptions were received
+          eventOptions = EventOptions(
+              batchSize: methodCall.arguments[Constants.eventBatchSize],
+              maxQueueSize: methodCall.arguments[Constants.eventMaxQueueSize],
+              timeInterval: methodCall.arguments[Constants.eventTimeInterval]);
+          periodicDownloadInterval =
+              methodCall.arguments[Constants.periodicDownloadInterval];
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.instanceCreated,
@@ -160,6 +170,85 @@ void main() {
 
         expect(response.success, equals(true));
         expect(response.reason, equals(Constants.instanceCreated));
+      });
+
+      test("with no eventOptions and no periodicDownloadInterval", () async {
+        // default values
+        const expectedEventOptions =
+            EventOptions(batchSize: 10, timeInterval: 60, maxQueueSize: 10000);
+        const expectedPeriodicDownloadInterval = 10 * 60;
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var response = await sdk.initializeClient();
+
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.instanceCreated));
+        expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
+        expect(eventOptions.maxQueueSize,
+            equals(expectedEventOptions.maxQueueSize));
+        expect(eventOptions.timeInterval,
+            equals(expectedEventOptions.timeInterval));
+        expect(
+            periodicDownloadInterval, equals(expectedPeriodicDownloadInterval));
+      });
+
+      test("with eventOptions and periodicDownloadInterval", () async {
+        const expectedEventOptions =
+            EventOptions(batchSize: 20, timeInterval: 30, maxQueueSize: 200);
+        const expectedPeriodicDownloadInterval = 40;
+        var sdk = OptimizelyFlutterSdk(testSDKKey,
+            eventOptions: expectedEventOptions,
+            periodicDownloadInterval: expectedPeriodicDownloadInterval);
+        var response = await sdk.initializeClient();
+
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.instanceCreated));
+        expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
+        expect(eventOptions.maxQueueSize,
+            equals(expectedEventOptions.maxQueueSize));
+        expect(eventOptions.timeInterval,
+            equals(expectedEventOptions.timeInterval));
+        expect(
+            periodicDownloadInterval, equals(expectedPeriodicDownloadInterval));
+      });
+
+      test("with no eventOptions and periodicDownloadInterval", () async {
+        // default values
+        const expectedEventOptions =
+            EventOptions(batchSize: 10, timeInterval: 60, maxQueueSize: 10000);
+        const expectedPeriodicDownloadInterval = 500;
+        var sdk = OptimizelyFlutterSdk(testSDKKey,
+            periodicDownloadInterval: expectedPeriodicDownloadInterval);
+        var response = await sdk.initializeClient();
+
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.instanceCreated));
+        expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
+        expect(eventOptions.maxQueueSize,
+            equals(expectedEventOptions.maxQueueSize));
+        expect(eventOptions.timeInterval,
+            equals(expectedEventOptions.timeInterval));
+        expect(
+            periodicDownloadInterval, equals(expectedPeriodicDownloadInterval));
+      });
+
+      test("with eventOptions and no periodicDownloadInterval", () async {
+        // default values
+        const expectedEventOptions =
+            EventOptions(batchSize: 50, timeInterval: 80, maxQueueSize: 20000);
+        const expectedPeriodicDownloadInterval = 10 * 60;
+        var sdk = OptimizelyFlutterSdk(testSDKKey,
+            eventOptions: expectedEventOptions);
+        var response = await sdk.initializeClient();
+
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.instanceCreated));
+        expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
+        expect(eventOptions.maxQueueSize,
+            equals(expectedEventOptions.maxQueueSize));
+        expect(eventOptions.timeInterval,
+            equals(expectedEventOptions.timeInterval));
+        expect(
+            periodicDownloadInterval, equals(expectedPeriodicDownloadInterval));
       });
     });
     group("close()", () {

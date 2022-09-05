@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +24,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> runOptimizelySDK() async {
-    var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A");
+    var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
+        periodicDownloadInterval: 10 * 60,
+        eventOptions: const EventOptions(
+            batchSize: 1, timeInterval: 60, maxQueueSize: 10000));
     var response = await flutterSDK.initializeClient();
 
     setState(() {
