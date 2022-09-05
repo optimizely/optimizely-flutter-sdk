@@ -17,12 +17,21 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/decision_listener_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/logevent_listener_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
 enum ListenerType { track, decision, logEvent, projectConfigUpdate }
 
+typedef DecisionNotificationCallback = void Function(
+    DecisionListenerResponse msg);
+typedef TrackNotificationCallback = void Function(TrackListenerResponse msg);
+typedef LogEventNotificationCallback = void Function(
+    LogEventListenerResponse msg);
 typedef MultiUseCallback = void Function(dynamic msg);
 typedef CancelListening = void Function();
 
@@ -30,7 +39,10 @@ typedef CancelListening = void Function();
 class OptimizelyClientWrapper {
   static const MethodChannel _channel = MethodChannel('optimizely_flutter_sdk');
   static int nextCallbackId = 0;
-  static Map<int, MultiUseCallback> callbacksById = {};
+  static Map<int, DecisionNotificationCallback> decisionCallbacksById = {};
+  static Map<int, TrackNotificationCallback> trackCallbacksById = {};
+  static Map<int, LogEventNotificationCallback> logEventCallbacksById = {};
+  static Map<int, MultiUseCallback> configUpdateCallbacksById = {};
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   static Future<BaseResponse> initializeClient(String sdkKey) async {
@@ -41,9 +53,18 @@ class OptimizelyClientWrapper {
   }
 
   /// Returns a snapshot of the current project configuration.
-  static Future<Map<String, dynamic>> getOptimizelyConfig(String sdkKey) async {
-    return Map<String, dynamic>.from(await _channel.invokeMethod(
+  static Future<OptimizelyConfigResponse> getOptimizelyConfig(
+      String sdkKey) async {
+    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
         Constants.getOptimizelyConfigMethod, {Constants.sdkKey: sdkKey}));
+    return OptimizelyConfigResponse(result);
+  }
+
+  /// Returns a success true if optimizely client closed successfully.
+  static Future<BaseResponse> close(String sdkKey) async {
+    final result = Map<String, dynamic>.from(await _channel
+        .invokeMethod(Constants.close, {Constants.sdkKey: sdkKey}));
+    return BaseResponse(result);
   }
 
   /// Creates a context of the user for which decision APIs will be called.
@@ -64,24 +85,43 @@ class OptimizelyClientWrapper {
     return null;
   }
 
-  /// Allows user to listen to supported notifications.
-  static Future<CancelListening> addNotificationListener(String sdkKey,
-      MultiUseCallback callback, ListenerType listenerType) async {
+  static bool checkCallBackExist(dynamic callback) {
+    for (var k in decisionCallbacksById.keys) {
+      if (decisionCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    for (var k in trackCallbacksById.keys) {
+      if (trackCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    for (var k in logEventCallbacksById.keys) {
+      if (logEventCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    for (var k in configUpdateCallbacksById.keys) {
+      if (configUpdateCallbacksById[k] == callback) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static Future<CancelListening> addDecisionNotificationListener(
+      String sdkKey, DecisionNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    for (var k in callbacksById.keys) {
-      if (callbacksById[k] == callback) {
-        // ignore: avoid_print
-        print("callback already exists.");
-        return () {};
-      }
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
     }
 
     int currentListenerId = nextCallbackId++;
-    callbacksById[currentListenerId] = callback;
-    // toString returns listenerType as type.logEvent, the following code explodes the string using `.`
-    // and returns the valid string value `logEvent`
-    final listenerTypeStr = listenerType.name;
+    decisionCallbacksById[currentListenerId] = callback;
+    final listenerTypeStr = ListenerType.decision.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,
@@ -91,22 +131,124 @@ class OptimizelyClientWrapper {
     return () {
       _channel.invokeMethod(Constants.removeNotificationListenerMethod,
           {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
-      callbacksById.remove(currentListenerId);
+      decisionCallbacksById.remove(currentListenerId);
+    };
+  }
+
+  static Future<CancelListening> addTrackNotificationListener(
+      String sdkKey, TrackNotificationCallback callback) async {
+    _channel.setMethodCallHandler(methodCallHandler);
+
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
+    }
+
+    int currentListenerId = nextCallbackId++;
+    trackCallbacksById[currentListenerId] = callback;
+    final listenerTypeStr = ListenerType.track.name;
+    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.id: currentListenerId,
+      Constants.type: listenerTypeStr
+    });
+    // Returning a callback function that allows the user to remove the added notification listener
+    return () {
+      _channel.invokeMethod(Constants.removeNotificationListenerMethod,
+          {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
+      trackCallbacksById.remove(currentListenerId);
+    };
+  }
+
+  static Future<CancelListening> addLogEventNotificationListener(
+      String sdkKey, LogEventNotificationCallback callback) async {
+    _channel.setMethodCallHandler(methodCallHandler);
+
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
+    }
+
+    int currentListenerId = nextCallbackId++;
+    logEventCallbacksById[currentListenerId] = callback;
+    final listenerTypeStr = ListenerType.logEvent.name;
+    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.id: currentListenerId,
+      Constants.type: listenerTypeStr
+    });
+    // Returning a callback function that allows the user to remove the added notification listener
+    return () {
+      _channel.invokeMethod(Constants.removeNotificationListenerMethod,
+          {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
+      logEventCallbacksById.remove(currentListenerId);
+    };
+  }
+
+  /// Allows user to listen to supported notifications.
+  static Future<CancelListening> addConfigUpdateNotificationListener(
+      String sdkKey, MultiUseCallback callback) async {
+    _channel.setMethodCallHandler(methodCallHandler);
+
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
+    }
+
+    int currentListenerId = nextCallbackId++;
+    configUpdateCallbacksById[currentListenerId] = callback;
+    final listenerTypeStr = ListenerType.projectConfigUpdate.name;
+    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.id: currentListenerId,
+      Constants.type: listenerTypeStr
+    });
+    // Returning a callback function that allows the user to remove the added notification listener
+    return () {
+      _channel.invokeMethod(Constants.removeNotificationListenerMethod,
+          {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
+      configUpdateCallbacksById.remove(currentListenerId);
     };
   }
 
   static Future<void> methodCallHandler(MethodCall call) async {
-    switch (call.method) {
-      case Constants.callBackListener:
-        final id = call.arguments[Constants.id];
-        final payload = call.arguments[Constants.payload];
-        if (id is int && payload != null && callbacksById.containsKey(id)) {
-          callbacksById[id]!(payload);
-        }
-        break;
-      default:
-        // ignore: avoid_print
-        print('Method ${call.method} not implemented.');
+    final id = call.arguments[Constants.id];
+    final payload = call.arguments[Constants.payload];
+    if (id is int && payload != null) {
+      switch (call.method) {
+        case Constants.decisionCallBackListener:
+          final response =
+              DecisionListenerResponse(Map<String, dynamic>.from(payload));
+          if (decisionCallbacksById.containsKey(id)) {
+            decisionCallbacksById[id]!(response);
+          }
+          break;
+        case Constants.trackCallBackListener:
+          final response =
+              TrackListenerResponse(Map<String, dynamic>.from(payload));
+          if (trackCallbacksById.containsKey(id)) {
+            trackCallbacksById[id]!(response);
+          }
+          break;
+        case Constants.logEventCallbackListener:
+          final response =
+              LogEventListenerResponse(Map<String, dynamic>.from(payload));
+          if (logEventCallbacksById.containsKey(id)) {
+            logEventCallbacksById[id]!(response);
+          }
+          break;
+        case Constants.configUpdateCallBackListener:
+          if (configUpdateCallbacksById.containsKey(id)) {
+            configUpdateCallbacksById[id]!(payload);
+          }
+          break;
+        default:
+          // ignore: avoid_print
+          print('Method ${call.method} not implemented.');
+      }
     }
   }
 }

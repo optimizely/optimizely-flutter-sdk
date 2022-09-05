@@ -44,7 +44,10 @@ void main() {
         jsonDecode(await optimizelyConfigJsonFile.readAsString());
 
     TestWidgetsFlutterBinding.ensureInitialized();
-    OptimizelyClientWrapper.callbacksById = {};
+    OptimizelyClientWrapper.decisionCallbacksById = {};
+    OptimizelyClientWrapper.trackCallbacksById = {};
+    OptimizelyClientWrapper.configUpdateCallbacksById = {};
+    OptimizelyClientWrapper.logEventCallbacksById = {};
     OptimizelyClientWrapper.nextCallbackId = 0;
     tester = TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger;
 
@@ -102,7 +105,7 @@ void main() {
         case Constants.getForcedDecision:
           return {
             Constants.responseSuccess: true,
-            Constants.variationKey: "123",
+            Constants.responseResult: {Constants.variationKey: "123"},
           };
         case Constants.removeForcedDecision:
           return {
@@ -123,6 +126,11 @@ void main() {
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.listenerRemoved,
+          };
+        case Constants.close:
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseReason: Constants.optimizelyClientClosed,
           };
         default:
           return null;
@@ -154,17 +162,24 @@ void main() {
         expect(response.reason, equals(Constants.instanceCreated));
       });
     });
+    group("close()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var response = await sdk.close();
+        expect(response.success, equals(true));
+        expect(response.reason, equals(Constants.optimizelyClientClosed));
+      });
+    });
     group("getOptimizelyConfig()", () {
       test("returns valid digested OptimizelyConfig should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
         var result = await sdk.getOptimizelyConfig();
-        var config = result[Constants.responseResult];
+        var config = result.optimizelyConfig;
 
-        expect(result[Constants.responseSuccess], equals(true));
-        expect(result[Constants.responseResult], isNotNull);
-        expect(result[Constants.responseReason],
-            equals(Constants.optimizelyConfigFound));
+        expect(result.success, equals(true));
+        expect(result.optimizelyConfig, isNotNull);
+        expect(result.reason, equals(Constants.optimizelyConfigFound));
 
         expect(config["sdkKey"], equals(testSDKKey));
         expect(config["environmentKey"], equals("production"));
@@ -233,9 +248,12 @@ void main() {
         var response = await userContext!.decide(decideKey, options);
 
         expect(response.success, equals(true));
-        expect(response.decisions.length, equals(1));
+        expect(response.decision != null, equals(true));
         expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response), true);
+        expect(
+            TestUtils.compareDecisions(
+                {response.decision!.flagKey: response.decision!}),
+            equals(true));
         expect(decideOptions.length == 5, equals(true));
         expect(assertDecideOptions(options, decideOptions), equals(true));
         decideOptions = [];
@@ -251,7 +269,7 @@ void main() {
         expect(response.success, equals(true));
         expect(response.decisions.length, equals(2));
         expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response), true);
+        expect(TestUtils.compareDecisions(response.decisions), equals(true));
         expect(decideOptions.length == 5, equals(true));
         expect(assertDecideOptions(options, decideOptions), equals(true));
         decideOptions = [];
@@ -266,7 +284,7 @@ void main() {
         expect(response.success, equals(true));
         expect(response.decisions.length, equals(3));
         expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response), true);
+        expect(TestUtils.compareDecisions(response.decisions), equals(true));
         expect(decideOptions.length == 5, equals(true));
         expect(assertDecideOptions(options, decideOptions), equals(true));
         decideOptions = [];
@@ -299,7 +317,8 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
 
-        var response = await userContext!.getForcedDecision();
+        var response = await userContext!
+            .getForcedDecision(OptimizelyDecisionContext("flagKey", "ruleKey"));
 
         expect(response.success, equals(true));
         expect(response.variationKey, equals("123"));
@@ -346,72 +365,98 @@ void main() {
       void Function(dynamic) callback = (msg) {
         notifications.add(msg);
       };
-      sdk.addDecisionNotificationListener(callback);
-      sdk.addLogEventNotificationListener(callback);
-      sdk.addUpdateConfigNotificationListener(callback);
-      sdk.addTrackNotificationListener(callback);
+      await sdk.addDecisionNotificationListener(callback);
+      await sdk.addLogEventNotificationListener(callback);
+      await sdk.addUpdateConfigNotificationListener(callback);
+      await sdk.addTrackNotificationListener(callback);
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
-      TestUtils.sendTestNotifications(callHandler, 4);
+      TestUtils.sendTestDecisionNotifications(callHandler, 0);
+      TestUtils.sendTestLogEventNotifications(callHandler, 1);
+      TestUtils.sendTestTrackNotifications(callHandler, 2);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
       expect(notifications.length, equals(1));
-      expect(TestUtils.testNotificationPayload(notifications), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
     });
 
     test("should receive 4 notification due to different callbacks used",
         () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
-      TestUtils.sendTestNotifications(callHandler, 4);
+      TestUtils.sendTestDecisionNotifications(callHandler, 0);
+      TestUtils.sendTestLogEventNotifications(callHandler, 1);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 2);
+      TestUtils.sendTestTrackNotifications(callHandler, 3);
       expect(notifications.length, equals(4));
-      expect(TestUtils.testNotificationPayload(notifications), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 2),
+          true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 3), true);
     });
 
     test("should receive notifications with several ListenerTypes", () async {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
-      TestUtils.sendTestNotifications(callHandler, 8);
+      TestUtils.sendTestDecisionNotifications(callHandler, 0);
+      TestUtils.sendTestDecisionNotifications(callHandler, 1);
+      TestUtils.sendTestLogEventNotifications(callHandler, 2);
+      TestUtils.sendTestLogEventNotifications(callHandler, 3);
+      TestUtils.sendTestTrackNotifications(callHandler, 4);
+      TestUtils.sendTestTrackNotifications(callHandler, 5);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 6);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
       expect(notifications.length, equals(8));
-      expect(TestUtils.testNotificationPayload(notifications), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 1), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 2), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 3), true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 4), true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 5), true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 6),
+          true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 7),
+          true);
     });
 
     test("should receive notifications with multiple sdkKeys", () async {
@@ -419,37 +464,53 @@ void main() {
       var sdk1 = OptimizelyFlutterSdk(testSDKKey);
       var sdk2 = OptimizelyFlutterSdk(testSDKKey2);
 
-      sdk1.addDecisionNotificationListener((msg) {
+      await sdk1.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk1.addLogEventNotificationListener((msg) {
+      await sdk1.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk1.addUpdateConfigNotificationListener((msg) {
+      await sdk1.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk1.addTrackNotificationListener((msg) {
+      await sdk1.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
 
-      sdk2.addDecisionNotificationListener((msg) {
+      await sdk2.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk2.addLogEventNotificationListener((msg) {
+      await sdk2.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk2.addUpdateConfigNotificationListener((msg) {
+      await sdk2.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk2.addTrackNotificationListener((msg) {
+      await sdk2.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
-      TestUtils.sendTestNotifications(callHandler, 8);
+      TestUtils.sendTestDecisionNotifications(callHandler, 0);
+      TestUtils.sendTestLogEventNotifications(callHandler, 1);
+      TestUtils.sendTestTrackNotifications(callHandler, 2);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
+      TestUtils.sendTestDecisionNotifications(callHandler, 4);
+      TestUtils.sendTestLogEventNotifications(callHandler, 5);
+      TestUtils.sendTestTrackNotifications(callHandler, 6);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
       expect(notifications.length, equals(8));
-      expect(TestUtils.testNotificationPayload(notifications), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 2), true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 3),
+          true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 4), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 5), true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 6), true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 7),
+          true);
     });
 
     test("should receive 4 notification because of listener removals",
@@ -457,16 +518,16 @@ void main() {
       var notifications = [];
       var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-      sdk.addDecisionNotificationListener((msg) {
+      await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addLogEventNotificationListener((msg) {
+      await sdk.addLogEventNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addUpdateConfigNotificationListener((msg) {
+      await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
-      sdk.addTrackNotificationListener((msg) {
+      await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
 
@@ -489,9 +550,20 @@ void main() {
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
-      TestUtils.sendTestNotifications(callHandler, 8);
+      TestUtils.sendTestDecisionNotifications(callHandler, 0);
+      TestUtils.sendTestLogEventNotifications(callHandler, 1);
+      TestUtils.sendTestTrackNotifications(callHandler, 2);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
+      TestUtils.sendTestDecisionNotifications(callHandler, 4);
+      TestUtils.sendTestLogEventNotifications(callHandler, 5);
+      TestUtils.sendTestTrackNotifications(callHandler, 6);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
       expect(notifications.length, equals(4));
-      expect(TestUtils.testNotificationPayload(notifications), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 2), true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 3),
+          true);
     });
   });
 }

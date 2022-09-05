@@ -75,23 +75,26 @@ class OptimizelyUserContext {
   Future<DecideResponse> decide(String key,
       [Set<OptimizelyDecideOption> options = const {}]) async {
     // passing key as an array since decide has a single generic implementation which takes array of keys as an argument
-    return await _decide([key], options);
+    final result = await _decide([key], options);
+    return DecideResponse(result);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<DecideResponse> decideForKeys(List<String> keys,
+  Future<DecideForKeysResponse> decideForKeys(List<String> keys,
       [Set<OptimizelyDecideOption> options = const {}]) async {
-    return await _decide(keys, options);
+    final result = await _decide(keys, options);
+    return DecideForKeysResponse(result);
   }
 
   /// Returns a key-map of decision results for all active flag keys.
-  Future<DecideResponse> decideAll(
+  Future<DecideForKeysResponse> decideAll(
       [Set<OptimizelyDecideOption> options = const {}]) async {
-    return await _decide([], options);
+    final result = await _decide([], options);
+    return DecideForKeysResponse(result);
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
-  Future<DecideResponse> _decide(
+  Future<Map<String, dynamic>> _decide(
       [List<String> keys = const [],
       Set<OptimizelyDecideOption> options = const {}]) async {
     final convertedOptions = Utils.convertDecideOptions(options);
@@ -101,7 +104,7 @@ class OptimizelyUserContext {
       Constants.keys: keys,
       Constants.optimizelyDecideOption: convertedOptions,
     }));
-    return DecideResponse(result);
+    return result;
   }
 
   /// Sets the forced decision for a given decision context.
@@ -121,11 +124,18 @@ class OptimizelyUserContext {
   }
 
   /// Returns the forced decision for a given decision context.
-  Future<GetForcedDecisionResponse> getForcedDecision() async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getForcedDecision, {
+  Future<GetForcedDecisionResponse> getForcedDecision(
+      OptimizelyDecisionContext context) async {
+    Map<String, dynamic> request = {
       Constants.sdkKey: _sdkKey,
-    }));
+      Constants.flagKey: context.flagKey,
+    };
+    if (context.ruleKey != null) {
+      request[Constants.ruleKey] = context.ruleKey;
+    }
+
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getForcedDecision, request));
     return GetForcedDecisionResponse(result);
   }
 

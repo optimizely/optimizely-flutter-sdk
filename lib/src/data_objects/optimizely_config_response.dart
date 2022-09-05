@@ -17,15 +17,13 @@
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
-class GetForcedDecisionResponse extends BaseResponse {
-  String variationKey = '';
+class OptimizelyConfigResponse extends BaseResponse {
+  Map<String, dynamic> optimizelyConfig = {};
 
-  GetForcedDecisionResponse(Map<String, dynamic> json) : super(json) {
+  OptimizelyConfigResponse(Map<String, dynamic> json) : super(json) {
     if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
-      var response = Map<String, dynamic>.from(json[Constants.responseResult]);
-      if (response[Constants.variationKey] is String) {
-        variationKey = response[Constants.variationKey];
-      }
+      optimizelyConfig =
+          Map<String, dynamic>.from(json[Constants.responseResult]);
     }
   }
 }

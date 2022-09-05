@@ -23,27 +23,26 @@ import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 class TestUtils {
   static const collectionEquality = DeepCollectionEquality();
   static const Map<String, dynamic> decideResponseMap = {
-    "enabled": true,
-    "variables": {
+    Constants.enabled: true,
+    Constants.variables: {
       "bool_var": true,
       "str_var": "hello",
       "int_var": 1,
       "double_var": 5.5999999999999996
     },
-    "reasons": ["test_reason"],
-    "variation_key": "16906801184",
-    "user_context": {
-      "user_id": "934391.0003922911",
-      "attributes": {"attr_1": "hola"}
+    Constants.reasons: ["test_reason"],
+    Constants.variationKey: "16906801184",
+    Constants.userContext: {
+      Constants.userID: "934391.0003922911",
+      Constants.attributes: {"attr_1": "hola"}
     },
-    "rule_key": "16941022436",
-    "flag_key": "feature_1"
+    Constants.ruleKey: "16941022436",
+    Constants.flagKey: "feature_1"
   };
 
-  static bool compareDecisions(DecideResponse response) {
+  static bool compareDecisions(Map<String, Decision> decisions) {
     final correctDecision = Decision(decideResponseMap);
-    for (var i = 0; i < response.decisions.length; i++) {
-      final decision = response.decisions[i];
+    for (var decision in decisions.values) {
       if (decision.variationKey != correctDecision.variationKey) {
         return false;
       }
@@ -71,21 +70,73 @@ class TestUtils {
     return true;
   }
 
-  static sendTestNotifications(
-      Function(MethodCall message) handler, int count) {
-    for (var i = 0; i < count; i++) {
-      handler(MethodCall(Constants.callBackListener, {
-        Constants.id: i,
-        Constants.payload: {"payload": i}
-      }));
-    }
+  static sendTestDecisionNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.decisionCallBackListener, {
+      Constants.id: id,
+      Constants.payload: {Constants.type: "$id", Constants.userID: "test"}
+    }));
   }
 
-  static bool testNotificationPayload(List notifications) {
-    for (var i = 0; i < notifications.length; i++) {
-      if (notifications[i]["payload"] != i) {
-        return false;
+  static sendTestLogEventNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.logEventCallbackListener, {
+      Constants.id: id,
+      Constants.payload: {
+        Constants.url: "$id",
+        Constants.params: {"test", id}
       }
+    }));
+  }
+
+  static sendTestTrackNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.trackCallBackListener, {
+      Constants.id: id,
+      Constants.payload: {
+        Constants.eventKey: "$id",
+        Constants.userID: "test",
+        Constants.attributes: {"test", id},
+        Constants.eventTags: {"testTag", id}
+      }
+    }));
+  }
+
+  static sendTestUpdateConfigNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.configUpdateCallBackListener, {
+      Constants.id: id,
+      Constants.payload: {"payload": id}
+    }));
+  }
+
+  static bool testDecisionNotificationPayload(List notifications, int id) {
+    if (notifications[id].type != "$id" && notifications[id].userID != "test") {
+      return false;
+    }
+    return true;
+  }
+
+  static bool testTrackNotificationPayload(List notifications, int id) {
+    if (notifications[id].eventKey != "$id" &&
+        notifications[id].userID != "test" &&
+        notifications[id].attributes != {"test", id}) {
+      return false;
+    }
+    return true;
+  }
+
+  static bool testLogEventNotificationPayload(List notifications, int id) {
+    if (notifications[id].url != "$id" &&
+        notifications[id].payload != {"payload": id}) {
+      return false;
+    }
+    return true;
+  }
+
+  static bool testUpdateConfigNotificationPayload(List notifications, int id) {
+    if (notifications[id]["payload"] != id) {
+      return false;
     }
     return true;
   }

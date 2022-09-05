@@ -23,6 +23,7 @@ class Constants {
 
   // Supported Method Names
   static const String initializeMethod = "initialize";
+  static const String close = "close";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
   static const String createUserContextMethod = "createUserContext";
   static const String setAttributesMethod = "setAttributes";
@@ -42,9 +43,12 @@ class Constants {
   static const String userContext = "userContext";
   static const String userID = "userID";
   static const String attributes = "attributes";
+  static const String decisionInfo = "decisionInfo";
   static const String variables = "variables";
   static const String reasons = "reasons";
   static const String eventKey = "eventKey";
+  static const String url = "url";
+  static const String params = "params";
   static const String eventTags = "eventTags";
   static const String keys = "keys";
   static const String variationKey = "variationKey";
@@ -55,7 +59,11 @@ class Constants {
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";
-  static const String callBackListener = "callbackListener";
+  static const String trackCallBackListener = "trackCallbackListener";
+  static const String decisionCallBackListener = "decisionCallbackListener";
+  static const String logEventCallbackListener = "logEventCallbackListener";
+  static const String configUpdateCallBackListener =
+      "projectConfigUpdateCallBackListener";
 
   // Response keys
   static const String responseSuccess = "success";
@@ -67,6 +75,8 @@ class Constants {
   static const String instanceCreated =
       "Optimizely instance created successfully.";
   static const String optimizelyConfigFound = "Optimizely config found.";
+  static const String optimizelyClientClosed =
+      "Optimizely client closed successfully.";
   static const String userContextCreated = "User context created successfully.";
   static const String attributesAdded = "Attributes added successfully.";
   static const String listenerAdded = "Listener added successfully.";

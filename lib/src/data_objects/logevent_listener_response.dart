@@ -14,18 +14,19 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
-import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
-class GetForcedDecisionResponse extends BaseResponse {
-  String variationKey = '';
+class LogEventListenerResponse {
+  String url = '';
+  Map<String, dynamic> params = {};
 
-  GetForcedDecisionResponse(Map<String, dynamic> json) : super(json) {
-    if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
-      var response = Map<String, dynamic>.from(json[Constants.responseResult]);
-      if (response[Constants.variationKey] is String) {
-        variationKey = response[Constants.variationKey];
-      }
+  LogEventListenerResponse(Map<String, dynamic> json) {
+    if (json[Constants.url] is String) {
+      url = json[Constants.url];
+    }
+
+    if (json[Constants.params] is Map<dynamic, dynamic>) {
+      params = Map<String, dynamic>.from(json[Constants.params]);
     }
   }
 }

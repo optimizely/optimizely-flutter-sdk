@@ -54,6 +54,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.getForcedDecision: getForcedDecision(call, result: result)
         case API.removeForcedDecision: removeForcedDecision(call, result: result)
         case API.removeAllForcedDecisions: removeAllForcedDecisions(call, result: result)
+        case API.close: close(call, result: result)
         default: result(FlutterMethodNotImplemented)
         }
     }
@@ -71,11 +72,11 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         
         // Creating new instance
         let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey)
-        optimizelyClientsTracker[sdkKey] = optimizelyInstance
         
         optimizelyInstance.start{ [weak self] res in
             switch res {
             case .success(_):
+                self?.optimizelyClientsTracker[sdkKey] = optimizelyInstance
                 result(self?.createResponse(success: true, reason: SuccessMessage.instanceCreated))
             case .failure(let err):
                 result(self?.createResponse(success: false, reason: err.localizedDescription))
@@ -280,7 +281,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
-        if let variationKey = usrContext.getForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String)) {
+        if let variationKey = usrContext.getForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String))?.variationKey {
             result(self.createResponse(success: true, result: [ResponseKey.variationKey: variationKey]))
             return
         }
@@ -317,6 +318,25 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             return
         }
         result(self.createResponse(success: false))
+    }
+    
+    /// Closes optimizely client after Flushing/batching all events
+    func close(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        
+        guard let parameters = call.arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
+        }
+        
+        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
+            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+            return
+        }
+        
+        optimizelyClient.close()
+        optimizelyClientsTracker.removeValue(forKey: sdkKey)
+        userContextsTracker.removeValue(forKey: sdkKey)
+        result(self.createResponse(success: true, reason: SuccessMessage.optimizelyClientClosed))
     }
     
     /// Returns saved optimizely client

@@ -15,30 +15,43 @@
  ***************************************************************************/
 package com.optimizely.optimizely_flutter_sdk.helper_classes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import static com.optimizely.ab.notification.DecisionNotification.FeatureVariableDecisionNotificationBuilder.SOURCE_INFO;
 
 import com.google.common.base.CaseFormat;
+import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 
 public class Utils {
-    public static Map<String, ?> convertKeysCamelCaseToSnakeCase(Map<String, ?> decisionInfo) {
-        Map<String, Object> decisionInfoCopy = new HashMap<>(decisionInfo);
 
-        if (decisionInfo.containsKey(SOURCE_INFO) && decisionInfo.get(SOURCE_INFO) instanceof Map) {
-            Map<String, String> sourceInfo = (Map<String, String>) decisionInfoCopy.get(SOURCE_INFO);
-            Map<String, String> sourceInfoCopy = new HashMap<>(sourceInfo);
-
-            for (String key : sourceInfo.keySet()) {
-                sourceInfoCopy.put(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key), sourceInfoCopy.remove(key));
+    public static List<OptimizelyDecideOption> getDecideOptions(List<String> options) {
+        if(options == null || options.isEmpty()) {
+            return null;
+        }
+        List<OptimizelyDecideOption> convertedOptions = new ArrayList<>();
+        for(String option: options) {
+            switch(option) {
+                case Constants.DecideOption.DISABLE_DECISION_EVENT:
+                    convertedOptions.add(OptimizelyDecideOption.DISABLE_DECISION_EVENT);
+                    break;
+                case Constants.DecideOption.ENABLED_FLAGS_ONLY:
+                    convertedOptions.add(OptimizelyDecideOption.ENABLED_FLAGS_ONLY);
+                    break;
+                case Constants.DecideOption.IGNORE_USER_PROFILE_SERVICE:
+                    convertedOptions.add(OptimizelyDecideOption.IGNORE_USER_PROFILE_SERVICE);
+                    break;
+                case Constants.DecideOption.EXCLUDE_VARIABLES:
+                    convertedOptions.add(OptimizelyDecideOption.EXCLUDE_VARIABLES);
+                    break;
+                case Constants.DecideOption.INCLUDE_REASONS:
+                    convertedOptions.add(OptimizelyDecideOption.INCLUDE_REASONS);
+                    break;
+                default:
+                    break;
             }
-            decisionInfoCopy.remove(SOURCE_INFO);
-            decisionInfoCopy.put(SOURCE_INFO, sourceInfoCopy);
         }
-
-        for (String key : decisionInfo.keySet()) {
-            decisionInfoCopy.put(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key), decisionInfoCopy.remove(key));
-        }
-        return decisionInfoCopy;
+        return convertedOptions;
     }
 }

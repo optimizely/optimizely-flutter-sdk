@@ -60,7 +60,7 @@ public class ArgumentsParser {
     }
 
     public List<OptimizelyDecideOption> getDecideOptions() {
-        return (List<OptimizelyDecideOption>) arguments.get(Constants.RequestParameterKey.DECIDE_OPTIONS);
+        return Utils.getDecideOptions((List<String>) arguments.get(Constants.RequestParameterKey.DECIDE_OPTIONS));
     }
 
     public String getFlagKey() {

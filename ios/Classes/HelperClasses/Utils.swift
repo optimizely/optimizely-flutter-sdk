@@ -65,7 +65,7 @@ public class Utils: NSObject {
                 "url"       : url,
                 "params"    : logEvent as Any
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.logEvent)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
         }
         
         return listener
@@ -79,7 +79,7 @@ public class Utils: NSObject {
             if let datafileMap = try? JSONSerialization.jsonObject(with: datafile, options: []) as? [String: Any] {
                 listenerDict["datafile"] = datafileMap
             }
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.projectConfigUpdate, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.projectConfigUpdate)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.projectConfigUpdate, RequestParameterKey.notificationPayload: listenerDict])
         }
         
         return listener
@@ -89,12 +89,12 @@ public class Utils: NSObject {
     static func getDecisionCallback(id: Int) -> DecisionListener {
         let listener : DecisionListener = {(type, userId, attributes, decisionInfo) in
             let listenerDict : [String : Any] = [
-                "type" : type,
-                "user_id"       : userId,
-                "attributes"   : attributes as Any,
-                "decision_info": decisionInfo
+                "type"        : type,
+                "userID"      : userId,
+                "attributes"  : attributes as Any,
+                "decisionInfo": decisionInfo
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.decision)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
         }
         return listener
     }
@@ -103,13 +103,13 @@ public class Utils: NSObject {
     static func getTrackCallback(id: Int) -> TrackListener {
         let listener : TrackListener = {(eventKey, userId, attributes, eventTags, event) in
             let listenerDict : [String : Any] = [
-                "attributes": attributes as Any,
-                "event_key"        : eventKey,
-                "event_tags"    : eventTags as Any,
-                "user_id"       : userId,
+                "attributes"   : attributes as Any,
+                "eventKey"     : eventKey,
+                "eventTags"    : eventTags as Any,
+                "userID"       : userId,
                 //                "event": event as Any, This is causing codec related exceptions on flutter side, need to debug
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("callbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.track)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
         }
         return listener
     }

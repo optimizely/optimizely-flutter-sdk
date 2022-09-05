@@ -14,18 +14,28 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
-import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
-class GetForcedDecisionResponse extends BaseResponse {
-  String variationKey = '';
+class DecisionListenerResponse {
+  String type = '';
+  String userID = '';
+  Map<String, dynamic> attributes = {};
+  Map<String, dynamic> decisionInfo = {};
 
-  GetForcedDecisionResponse(Map<String, dynamic> json) : super(json) {
-    if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
-      var response = Map<String, dynamic>.from(json[Constants.responseResult]);
-      if (response[Constants.variationKey] is String) {
-        variationKey = response[Constants.variationKey];
-      }
+  DecisionListenerResponse(Map<String, dynamic> json) {
+    if (json[Constants.type] is String) {
+      type = json[Constants.type];
+    }
+    if (json[Constants.userID] is String) {
+      userID = json[Constants.userID];
+    }
+
+    if (json[Constants.attributes] is Map<dynamic, dynamic>) {
+      attributes = Map<String, dynamic>.from(json[Constants.attributes]);
+    }
+
+    if (json[Constants.decisionInfo] is Map<dynamic, dynamic>) {
+      decisionInfo = Map<String, dynamic>.from(json[Constants.decisionInfo]);
     }
   }
 }
