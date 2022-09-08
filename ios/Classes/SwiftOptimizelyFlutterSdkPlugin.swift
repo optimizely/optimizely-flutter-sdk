@@ -90,8 +90,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
         
         // Delete old user context
-        userContextsTracker[sdkKey] = nil
         userContextsTracker.removeValue(forKey: sdkKey)
+        // Close and remove old client
+        getOptimizelyClient(arguments: call.arguments)?.close()
+        optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
         let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, periodicDownloadInterval: periodicDownloadInterval)
