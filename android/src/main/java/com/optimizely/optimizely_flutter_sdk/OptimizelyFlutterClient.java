@@ -81,7 +81,7 @@ public class OptimizelyFlutterClient {
             batchSize = argumentsParser.getEventBatchSize();
         }
         if (argumentsParser.getEventTimeInterval() != null) {
-            timeInterval = TimeUnit.SECONDS.toMillis(argumentsParser.getEventBatchSize());
+            timeInterval = TimeUnit.SECONDS.toMillis(argumentsParser.getEventTimeInterval());
         }
         if (argumentsParser.getEventMaxQueueSize() != null) {
             maxQueueSize = argumentsParser.getEventMaxQueueSize();
