@@ -79,15 +79,15 @@ public class ArgumentsParser {
         return (Integer) arguments.get(Constants.RequestParameterKey.EVENT_BATCH_SIZE);
     }
 
-    public Long getEventTimeInterval() {
-        return (Long) arguments.get(Constants.RequestParameterKey.EVENT_TIME_INTERVAL);
+    public Integer getEventTimeInterval() {
+        return (Integer) arguments.get(Constants.RequestParameterKey.EVENT_TIME_INTERVAL);
     }
 
     public Integer getEventMaxQueueSize() {
         return (Integer) arguments.get(Constants.RequestParameterKey.EVENT_MAX_QUEUE_SIZE);
     }
 
-    public Long getDatafilePeriodicDownloadInterval() {
-        return (Long) arguments.get(Constants.RequestParameterKey.DATAFILE_PERIODIC_DOWNLOAD_INTERVAL);
+    public Integer getDatafilePeriodicDownloadInterval() {
+        return (Integer) arguments.get(Constants.RequestParameterKey.DATAFILE_PERIODIC_DOWNLOAD_INTERVAL);
     }
 }

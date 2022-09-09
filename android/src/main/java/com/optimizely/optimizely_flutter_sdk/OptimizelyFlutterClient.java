@@ -73,7 +73,7 @@ public class OptimizelyFlutterClient {
         }
         // EventDispatcher Default Values
         Integer batchSize = 10;
-        Long timeInterval = TimeUnit.MINUTES.toMillis(1L); // Minutes
+        long timeInterval = TimeUnit.MINUTES.toMillis(1L); // Minutes
         Integer maxQueueSize = 10000;
 
         if (argumentsParser.getEventBatchSize() != null) {
@@ -107,7 +107,9 @@ public class OptimizelyFlutterClient {
         }
         // Delete old user context
         userContextsTracker.remove(sdkKey);
-        getOptimizelyClient(sdkKey).close();
+        if (getOptimizelyClient(sdkKey) != null) {
+            getOptimizelyClient(sdkKey).close();
+        }
         optimizelyManagerTracker.remove(sdkKey);
 
         // Creating new instance
