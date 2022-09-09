@@ -44,11 +44,12 @@ class OptimizelyClientWrapper {
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey and options.
   static Future<BaseResponse> initializeClient(String sdkKey,
-      int periodicDownloadInterval, EventOptions eventOptions) async {
+      int datafilePeriodicDownloadInterval, EventOptions eventOptions) async {
     _channel.setMethodCallHandler(methodCallHandler);
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
-      Constants.periodicDownloadInterval: periodicDownloadInterval,
+      Constants.datafilePeriodicDownloadInterval:
+          datafilePeriodicDownloadInterval,
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,

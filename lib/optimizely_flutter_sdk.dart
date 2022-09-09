@@ -42,25 +42,26 @@ export 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart'
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
-/// To use, create an instance of OptimizelyFlutterSdk class with a valid sdkKey, periodicDownloadInterval (optional), eventOptions (optional) and
+/// To use, create an instance of OptimizelyFlutterSdk class with a valid sdkKey, datafilePeriodicDownloadInterval (optional), eventOptions (optional) and
 /// call initializeClient method.
 /// If successfull, call createUserContext to setup user context.
 /// Once done, all API's should be available.
 class OptimizelyFlutterSdk {
   final String _sdkKey;
-  final int _periodicDownloadInterval;
+  final int _datafilePeriodicDownloadInterval;
   final EventOptions _eventOptions;
 
   OptimizelyFlutterSdk(this._sdkKey,
-      {periodicDownloadInterval = 10 * 60, // Default time interval in seconds
+      {datafilePeriodicDownloadInterval =
+          10 * 60, // Default time interval in seconds
       EventOptions eventOptions = const EventOptions()})
-      : _periodicDownloadInterval = periodicDownloadInterval,
+      : _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
         _eventOptions = eventOptions;
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   Future<BaseResponse> initializeClient() async {
     return await OptimizelyClientWrapper.initializeClient(
-        _sdkKey, _periodicDownloadInterval, _eventOptions);
+        _sdkKey, _datafilePeriodicDownloadInterval, _eventOptions);
   }
 
   /// Returns a snapshot of the current project configuration.

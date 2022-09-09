@@ -83,10 +83,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         let eventDispatcher = DefaultEventDispatcher(batchSize: batchSize, backingStore: .file, dataStoreName: "OPTEventQueue", timerInterval: timeInterval, maxQueueSize: maxQueueSize)
         
         // Datafile Download Interval
-        var periodicDownloadInterval = 10 * 60 // seconds
+        var datafilePeriodicDownloadInterval = 10 * 60 // seconds
         
-        if let _periodicDownloadInterval = parameters[RequestParameterKey.periodicDownloadInterval] as? Int {
-            periodicDownloadInterval = _periodicDownloadInterval
+        if let _datafilePeriodicDownloadInterval = parameters[RequestParameterKey.datafilePeriodicDownloadInterval] as? Int {
+            datafilePeriodicDownloadInterval = _datafilePeriodicDownloadInterval
         }
         
         // Delete old user context
@@ -96,7 +96,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
-        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, periodicDownloadInterval: periodicDownloadInterval)
+        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, periodicDownloadInterval: datafilePeriodicDownloadInterval)
         
         optimizelyInstance.start{ [weak self] res in
             switch res {

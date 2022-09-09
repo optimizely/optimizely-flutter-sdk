@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> runOptimizelySDK() async {
     var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
-        periodicDownloadInterval: 10 * 60,
+        datafilePeriodicDownloadInterval: 10 * 60,
         eventOptions: const EventOptions(
             batchSize: 1, timeInterval: 60, maxQueueSize: 10000));
     var response = await flutterSDK.initializeClient();
