@@ -18,6 +18,7 @@ library optimizely_flutter_sdk;
 
 import 'dart:async';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
@@ -36,19 +37,30 @@ export 'package:optimizely_flutter_sdk/src/data_objects/decision_listener_respon
     show DecisionListenerResponse;
 export 'package:optimizely_flutter_sdk/src/data_objects/logevent_listener_response.dart'
     show LogEventListenerResponse;
+export 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart'
+    show EventOptions;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
-/// To use, create an instance of OptimizelyFlutterSdk class with a valid sdkKey and call initializeClient method.
+/// To use, create an instance of OptimizelyFlutterSdk class with a valid sdkKey, periodicDownloadInterval (optional), eventOptions (optional) and
+/// call initializeClient method.
 /// If successfull, call createUserContext to setup user context.
 /// Once done, all API's should be available.
 class OptimizelyFlutterSdk {
   final String _sdkKey;
-  OptimizelyFlutterSdk(this._sdkKey);
+  final int _periodicDownloadInterval;
+  final EventOptions _eventOptions;
+
+  OptimizelyFlutterSdk(this._sdkKey,
+      {periodicDownloadInterval = 10 * 60, // Default time interval in seconds
+      EventOptions eventOptions = const EventOptions()})
+      : _periodicDownloadInterval = periodicDownloadInterval,
+        _eventOptions = eventOptions;
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   Future<BaseResponse> initializeClient() async {
-    return await OptimizelyClientWrapper.initializeClient(_sdkKey);
+    return await OptimizelyClientWrapper.initializeClient(
+        _sdkKey, _periodicDownloadInterval, _eventOptions);
   }
 
   /// Returns a snapshot of the current project configuration.

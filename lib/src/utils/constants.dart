@@ -59,6 +59,10 @@ class Constants {
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";
+  static const String eventBatchSize = "eventBatchSize";
+  static const String eventTimeInterval = "eventTimeInterval";
+  static const String eventMaxQueueSize = "eventMaxQueueSize";
+  static const String periodicDownloadInterval = "periodicDownloadInterval";
   static const String trackCallBackListener = "trackCallbackListener";
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";

@@ -16,10 +16,8 @@
 
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/decision_listener_response.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/logevent_listener_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
@@ -44,11 +42,19 @@ class OptimizelyClientWrapper {
   static Map<int, LogEventNotificationCallback> logEventCallbacksById = {};
   static Map<int, MultiUseCallback> configUpdateCallbacksById = {};
 
-  /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
-  static Future<BaseResponse> initializeClient(String sdkKey) async {
+  /// Starts Optimizely SDK (Synchronous) with provided sdkKey and options.
+  static Future<BaseResponse> initializeClient(String sdkKey,
+      int periodicDownloadInterval, EventOptions eventOptions) async {
     _channel.setMethodCallHandler(methodCallHandler);
-    final result = Map<String, dynamic>.from(await _channel
-        .invokeMethod(Constants.initializeMethod, {Constants.sdkKey: sdkKey}));
+    Map<String, dynamic> requestDict = {
+      Constants.sdkKey: sdkKey,
+      Constants.periodicDownloadInterval: periodicDownloadInterval,
+      Constants.eventBatchSize: eventOptions.batchSize,
+      Constants.eventTimeInterval: eventOptions.timeInterval,
+      Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
+    };
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.initializeMethod, requestDict));
     return BaseResponse(result);
   }
 

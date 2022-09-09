@@ -23,6 +23,7 @@ import com.optimizely.ab.OptimizelyUserContext;
 import com.optimizely.ab.OptimizelyDecisionContext;
 import com.optimizely.ab.OptimizelyForcedDecision;
 import com.optimizely.ab.UnknownEventTypeException;
+import com.optimizely.ab.android.event_handler.DefaultEventHandler;
 import com.optimizely.ab.android.sdk.OptimizelyClient;
 
 import java.util.HashMap;
@@ -35,8 +36,12 @@ import android.os.Handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
 import com.optimizely.ab.error.RaiseExceptionErrorHandler;
+import com.optimizely.ab.event.BatchEventProcessor;
+import com.optimizely.ab.event.EventHandler;
+import com.optimizely.ab.event.EventProcessor;
 import com.optimizely.ab.event.LogEvent;
 import com.optimizely.ab.notification.DecisionNotification;
+import com.optimizely.ab.notification.NotificationCenter;
 import com.optimizely.ab.notification.TrackNotification;
 import com.optimizely.ab.notification.UpdateConfigNotification;
 import com.optimizely.ab.optimizelyconfig.OptimizelyConfig;
@@ -49,6 +54,7 @@ import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class OptimizelyFlutterClient {
@@ -66,15 +72,55 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
+        // EventDispatcher Default Values
+        Integer batchSize = 10;
+        Long timeInterval = TimeUnit.MINUTES.toMillis(1L); // Minutes
+        Integer maxQueueSize = 10000;
+
+        if (argumentsParser.getEventBatchSize() != null) {
+            batchSize = argumentsParser.getEventBatchSize();
+        }
+        if (argumentsParser.getEventTimeInterval() != null) {
+            timeInterval = TimeUnit.SECONDS.toMillis(argumentsParser.getEventBatchSize());
+        }
+        if (argumentsParser.getEventMaxQueueSize() != null) {
+            maxQueueSize = argumentsParser.getEventMaxQueueSize();
+        }
+
+        DefaultEventHandler eventHandler = DefaultEventHandler.getInstance(context);
+        eventHandler.setDispatchInterval(-1L);
+        NotificationCenter notificationCenter = new NotificationCenter();
+        // Here we are using the builder options to set batch size
+        // to 5 events and flush interval to a minute.
+        EventProcessor batchProcessor = BatchEventProcessor.builder()
+                .withNotificationCenter(notificationCenter)
+                .withEventHandler(eventHandler)
+                .withBatchSize(batchSize)
+                .withEventQueue(new ArrayBlockingQueue<>(maxQueueSize))
+                .withFlushInterval(timeInterval)
+                .build();
+
+        // Datafile Download Interval
+        long periodicDownloadInterval = 10 * 60; // seconds
+
+        if (argumentsParser.getPeriodicDownloadInterval() != null) {
+            periodicDownloadInterval = argumentsParser.getPeriodicDownloadInterval();
+        }
         // Delete old user context
         userContextsTracker.remove(sdkKey);
+        getOptimizelyClient(sdkKey).close();
+        optimizelyManagerTracker.remove(sdkKey);
+
         // Creating new instance
         OptimizelyManager optimizelyManager = OptimizelyManager.builder()
-                .withEventDispatchInterval(60L, TimeUnit.SECONDS)
-                .withDatafileDownloadInterval(15, TimeUnit.MINUTES)
+                .withEventProcessor(batchProcessor)
+                .withEventHandler(eventHandler)
+                .withNotificationCenter(notificationCenter)
+                .withDatafileDownloadInterval(periodicDownloadInterval, TimeUnit.SECONDS)
                 .withErrorHandler(new RaiseExceptionErrorHandler())
                 .withSDKKey(sdkKey)
                 .build(context);
+
         optimizelyManager.initialize(context, null, (OptimizelyClient client) -> {
             if (client.isValid()) {
                 optimizelyManagerTracker.put(sdkKey, optimizelyManager);
