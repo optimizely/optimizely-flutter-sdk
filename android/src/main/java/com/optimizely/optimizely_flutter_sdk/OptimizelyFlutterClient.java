@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
 import com.optimizely.ab.error.RaiseExceptionErrorHandler;
 import com.optimizely.ab.event.BatchEventProcessor;
-import com.optimizely.ab.event.EventHandler;
 import com.optimizely.ab.event.EventProcessor;
 import com.optimizely.ab.event.LogEvent;
 import com.optimizely.ab.notification.DecisionNotification;
@@ -74,14 +73,14 @@ public class OptimizelyFlutterClient {
         }
         // EventDispatcher Default Values
         Integer batchSize = 10;
-        Long timeInterval = TimeUnit.MINUTES.toMillis(1L); // Minutes
+        long timeInterval = TimeUnit.MINUTES.toMillis(1L); // Minutes
         Integer maxQueueSize = 10000;
 
         if (argumentsParser.getEventBatchSize() != null) {
             batchSize = argumentsParser.getEventBatchSize();
         }
         if (argumentsParser.getEventTimeInterval() != null) {
-            timeInterval = TimeUnit.SECONDS.toMillis(argumentsParser.getEventBatchSize());
+            timeInterval = TimeUnit.SECONDS.toMillis(argumentsParser.getEventTimeInterval());
         }
         if (argumentsParser.getEventMaxQueueSize() != null) {
             maxQueueSize = argumentsParser.getEventMaxQueueSize();
@@ -101,14 +100,16 @@ public class OptimizelyFlutterClient {
                 .build();
 
         // Datafile Download Interval
-        long periodicDownloadInterval = 10 * 60; // seconds
+        long datafilePeriodicDownloadInterval = 10 * 60; // seconds
 
-        if (argumentsParser.getPeriodicDownloadInterval() != null) {
-            periodicDownloadInterval = argumentsParser.getPeriodicDownloadInterval();
+        if (argumentsParser.getDatafilePeriodicDownloadInterval() != null) {
+            datafilePeriodicDownloadInterval = argumentsParser.getDatafilePeriodicDownloadInterval();
         }
         // Delete old user context
         userContextsTracker.remove(sdkKey);
-        getOptimizelyClient(sdkKey).close();
+        if (getOptimizelyClient(sdkKey) != null) {
+            getOptimizelyClient(sdkKey).close();
+        }
         optimizelyManagerTracker.remove(sdkKey);
 
         // Creating new instance
@@ -116,7 +117,7 @@ public class OptimizelyFlutterClient {
                 .withEventProcessor(batchProcessor)
                 .withEventHandler(eventHandler)
                 .withNotificationCenter(notificationCenter)
-                .withDatafileDownloadInterval(periodicDownloadInterval, TimeUnit.SECONDS)
+                .withDatafileDownloadInterval(datafilePeriodicDownloadInterval, TimeUnit.SECONDS)
                 .withErrorHandler(new RaiseExceptionErrorHandler())
                 .withSDKKey(sdkKey)
                 .build(context);
