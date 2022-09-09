@@ -74,4 +74,20 @@ public class ArgumentsParser {
     public String getVariationKey() {
         return (String) arguments.get(Constants.RequestParameterKey.VARIATION_KEY);
     }
+
+    public Integer getEventBatchSize() {
+        return (Integer) arguments.get(Constants.RequestParameterKey.EVENT_BATCH_SIZE);
+    }
+
+    public Long getEventTimeInterval() {
+        return (Long) arguments.get(Constants.RequestParameterKey.EVENT_TIME_INTERVAL);
+    }
+
+    public Integer getEventMaxQueueSize() {
+        return (Integer) arguments.get(Constants.RequestParameterKey.EVENT_MAX_QUEUE_SIZE);
+    }
+
+    public Long getPeriodicDownloadInterval() {
+        return (Long) arguments.get(Constants.RequestParameterKey.PERIODIC_DOWNLOAD_INTERVAL);
+    }
 }

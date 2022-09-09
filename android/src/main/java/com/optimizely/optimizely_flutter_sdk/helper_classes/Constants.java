@@ -48,6 +48,10 @@ public class Constants {
         public static final String ATTRIBUTES = "attributes";
         public static final String DECIDE_KEYS = "keys";
         public static final String DECIDE_OPTIONS = "optimizelyDecideOption";
+        public static final String EVENT_BATCH_SIZE = "eventBatchSize";
+        public static final String EVENT_TIME_INTERVAL = "eventTimeInterval";
+        public static final String EVENT_MAX_QUEUE_SIZE = "eventMaxQueueSize";
+        public static final String PERIODIC_DOWNLOAD_INTERVAL = "periodicDownloadInterval";
         public static final String EVENT_KEY = "eventKey";
         public static final String EVENT_TAGS = "eventTags";
         public static final String FLAG_KEY = "flagKey";
