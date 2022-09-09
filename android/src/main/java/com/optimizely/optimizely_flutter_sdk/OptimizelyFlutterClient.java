@@ -100,10 +100,10 @@ public class OptimizelyFlutterClient {
                 .build();
 
         // Datafile Download Interval
-        long periodicDownloadInterval = 10 * 60; // seconds
+        long datafilePeriodicDownloadInterval = 10 * 60; // seconds
 
         if (argumentsParser.getDatafilePeriodicDownloadInterval() != null) {
-            periodicDownloadInterval = argumentsParser.getDatafilePeriodicDownloadInterval();
+            datafilePeriodicDownloadInterval = argumentsParser.getDatafilePeriodicDownloadInterval();
         }
         // Delete old user context
         userContextsTracker.remove(sdkKey);
@@ -117,7 +117,7 @@ public class OptimizelyFlutterClient {
                 .withEventProcessor(batchProcessor)
                 .withEventHandler(eventHandler)
                 .withNotificationCenter(notificationCenter)
-                .withDatafileDownloadInterval(periodicDownloadInterval, TimeUnit.SECONDS)
+                .withDatafileDownloadInterval(datafilePeriodicDownloadInterval, TimeUnit.SECONDS)
                 .withErrorHandler(new RaiseExceptionErrorHandler())
                 .withSDKKey(sdkKey)
                 .build(context);

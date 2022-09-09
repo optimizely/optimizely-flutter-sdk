@@ -51,7 +51,7 @@ public class Constants {
         public static final String EVENT_BATCH_SIZE = "eventBatchSize";
         public static final String EVENT_TIME_INTERVAL = "eventTimeInterval";
         public static final String EVENT_MAX_QUEUE_SIZE = "eventMaxQueueSize";
-        public static final String DATAFILE_PERIODIC_DOWNLOAD_INTERVAL = "periodicDownloadInterval";
+        public static final String DATAFILE_PERIODIC_DOWNLOAD_INTERVAL = "datafilePeriodicDownloadInterval";
         public static final String EVENT_KEY = "eventKey";
         public static final String EVENT_TAGS = "eventTags";
         public static final String FLAG_KEY = "flagKey";
