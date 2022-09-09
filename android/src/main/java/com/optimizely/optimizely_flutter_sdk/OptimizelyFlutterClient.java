@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
 import com.optimizely.ab.error.RaiseExceptionErrorHandler;
 import com.optimizely.ab.event.BatchEventProcessor;
-import com.optimizely.ab.event.EventHandler;
 import com.optimizely.ab.event.EventProcessor;
 import com.optimizely.ab.event.LogEvent;
 import com.optimizely.ab.notification.DecisionNotification;
@@ -103,8 +102,8 @@ public class OptimizelyFlutterClient {
         // Datafile Download Interval
         long periodicDownloadInterval = 10 * 60; // seconds
 
-        if (argumentsParser.getPeriodicDownloadInterval() != null) {
-            periodicDownloadInterval = argumentsParser.getPeriodicDownloadInterval();
+        if (argumentsParser.getDatafilePeriodicDownloadInterval() != null) {
+            periodicDownloadInterval = argumentsParser.getDatafilePeriodicDownloadInterval();
         }
         // Delete old user context
         userContextsTracker.remove(sdkKey);

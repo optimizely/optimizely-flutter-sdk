@@ -87,7 +87,7 @@ public class ArgumentsParser {
         return (Integer) arguments.get(Constants.RequestParameterKey.EVENT_MAX_QUEUE_SIZE);
     }
 
-    public Long getPeriodicDownloadInterval() {
-        return (Long) arguments.get(Constants.RequestParameterKey.PERIODIC_DOWNLOAD_INTERVAL);
+    public Long getDatafilePeriodicDownloadInterval() {
+        return (Long) arguments.get(Constants.RequestParameterKey.DATAFILE_PERIODIC_DOWNLOAD_INTERVAL);
     }
 }
