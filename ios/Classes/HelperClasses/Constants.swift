@@ -69,6 +69,8 @@ struct RequestParameterKey {
     static let eventTimeInterval = "eventTimeInterval"
     static let eventMaxQueueSize = "eventMaxQueueSize"
     static let datafilePeriodicDownloadInterval = "datafilePeriodicDownloadInterval"
+    static let datafileHostPrefix = "datafileHostPrefix"
+    static let datafileHostSuffix = "datafileHostSuffix"
 }
 
 struct ResponseKey {

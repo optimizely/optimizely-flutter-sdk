@@ -89,6 +89,11 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             datafilePeriodicDownloadInterval = _datafilePeriodicDownloadInterval
         }
         
+        let datafileHandler = DefaultDatafileHandler()
+        if let datafileHostPrefix = parameters[RequestParameterKey.datafileHostPrefix] as? String, let datafileHostSuffix = parameters[RequestParameterKey.datafileHostSuffix] as? String {
+            datafileHandler.endPointStringFormat = String(format: datafileHostPrefix + datafileHostSuffix, sdkKey)
+        }
+        
         // Delete old user context
         userContextsTracker.removeValue(forKey: sdkKey)
         // Close and remove old client
@@ -96,7 +101,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
-        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, periodicDownloadInterval: datafilePeriodicDownloadInterval)
+        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, datafileHandler: datafileHandler, periodicDownloadInterval: datafilePeriodicDownloadInterval)
         
         optimizelyInstance.start{ [weak self] res in
             switch res {

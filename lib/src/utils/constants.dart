@@ -64,6 +64,8 @@ class Constants {
   static const String eventMaxQueueSize = "eventMaxQueueSize";
   static const String datafilePeriodicDownloadInterval =
       "datafilePeriodicDownloadInterval";
+  static const String datafileHostPrefix = "datafileHostPrefix";
+  static const String datafileHostSuffix = "datafileHostSuffix";
   static const String trackCallBackListener = "trackCallbackListener";
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";
