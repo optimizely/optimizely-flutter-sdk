@@ -15,6 +15,7 @@
 ///**************************************************************************/
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
@@ -22,11 +23,10 @@ import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_respon
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
-import 'dart:io' as io;
 
 enum ListenerType { track, decision, logEvent, projectConfigUpdate }
 
-enum ClientPlatform { ios, android }
+enum ClientPlatform { iOS, android }
 
 typedef DecisionNotificationCallback = void Function(
     DecisionListenerResponse msg);
@@ -63,7 +63,7 @@ class OptimizelyClientWrapper {
 
     datafileHostOptions.forEach((platform, datafileoptions) {
       // Pass datafile host only if non empty value for current platform is provided
-      if (platform.name == io.Platform.operatingSystem &&
+      if (platform.name == defaultTargetPlatform.name &&
           datafileoptions.datafileHostPrefix.isNotEmpty &&
           datafileoptions.datafileHostSuffix.isNotEmpty) {
         requestDict[Constants.datafileHostPrefix] =

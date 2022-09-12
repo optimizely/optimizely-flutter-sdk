@@ -14,6 +14,7 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
+import 'package:flutter/foundation.dart';
 import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart";
@@ -31,8 +32,9 @@ void main() {
   const String userId = "uid-351ea8";
   // To check if decide options properly reached the native sdk through channel
   List<String> decideOptions = [];
-  // To check if event options and datafilePeriodicDownloadInterval properly reached the native sdk through channel
+  // To check if event options and datafileOptions reached the native sdk through channel
   EventOptions eventOptions = const EventOptions();
+  DatafileHostOptions datafileHostOptions = const DatafileHostOptions("", "");
   int datafilePeriodicDownloadInterval = 0;
 
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
@@ -66,6 +68,16 @@ void main() {
               timeInterval: methodCall.arguments[Constants.eventTimeInterval]);
           datafilePeriodicDownloadInterval =
               methodCall.arguments[Constants.datafilePeriodicDownloadInterval];
+
+          // Resetting to default for every test
+          datafileHostOptions = const DatafileHostOptions("", "");
+          if (methodCall.arguments[Constants.datafileHostPrefix] != null &&
+              methodCall.arguments[Constants.datafileHostSuffix] != null) {
+            datafileHostOptions = DatafileHostOptions(
+                methodCall.arguments[Constants.datafileHostPrefix],
+                methodCall.arguments[Constants.datafileHostSuffix]);
+          }
+
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.instanceCreated,
@@ -172,11 +184,12 @@ void main() {
         expect(response.reason, equals(Constants.instanceCreated));
       });
 
-      test("with no eventOptions and no datafilePeriodicDownloadInterval",
-          () async {
+      test("with no eventOptions and no datafileOptions", () async {
         // default values
         const expectedEventOptions =
             EventOptions(batchSize: 10, timeInterval: 60, maxQueueSize: 10000);
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        const expectedDatafileHostOptions = DatafileHostOptions("", "");
         const expectedDatafilePeriodicDownloadInterval = 10 * 60;
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var response = await sdk.initializeClient();
@@ -190,16 +203,26 @@ void main() {
             equals(expectedEventOptions.timeInterval));
         expect(datafilePeriodicDownloadInterval,
             equals(expectedDatafilePeriodicDownloadInterval));
+        expect(datafileHostOptions.datafileHostPrefix,
+            equals(expectedDatafileHostOptions.datafileHostPrefix));
+        expect(datafileHostOptions.datafileHostSuffix,
+            equals(expectedDatafileHostOptions.datafileHostSuffix));
+        debugDefaultTargetPlatformOverride = null;
       });
 
-      test("with eventOptions and datafilePeriodicDownloadInterval", () async {
+      test("with eventOptions and datafileOptions", () async {
         const expectedEventOptions =
             EventOptions(batchSize: 20, timeInterval: 30, maxQueueSize: 200);
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        const expectedDatafileHostOptions = DatafileHostOptions("123", "456");
         const expectedDatafilePeriodicDownloadInterval = 40;
         var sdk = OptimizelyFlutterSdk(testSDKKey,
             eventOptions: expectedEventOptions,
             datafilePeriodicDownloadInterval:
-                expectedDatafilePeriodicDownloadInterval);
+                expectedDatafilePeriodicDownloadInterval,
+            datafileHostOptions: {
+              ClientPlatform.iOS: expectedDatafileHostOptions
+            });
         var response = await sdk.initializeClient();
 
         expect(response.success, equals(true));
@@ -211,17 +234,26 @@ void main() {
             equals(expectedEventOptions.timeInterval));
         expect(datafilePeriodicDownloadInterval,
             equals(expectedDatafilePeriodicDownloadInterval));
+        expect(datafileHostOptions.datafileHostPrefix,
+            equals(expectedDatafileHostOptions.datafileHostPrefix));
+        expect(datafileHostOptions.datafileHostSuffix,
+            equals(expectedDatafileHostOptions.datafileHostSuffix));
+        debugDefaultTargetPlatformOverride = null;
       });
 
-      test("with no eventOptions and datafilePeriodicDownloadInterval",
-          () async {
+      test("with no eventOptions and datafileOptions", () async {
         // default values
         const expectedEventOptions =
             EventOptions(batchSize: 10, timeInterval: 60, maxQueueSize: 10000);
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        const expectedDatafileHostOptions = DatafileHostOptions("123", "456");
         const expectedDatafilePeriodicDownloadInterval = 500;
         var sdk = OptimizelyFlutterSdk(testSDKKey,
             datafilePeriodicDownloadInterval:
-                expectedDatafilePeriodicDownloadInterval);
+                expectedDatafilePeriodicDownloadInterval,
+            datafileHostOptions: {
+              ClientPlatform.iOS: expectedDatafileHostOptions
+            });
         var response = await sdk.initializeClient();
 
         expect(response.success, equals(true));
@@ -233,13 +265,19 @@ void main() {
             equals(expectedEventOptions.timeInterval));
         expect(datafilePeriodicDownloadInterval,
             equals(expectedDatafilePeriodicDownloadInterval));
+        expect(datafileHostOptions.datafileHostPrefix,
+            equals(expectedDatafileHostOptions.datafileHostPrefix));
+        expect(datafileHostOptions.datafileHostSuffix,
+            equals(expectedDatafileHostOptions.datafileHostSuffix));
+        debugDefaultTargetPlatformOverride = null;
       });
 
-      test("with eventOptions and no datafilePeriodicDownloadInterval",
-          () async {
+      test("with eventOptions and no datafileOptions", () async {
         // default values
         const expectedEventOptions =
             EventOptions(batchSize: 50, timeInterval: 80, maxQueueSize: 20000);
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        const expectedDatafileHostOptions = DatafileHostOptions("", "");
         const expectedDatafilePeriodicDownloadInterval = 10 * 60;
         var sdk = OptimizelyFlutterSdk(testSDKKey,
             eventOptions: expectedEventOptions);
@@ -254,6 +292,11 @@ void main() {
             equals(expectedEventOptions.timeInterval));
         expect(datafilePeriodicDownloadInterval,
             equals(expectedDatafilePeriodicDownloadInterval));
+        expect(datafileHostOptions.datafileHostPrefix,
+            equals(expectedDatafileHostOptions.datafileHostPrefix));
+        expect(datafileHostOptions.datafileHostSuffix,
+            equals(expectedDatafileHostOptions.datafileHostSuffix));
+        debugDefaultTargetPlatformOverride = null;
       });
     });
     group("close()", () {
