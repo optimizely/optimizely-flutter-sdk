@@ -90,4 +90,12 @@ public class ArgumentsParser {
     public Integer getDatafilePeriodicDownloadInterval() {
         return (Integer) arguments.get(Constants.RequestParameterKey.DATAFILE_PERIODIC_DOWNLOAD_INTERVAL);
     }
+
+    public String getDatafileHostSuffix() {
+        return (String) arguments.get(Constants.RequestParameterKey.DATAFILE_HOST_SUFFIX);
+    }
+
+    public String getDatafileHostPrefix() {
+        return (String) arguments.get(Constants.RequestParameterKey.DATAFILE_HOST_PREFIX);
+    }
 }

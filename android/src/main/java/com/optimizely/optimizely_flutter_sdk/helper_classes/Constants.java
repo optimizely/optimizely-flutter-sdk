@@ -57,6 +57,8 @@ public class Constants {
         public static final String FLAG_KEY = "flagKey";
         public static final String RULE_KEY = "ruleKey";
         public static final String VARIATION_KEY = "variationKey";
+        public static final String DATAFILE_HOST_PREFIX = "datafileHostPrefix";
+        public static final String DATAFILE_HOST_SUFFIX = "datafileHostSuffix";
     }
 
     public static class ErrorMessage {

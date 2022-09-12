@@ -35,6 +35,7 @@ import android.os.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
+import com.optimizely.ab.android.shared.DatafileConfig;
 import com.optimizely.ab.error.RaiseExceptionErrorHandler;
 import com.optimizely.ab.event.BatchEventProcessor;
 import com.optimizely.ab.event.EventProcessor;
@@ -105,6 +106,14 @@ public class OptimizelyFlutterClient {
         if (argumentsParser.getDatafilePeriodicDownloadInterval() != null) {
             datafilePeriodicDownloadInterval = argumentsParser.getDatafilePeriodicDownloadInterval();
         }
+
+        // String default datafile host
+        String defaultDatafileHost = "https://cdn.optimizely.com";
+        String environmentUrlSuffix = "/datafiles/%s.json";
+
+        DatafileConfig.defaultHost = argumentsParser.getDatafileHostPrefix() != null ? argumentsParser.getDatafileHostPrefix() : defaultDatafileHost;
+        DatafileConfig.environmentUrlSuffix = argumentsParser.getDatafileHostSuffix() != null ? argumentsParser.getDatafileHostSuffix() : environmentUrlSuffix;
+
         // Delete old user context
         userContextsTracker.remove(sdkKey);
         if (getOptimizelyClient(sdkKey) != null) {
