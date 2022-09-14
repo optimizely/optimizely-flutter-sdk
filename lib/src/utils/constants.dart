@@ -40,6 +40,7 @@ class Constants {
   // Request parameter keys
   static const String id = "id";
   static const String sdkKey = "sdkKey";
+  static const String userContextId = "userContextId";
   static const String userContext = "userContext";
   static const String userID = "userID";
   static const String attributes = "attributes";

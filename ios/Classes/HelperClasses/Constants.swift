@@ -50,6 +50,7 @@ struct DecideOption {
 struct RequestParameterKey {
     static let sdkKey = "sdkKey"
     static let userId = "userID"
+    static let userContextId = "userContextId"
     static let notificationId = "id"
     static let notificationType = "type"
     static let notificationPayload = "payload"

@@ -105,8 +105,12 @@ class OptimizelyClientWrapper {
       Constants.userID: userId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
+
     if (result[Constants.responseSuccess] == true) {
-      return OptimizelyUserContext(sdkKey, _channel);
+      final response =
+          Map<String, dynamic>.from(result[Constants.responseResult]);
+      return OptimizelyUserContext(
+          sdkKey, response[Constants.userContextId], _channel);
     }
     return null;
   }

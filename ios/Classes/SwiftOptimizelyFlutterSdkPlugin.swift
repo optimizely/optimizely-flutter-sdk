@@ -26,10 +26,15 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     // to keep track of optimizely clients against their sdkKeys
     var optimizelyClientsTracker = [String: OptimizelyClient?]()
     // to keep track of optimizely user contexts against their sdkKeys
-    var userContextsTracker = [String: OptimizelyUserContext?]()
+    var userContextsTracker = [String: [String: OptimizelyUserContext?]]()
     
     // to communicate with optimizely flutter sdk
     static var channel: FlutterMethodChannel!
+    
+    // to track each unique userContext
+    var uuid: String {
+        return UUID().uuidString
+    }
     
     /// Registers optimizely_flutter_sdk channel to communicate with the flutter sdk to receive requests and send responses
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -91,7 +96,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         
         let datafileHandler = DefaultDatafileHandler()
         if let datafileHostPrefix = parameters[RequestParameterKey.datafileHostPrefix] as? String, let datafileHostSuffix = parameters[RequestParameterKey.datafileHostSuffix] as? String {
-            datafileHandler.endPointStringFormat = String(format: datafileHostPrefix + datafileHostSuffix, sdkKey)
+            datafileHandler.endPointStringFormat = String(format: "\(datafileHostPrefix)\(datafileHostSuffix)", sdkKey)
         }
         
         // Delete old user context
@@ -195,12 +200,14 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        if let attributes = Utils.getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any) {
-            userContextsTracker[sdkKey] = optimizelyClient.createUserContext(userId: userId, attributes: attributes)
+        let userContextId = uuid
+        let userContext = optimizelyClient.createUserContext(userId: userId, attributes: Utils.getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any))
+        if userContextsTracker[sdkKey] != nil {
+            userContextsTracker[sdkKey]![userContextId] = userContext
         } else {
-            userContextsTracker[sdkKey] = optimizelyClient.createUserContext(userId: userId)
+            userContextsTracker[sdkKey] = [userContextId: userContext]
         }
-        result(self.createResponse(success: true, reason: SuccessMessage.userContextCreated))
+        result(self.createResponse(success: true,result: [RequestParameterKey.userContextId: userContextId], reason: SuccessMessage.userContextCreated))
     }
     
     /// Sets attributes for the user context.
@@ -379,10 +386,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Returns saved user context
     func getUserContext(arguments: Any?) -> OptimizelyUserContext? {
-        guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+        guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String, let userContextId = parameters[RequestParameterKey.userContextId] as? String else {
             return nil
         }
-        return userContextsTracker[sdkKey] ?? nil
+        return userContextsTracker[sdkKey]?[userContextId] ?? nil
     }
     
     func createResponse(success: Bool, result: Any? = nil, reason: String? = nil) -> [String: Any] {

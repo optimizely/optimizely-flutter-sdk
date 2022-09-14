@@ -92,6 +92,7 @@ void main() {
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.userContextCreated,
+            Constants.responseResult: {Constants.userContextId: "123"},
           };
         case Constants.setAttributesMethod:
           return {
