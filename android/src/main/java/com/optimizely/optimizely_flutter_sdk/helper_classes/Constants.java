@@ -21,6 +21,8 @@ public class Constants {
         public static final String INITIALIZE = "initialize";
         public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
         public static final String CREATE_USER_CONTEXT = "createUserContext";
+        public static final String GET_USER_ID = "getUserId";
+        public static final String GET_ATTRIBUTES = "getAttributes";
         public static final String SET_ATTRIBUTES="setAttributes";
         public static final String GET_FORCED_DECISION = "getForcedDecision";
         public static final String REMOVE_FORCED_DECISION = "removeForcedDecision";
