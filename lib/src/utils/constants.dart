@@ -26,7 +26,9 @@ class Constants {
   static const String close = "close";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
   static const String createUserContextMethod = "createUserContext";
+  static const String getUserIdMethod = "getUserId";
   static const String setAttributesMethod = "setAttributes";
+  static const String getAttributesMethod = "getAttributes";
   static const String trackEventMethod = "trackEvent";
   static const String decideMethod = "decide";
   static const String setForcedDecision = "setForcedDecision";

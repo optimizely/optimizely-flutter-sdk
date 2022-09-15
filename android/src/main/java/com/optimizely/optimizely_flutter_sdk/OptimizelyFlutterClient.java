@@ -371,6 +371,24 @@ public class OptimizelyFlutterClient {
         }
     }
 
+    protected void getUserId(ArgumentsParser argumentsParser, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+        result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.USER_ID, userContext.getUserId()), ""));
+    }
+
+    protected void getAttributes(ArgumentsParser argumentsParser, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+        result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.ATTRIBUTES, userContext.getAttributes()), ""));
+    }
+
     protected void setAttribute(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         if (sdkKey == null) {
