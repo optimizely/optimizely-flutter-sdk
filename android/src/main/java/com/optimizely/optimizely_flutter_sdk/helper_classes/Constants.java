@@ -42,6 +42,7 @@ public class Constants {
     public static class RequestParameterKey {
         public static final String SDK_KEY = "sdkKey";
         public static final String USER_ID = "userID";
+        public static final String USER_CONTEXT_ID = "userContextId";
         public static final String NOTIFICATION_ID = "id";
         public static final String NOTIFICATION_TYPE = "type";
         public static final String NOTIFICATION_PAYLOAD = "payload";
