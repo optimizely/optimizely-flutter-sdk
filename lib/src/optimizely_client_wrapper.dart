@@ -19,6 +19,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
@@ -75,6 +76,66 @@ class OptimizelyClientWrapper {
 
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.initializeMethod, requestDict));
+    return BaseResponse(result);
+  }
+
+  /// Use the activate method to start an experiment.
+  ///  The activate call will conditionally activate an experiment for a user based on the provided experiment key and a randomized hash of the provided user ID.
+  ///  If the user satisfies audience conditions for the experiment and the experiment is valid and running, the function returns the variation the user is bucketed into.
+  ///  Otherwise, activate returns empty variationKey. Make sure that your code adequately deals with the case when the experiment is not activated (e.g. execute the default variation).
+  static Future<GetForcedDecisionResponse> activate(
+      String sdkKey, String experimentKey, String userId,
+      [Map<String, dynamic> attributes = const {}]) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.activate, {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userID: userId,
+      Constants.attributes: Utils.convertToTypedMap(attributes)
+    }));
+    return GetForcedDecisionResponse(result);
+  }
+
+  /// Get variation for experiment and user ID with user attributes.
+  static Future<GetForcedDecisionResponse> getVariation(
+      String sdkKey, String experimentKey, String userId,
+      [Map<String, dynamic> attributes = const {}]) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getVariation, {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userID: userId,
+      Constants.attributes: Utils.convertToTypedMap(attributes)
+    }));
+    return GetForcedDecisionResponse(result);
+  }
+
+  /// Get forced variation for experiment and user ID.
+  static Future<GetForcedDecisionResponse> getForcedVariation(
+      String sdkKey, String experimentKey, String userId) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getForcedVariation, {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userID: userId,
+    }));
+    return GetForcedDecisionResponse(result);
+  }
+
+  /// Set forced variation for experiment and user ID to variationKey.
+  static Future<BaseResponse> setForcedVariation(
+      String sdkKey, String experimentKey, String userId,
+      [String variationKey = ""]) async {
+    Map<String, dynamic> request = {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userID: userId,
+    };
+    if (variationKey != "") {
+      request[Constants.variationKey] = variationKey;
+    }
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.setForcedVariation, request));
     return BaseResponse(result);
   }
 

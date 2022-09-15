@@ -19,6 +19,10 @@ import Foundation
 struct API {
     static let initialize = "initialize"
     static let getOptimizelyConfig = "getOptimizelyConfig"
+    static let activate = "activate"
+    static let getVariation = "getVariation"
+    static let setForcedVariation = "setForcedVariation"
+    static let getForcedVariation = "getForcedVariation"
     static let createUserContext = "createUserContext"
     static let setAttributes = "setAttributes"
     static let trackEvent = "trackEvent"
@@ -59,6 +63,7 @@ struct RequestParameterKey {
     static let variationKey = "variationKey"
     static let flagKey = "flagKey"
     static let ruleKey = "ruleKey"
+    static let experimentKey = "experimentKey"
     static let enabled = "enabled"
     static let userContext = "userContext"
     static let variables = "variables"

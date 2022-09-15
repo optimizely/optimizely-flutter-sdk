@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
@@ -71,6 +72,39 @@ class OptimizelyFlutterSdk {
   Future<BaseResponse> initializeClient() async {
     return await OptimizelyClientWrapper.initializeClient(_sdkKey,
         _eventOptions, _datafilePeriodicDownloadInterval, _datafileHostOptions);
+  }
+
+  /// Use the activate method to start an experiment.
+  ///  The activate call will conditionally activate an experiment for a user based on the provided experiment key and a randomized hash of the provided user ID.
+  ///  If the user satisfies audience conditions for the experiment and the experiment is valid and running, the function returns the variation the user is bucketed into.
+  ///  Otherwise, activate returns empty variationKey. Make sure that your code adequately deals with the case when the experiment is not activated (e.g. execute the default variation).
+  Future<GetForcedDecisionResponse> activate(
+      String experimentKey, String userId,
+      [Map<String, dynamic> attributes = const {}]) async {
+    return await OptimizelyClientWrapper.activate(
+        _sdkKey, experimentKey, userId, attributes);
+  }
+
+  /// Get variation for experiment and user ID with user attributes.
+  Future<GetForcedDecisionResponse> getVariation(
+      String experimentKey, String userId,
+      [Map<String, dynamic> attributes = const {}]) async {
+    return await OptimizelyClientWrapper.getVariation(
+        _sdkKey, experimentKey, userId, attributes);
+  }
+
+  /// Get forced variation for experiment and user ID.
+  Future<GetForcedDecisionResponse> getForcedVariation(
+      String experimentKey, String userId) async {
+    return await OptimizelyClientWrapper.getForcedVariation(
+        _sdkKey, experimentKey, userId);
+  }
+
+  /// Set forced variation for experiment and user ID to variationKey.
+  Future<BaseResponse> setForcedVariation(String experimentKey, String userId,
+      [String variationKey = ""]) async {
+    return await OptimizelyClientWrapper.setForcedVariation(
+        _sdkKey, experimentKey, userId, variationKey);
   }
 
   /// Returns a snapshot of the current project configuration.

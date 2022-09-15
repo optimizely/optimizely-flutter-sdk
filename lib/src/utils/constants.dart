@@ -24,7 +24,11 @@ class Constants {
   // Supported Method Names
   static const String initializeMethod = "initialize";
   static const String close = "close";
+  static const String activate = "activate";
+  static const String getVariation = "getVariation";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
+  static const String setForcedVariation = "setForcedVariation";
+  static const String getForcedVariation = "getForcedVariation";
   static const String createUserContextMethod = "createUserContext";
   static const String setAttributesMethod = "setAttributes";
   static const String trackEventMethod = "trackEvent";
@@ -43,6 +47,7 @@ class Constants {
   static const String userContextId = "userContextId";
   static const String userContext = "userContext";
   static const String userID = "userID";
+  static const String experimentKey = "experimentKey";
   static const String attributes = "attributes";
   static const String decisionInfo = "decisionInfo";
   static const String variables = "variables";
