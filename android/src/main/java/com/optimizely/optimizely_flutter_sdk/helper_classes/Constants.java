@@ -21,6 +21,8 @@ public class Constants {
         public static final String INITIALIZE = "initialize";
         public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
         public static final String CREATE_USER_CONTEXT = "createUserContext";
+        public static final String GET_USER_ID = "getUserId";
+        public static final String GET_ATTRIBUTES = "getAttributes";
         public static final String SET_ATTRIBUTES="setAttributes";
         public static final String GET_FORCED_DECISION = "getForcedDecision";
         public static final String REMOVE_FORCED_DECISION = "removeForcedDecision";
@@ -42,6 +44,7 @@ public class Constants {
     public static class RequestParameterKey {
         public static final String SDK_KEY = "sdkKey";
         public static final String USER_ID = "userID";
+        public static final String USER_CONTEXT_ID = "userContextId";
         public static final String NOTIFICATION_ID = "id";
         public static final String NOTIFICATION_TYPE = "type";
         public static final String NOTIFICATION_PAYLOAD = "payload";

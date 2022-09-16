@@ -54,6 +54,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.activate: activate(call, result: result)
         case API.getVariation: getVariation(call, result: result)
         case API.createUserContext: createUserContext(call, result: result)
+        case API.getUserId: getUserId(call, result: result)
+        case API.getAttributes: getAttributes(call, result: result)
         case API.setAttributes: setAttributes(call, result: result)
         case API.trackEvent: trackEvent(call, result: result)
         case API.decide: decide(call, result: result)
@@ -256,7 +258,25 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         } else {
             userContextsTracker[sdkKey] = [userContextId: userContext]
         }
-        result(self.createResponse(success: true,result: [RequestParameterKey.userContextId: userContextId], reason: SuccessMessage.userContextCreated))
+        result(self.createResponse(success: true, result: [RequestParameterKey.userContextId: userContextId], reason: SuccessMessage.userContextCreated))
+    }
+    
+    /// Returns userId for the user context.
+    func getUserId(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        result(createResponse(success: true, result: [RequestParameterKey.userId: usrContext.userId]))
+    }
+    
+    /// Returns attributes for the user context.
+    func getAttributes(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        result(createResponse(success: true, result: [RequestParameterKey.attributes: usrContext.attributes]))
     }
     
     /// Sets attributes for the user context.

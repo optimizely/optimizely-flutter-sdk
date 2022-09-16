@@ -136,6 +136,26 @@ void main() {
             Constants.responseReason: Constants.userContextCreated,
             Constants.responseResult: {Constants.userContextId: userContextId},
           };
+        case Constants.getUserIdMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: {
+              Constants.userID: userId,
+            },
+          };
+        case Constants.getAttributesMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: {
+              Constants.attributes: attributes,
+            },
+          };
         case Constants.setAttributesMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
           expect(methodCall.arguments[Constants.userContextId],
@@ -440,6 +460,27 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId, attributes);
         expect(userContext, isNotNull);
+      });
+    });
+
+    group("getUserId()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var userContext = await sdk.createUserContext(userId, attributes);
+        var response = await userContext!.getUserId();
+
+        expect(response.success, isTrue);
+        expect(response.userId, equals(userId));
+      });
+    });
+    group("getAttributes()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var userContext = await sdk.createUserContext(userId, attributes);
+        var response = await userContext!.getAttributes();
+
+        expect(response.success, isTrue);
+        expect(response.attributes["abc"], equals(attributes["abc"]));
       });
     });
 

@@ -22,6 +22,8 @@ struct API {
     static let activate = "activate"
     static let getVariation = "getVariation"
     static let createUserContext = "createUserContext"
+    static let getUserId = "getUserId"
+    static let getAttributes = "getAttributes"
     static let setAttributes = "setAttributes"
     static let trackEvent = "trackEvent"
     static let decide = "decide"
