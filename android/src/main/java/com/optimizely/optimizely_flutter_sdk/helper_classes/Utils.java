@@ -19,12 +19,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 import static com.optimizely.ab.notification.DecisionNotification.FeatureVariableDecisionNotificationBuilder.SOURCE_INFO;
 
 import com.google.common.base.CaseFormat;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 
 public class Utils {
+
+    public static String getRandomUUID() {
+        return UUID.randomUUID().toString();
+    }
 
     public static List<OptimizelyDecideOption> getDecideOptions(List<String> options) {
         if(options == null || options.isEmpty()) {

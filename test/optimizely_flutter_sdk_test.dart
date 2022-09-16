@@ -92,6 +92,21 @@ void main() {
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.userContextCreated,
+            Constants.responseResult: {Constants.userContextId: "123"},
+          };
+        case Constants.getUserIdMethod:
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: {
+              Constants.userID: userId,
+            },
+          };
+        case Constants.getAttributesMethod:
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: {
+              Constants.attributes: {"abc": 123}
+            },
           };
         case Constants.setAttributesMethod:
           return {
@@ -333,6 +348,26 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var userContext = await sdk.createUserContext(userId);
         expect(userContext, isNotNull);
+      });
+    });
+    group("getUserId()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var userContext = await sdk.createUserContext(userId);
+        var response = await userContext!.getUserId();
+
+        expect(response.success, equals(true));
+        expect(response.userId, equals(userId));
+      });
+    });
+    group("getAttributes()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var userContext = await sdk.createUserContext(userId);
+        var response = await userContext!.getAttributes();
+
+        expect(response.success, equals(true));
+        expect(response.attributes, equals({"abc": 123}));
       });
     });
     group("setAttributes()", () {
