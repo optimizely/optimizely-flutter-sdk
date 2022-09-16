@@ -98,4 +98,8 @@ public class ArgumentsParser {
     public String getDatafileHostPrefix() {
         return (String) arguments.get(Constants.RequestParameterKey.DATAFILE_HOST_PREFIX);
     }
+
+    public String getExperimentKey() {
+        return (String) arguments.get(Constants.RequestParameterKey.EXPERIMENT_KEY);
+    }
 }

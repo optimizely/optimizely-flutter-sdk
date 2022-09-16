@@ -36,6 +36,7 @@ import android.os.Handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
 import com.optimizely.ab.android.shared.DatafileConfig;
+import com.optimizely.ab.config.Variation;
 import com.optimizely.ab.error.RaiseExceptionErrorHandler;
 import com.optimizely.ab.event.BatchEventProcessor;
 import com.optimizely.ab.event.EventProcessor;
@@ -176,6 +177,69 @@ public class OptimizelyFlutterClient {
         } catch (Exception ex) {
             result.success(createResponse(false, ex.getMessage()));
         }
+    }
+
+    protected void activate(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (optimizelyClient == null) {
+            result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
+            return;
+        }
+
+        String experimentKey = argumentsParser.getExperimentKey();
+        String userId = argumentsParser.getUserID();
+        Map<String, Object> attributes = argumentsParser.getAttributes();
+
+        if (userId == null || experimentKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        try {
+            Variation variation = optimizelyClient.activate(experimentKey, userId, attributes);
+            String variationKey = variation != null ? variation.getKey() : null;
+            result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VARIATION_KEY, variationKey), ""));
+        } catch (Exception ex) {
+            result.success(createResponse(false, ex.getMessage()));
+        }
+    }
+
+    protected void getVariation(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (optimizelyClient == null) {
+            result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
+            return;
+        }
+
+        String experimentKey = argumentsParser.getExperimentKey();
+        String userId = argumentsParser.getUserID();
+        Map<String, Object> attributes = argumentsParser.getAttributes();
+
+        if (userId == null || experimentKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        try {
+            Variation variation = optimizelyClient.getVariation(experimentKey, userId, attributes);
+            String variationKey = variation != null ? variation.getKey() : null;
+            result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VARIATION_KEY, variationKey), ""));
+        } catch (Exception ex) {
+            result.success(createResponse(false, ex.getMessage()));
+        }
+
     }
 
     protected void decide(ArgumentsParser argumentsParser, @NonNull Result result) {

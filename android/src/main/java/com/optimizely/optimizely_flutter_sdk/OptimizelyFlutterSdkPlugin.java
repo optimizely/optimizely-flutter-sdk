@@ -46,6 +46,14 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         initializeOptimizely(argumentsParser, result);
         break;
       }
+      case APIs.ACTIVATE: {
+        activate(argumentsParser, result);
+        break;
+      }
+      case APIs.GET_VARIATION: {
+        getVariation(argumentsParser, result);
+        break;
+      }
       case APIs.ADD_NOTIFICATION_LISTENER: {
         addNotificationListener(argumentsParser, result);
         break;

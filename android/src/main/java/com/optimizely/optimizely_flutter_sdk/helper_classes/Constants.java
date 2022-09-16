@@ -18,6 +18,8 @@ package com.optimizely.optimizely_flutter_sdk.helper_classes;
 public class Constants {
     public static class APIs {
         public static final String CLOSE = "close";
+        public static final String ACTIVATE = "activate";
+        public static final String GET_VARIATION = "getVariation";
         public static final String INITIALIZE = "initialize";
         public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
         public static final String CREATE_USER_CONTEXT = "createUserContext";
@@ -56,6 +58,7 @@ public class Constants {
         public static final String EVENT_TAGS = "eventTags";
         public static final String FLAG_KEY = "flagKey";
         public static final String RULE_KEY = "ruleKey";
+        public static final String EXPERIMENT_KEY = "experimentKey";
         public static final String VARIATION_KEY = "variationKey";
         public static final String DATAFILE_HOST_PREFIX = "datafileHostPrefix";
         public static final String DATAFILE_HOST_SUFFIX = "datafileHostSuffix";
