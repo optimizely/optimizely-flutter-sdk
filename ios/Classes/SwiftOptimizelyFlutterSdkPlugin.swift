@@ -53,9 +53,9 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.getOptimizelyConfig: getOptimizelyConfig(call, result: result)
         case API.activate: activate(call, result: result)
         case API.getVariation: getVariation(call, result: result)
-        case API.setForcedVariation: setForcedVariation(call, result: result)
-        case API.getForcedVariation: getForcedVariation(call, result: result)
         case API.createUserContext: createUserContext(call, result: result)
+        case API.getUserId: getUserId(call, result: result)
+        case API.getAttributes: getAttributes(call, result: result)
         case API.setAttributes: setAttributes(call, result: result)
         case API.trackEvent: trackEvent(call, result: result)
         case API.decide: decide(call, result: result)
@@ -239,44 +239,6 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    /// Set forced variation for experiment and user ID to variationKey.
-    ///
-    func setForcedVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
-            return
-        }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
-            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
-            return
-        }
-        let variationKey = parameters[RequestParameterKey.variationKey] as? String
-        let success = optimizelyClient.setForcedVariation(experimentKey: experimentKey, userId: userId, variationKey: variationKey)
-        result(self.createResponse(success: success))
-    }
-    
-    /// Get forced variation for experiment and user ID.
-    ///
-    func getForcedVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
-            return
-        }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
-            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
-            return
-        }
-        if let variationKey = optimizelyClient.getForcedVariation(experimentKey: experimentKey, userId: userId) {
-            result(self.createResponse(success: true, result: [RequestParameterKey.variationKey: variationKey]))
-            return
-        }
-        result(self.createResponse(success: false))
-    }
-
-
-    
     /// Creates a context of the user for which decision APIs will be called.
     /// A user context will only be created successfully when the SDK is fully configured using initializeClient.
     func createUserContext(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -296,7 +258,25 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         } else {
             userContextsTracker[sdkKey] = [userContextId: userContext]
         }
-        result(self.createResponse(success: true,result: [RequestParameterKey.userContextId: userContextId], reason: SuccessMessage.userContextCreated))
+        result(self.createResponse(success: true, result: [RequestParameterKey.userContextId: userContextId], reason: SuccessMessage.userContextCreated))
+    }
+    
+    /// Returns userId for the user context.
+    func getUserId(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        result(createResponse(success: true, result: [RequestParameterKey.userId: usrContext.userId]))
+    }
+    
+    /// Returns attributes for the user context.
+    func getAttributes(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let usrContext = getUserContext(arguments: call.arguments) else  {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+            return
+        }
+        result(createResponse(success: true, result: [RequestParameterKey.attributes: usrContext.attributes]))
     }
     
     /// Sets attributes for the user context.

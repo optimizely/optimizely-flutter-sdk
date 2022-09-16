@@ -27,10 +27,10 @@ class Constants {
   static const String activate = "activate";
   static const String getVariation = "getVariation";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
-  static const String setForcedVariation = "setForcedVariation";
-  static const String getForcedVariation = "getForcedVariation";
   static const String createUserContextMethod = "createUserContext";
+  static const String getUserIdMethod = "getUserId";
   static const String setAttributesMethod = "setAttributes";
+  static const String getAttributesMethod = "getAttributes";
   static const String trackEventMethod = "trackEvent";
   static const String decideMethod = "decide";
   static const String setForcedDecision = "setForcedDecision";

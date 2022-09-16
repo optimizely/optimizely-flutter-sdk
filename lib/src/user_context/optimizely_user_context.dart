@@ -18,7 +18,9 @@ import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_attributes_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_user_id_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
@@ -49,6 +51,26 @@ class OptimizelyUserContext {
   final MethodChannel _channel;
 
   OptimizelyUserContext(this._sdkKey, this._userContextId, this._channel);
+
+  /// Returns userId for the user context.
+  Future<GetUserIdResponse> getUserId() async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getUserIdMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+    }));
+    return GetUserIdResponse(result);
+  }
+
+  /// Returns attributes for the user context.
+  Future<GetAttributesResponse> getAttributes() async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getAttributesMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+    }));
+    return GetAttributesResponse(result);
+  }
 
   /// Sets attributes for the user context.
   Future<BaseResponse> setAttributes(Map<String, dynamic> attributes) async {

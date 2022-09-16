@@ -43,6 +43,10 @@ public class ArgumentsParser {
         return (String) arguments.get(Constants.RequestParameterKey.USER_ID);
     }
 
+    public String getUserContextId() {
+        return (String) arguments.get(Constants.RequestParameterKey.USER_CONTEXT_ID);
+    }
+
     public Map<String, Object> getAttributes() {
         return (Map<String, Object>) arguments.get(Constants.RequestParameterKey.ATTRIBUTES);
     }

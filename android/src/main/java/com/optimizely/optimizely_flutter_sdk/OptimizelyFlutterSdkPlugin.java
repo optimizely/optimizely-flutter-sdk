@@ -70,6 +70,14 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         createUserContext(argumentsParser, result);
         break;
       }
+      case APIs.GET_USER_ID: {
+        getUserId(argumentsParser, result);
+        break;
+      }
+      case APIs.GET_ATTRIBUTES: {
+        getAttributes(argumentsParser, result);
+        break;
+      }
       case APIs.SET_ATTRIBUTES: {
         setAttribute(argumentsParser, result);
         break;
