@@ -20,6 +20,8 @@ struct API {
     static let initialize = "initialize"
     static let getOptimizelyConfig = "getOptimizelyConfig"
     static let createUserContext = "createUserContext"
+    static let getUserId = "getUserId"
+    static let getAttributes = "getAttributes"
     static let setAttributes = "setAttributes"
     static let trackEvent = "trackEvent"
     static let decide = "decide"
@@ -50,6 +52,7 @@ struct DecideOption {
 struct RequestParameterKey {
     static let sdkKey = "sdkKey"
     static let userId = "userID"
+    static let userContextId = "userContextId"
     static let notificationId = "id"
     static let notificationType = "type"
     static let notificationPayload = "payload"
@@ -69,6 +72,8 @@ struct RequestParameterKey {
     static let eventTimeInterval = "eventTimeInterval"
     static let eventMaxQueueSize = "eventMaxQueueSize"
     static let datafilePeriodicDownloadInterval = "datafilePeriodicDownloadInterval"
+    static let datafileHostPrefix = "datafileHostPrefix"
+    static let datafileHostSuffix = "datafileHostSuffix"
 }
 
 struct ResponseKey {

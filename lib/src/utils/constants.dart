@@ -26,7 +26,9 @@ class Constants {
   static const String close = "close";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
   static const String createUserContextMethod = "createUserContext";
+  static const String getUserIdMethod = "getUserId";
   static const String setAttributesMethod = "setAttributes";
+  static const String getAttributesMethod = "getAttributes";
   static const String trackEventMethod = "trackEvent";
   static const String decideMethod = "decide";
   static const String setForcedDecision = "setForcedDecision";
@@ -40,6 +42,7 @@ class Constants {
   // Request parameter keys
   static const String id = "id";
   static const String sdkKey = "sdkKey";
+  static const String userContextId = "userContextId";
   static const String userContext = "userContext";
   static const String userID = "userID";
   static const String attributes = "attributes";
@@ -64,6 +67,8 @@ class Constants {
   static const String eventMaxQueueSize = "eventMaxQueueSize";
   static const String datafilePeriodicDownloadInterval =
       "datafilePeriodicDownloadInterval";
+  static const String datafileHostPrefix = "datafileHostPrefix";
+  static const String datafileHostSuffix = "datafileHostSuffix";
   static const String trackCallBackListener = "trackCallbackListener";
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";
