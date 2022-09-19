@@ -117,6 +117,27 @@ void main() {
             Constants.responseSuccess: true,
             Constants.responseResult: {Constants.variationKey: variationKey},
           };
+        case Constants.setForcedVariation:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          expect(methodCall.arguments[Constants.experimentKey],
+              equals(experimentKey));
+          expect(methodCall.arguments[Constants.userID], equals(userId));
+          expect(methodCall.arguments[Constants.variationKey],
+              equals(variationKey));
+          return {
+            Constants.responseSuccess: true,
+          };
+        case Constants.getForcedVariation:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          expect(methodCall.arguments[Constants.experimentKey],
+              equals(experimentKey));
+          expect(methodCall.arguments[Constants.userID], equals(userId));
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: {Constants.variationKey: variationKey},
+          };
         case Constants.getOptimizelyConfigMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
           expect(methodCall.arguments[Constants.userContextId], isNull);
@@ -430,6 +451,26 @@ void main() {
         var result = await sdk.getVariation(experimentKey, userId, attributes);
         expect(result.success, isTrue);
         expect(result.variationKey, equals(variationKey));
+      });
+    });
+
+    group("getForcedVariation()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.getForcedVariation(experimentKey, userId);
+        expect(result.success, isTrue);
+        expect(result.variationKey, equals(variationKey));
+      });
+    });
+
+    group("setForcedVariation()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result =
+            await sdk.setForcedVariation(experimentKey, userId, variationKey);
+        expect(result.success, isTrue);
       });
     });
 

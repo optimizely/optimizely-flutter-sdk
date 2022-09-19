@@ -21,6 +21,8 @@ struct API {
     static let getOptimizelyConfig = "getOptimizelyConfig"
     static let activate = "activate"
     static let getVariation = "getVariation"
+    static let getForcedVariation = "getForcedVariation"
+    static let setForcedVariation = "setForcedVariation"
     static let createUserContext = "createUserContext"
     static let getUserId = "getUserId"
     static let getAttributes = "getAttributes"

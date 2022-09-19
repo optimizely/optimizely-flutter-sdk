@@ -110,6 +110,35 @@ class OptimizelyClientWrapper {
     return GetForcedDecisionResponse(result);
   }
 
+  /// Get forced variation for experiment and user ID.
+  static Future<GetForcedDecisionResponse> getForcedVariation(
+      String sdkKey, String experimentKey, String userId) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getForcedVariation, {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userID: userId,
+    }));
+    return GetForcedDecisionResponse(result);
+  }
+
+  /// Set forced variation for experiment and user ID to variationKey.
+  static Future<BaseResponse> setForcedVariation(
+      String sdkKey, String experimentKey, String userId,
+      [String variationKey = ""]) async {
+    Map<String, dynamic> request = {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userID: userId,
+    };
+    if (variationKey != "") {
+      request[Constants.variationKey] = variationKey;
+    }
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.setForcedVariation, request));
+    return BaseResponse(result);
+  }
+
   /// Returns a snapshot of the current project configuration.
   static Future<OptimizelyConfigResponse> getOptimizelyConfig(
       String sdkKey) async {

@@ -93,6 +93,20 @@ class OptimizelyFlutterSdk {
         _sdkKey, experimentKey, userId, attributes);
   }
 
+  /// Get forced variation for experiment and user ID.
+  Future<GetForcedDecisionResponse> getForcedVariation(
+      String experimentKey, String userId) async {
+    return await OptimizelyClientWrapper.getForcedVariation(
+        _sdkKey, experimentKey, userId);
+  }
+
+  /// Set forced variation for experiment and user ID to variationKey.
+  Future<BaseResponse> setForcedVariation(String experimentKey, String userId,
+      [String variationKey = ""]) async {
+    return await OptimizelyClientWrapper.setForcedVariation(
+        _sdkKey, experimentKey, userId, variationKey);
+  }
+
   /// Returns a snapshot of the current project configuration.
   Future<OptimizelyConfigResponse> getOptimizelyConfig() async {
     return await OptimizelyClientWrapper.getOptimizelyConfig(_sdkKey);

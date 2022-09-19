@@ -26,6 +26,8 @@ class Constants {
   static const String close = "close";
   static const String activate = "activate";
   static const String getVariation = "getVariation";
+  static const String getForcedVariation = "getForcedVariation";
+  static const String setForcedVariation = "setForcedVariation";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
   static const String createUserContextMethod = "createUserContext";
   static const String getUserIdMethod = "getUserId";
