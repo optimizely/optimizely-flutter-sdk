@@ -425,7 +425,6 @@ public class OptimizelyFlutterClient {
         }
         ObjectMapper objMapper = new ObjectMapper();
         Map optimizelyConfigMap = objMapper.convertValue(optimizelyConfig, Map.class);
-        optimizelyConfigMap.remove("datafile");
         result.success(createResponse(true, optimizelyConfigMap, SuccessMessage.OPTIMIZELY_CONFIG_FOUND));
     }
 

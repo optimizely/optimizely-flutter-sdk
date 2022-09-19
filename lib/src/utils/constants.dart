@@ -70,6 +70,23 @@ class Constants {
   static const String configUpdateCallBackListener =
       "projectConfigUpdateCallBackListener";
 
+  // OptimizelyConfig Request params
+  static const String audiences = "audiences";
+  static const String conditions = "conditions";
+  static const String datafile = "datafile";
+  static const String deliveryRules = "deliveryRules";
+  static const String events = "events";
+  static const String experimentIds = "experimentIds";
+  static const String experimentRules = "experimentRules";
+  static const String experimentsMap = "experimentsMap";
+  static const String environmentKey = "environmentKey";
+  static const String featuresMap = "featuresMap";
+  static const String featureEnabled = "featureEnabled";
+  static const String key = "key";
+  static const String name = "name";
+  static const String revision = "revision";
+  static const String variationsMap = "variationsMap";
+
   // Response keys
   static const String responseSuccess = "success";
   static const String responseResult = "result";
