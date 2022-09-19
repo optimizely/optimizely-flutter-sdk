@@ -221,7 +221,6 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     }
     
     /// Get variation for experiment and user ID with user attributes.
-    ///
     func getVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
             result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
@@ -242,7 +241,6 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     }
     
     /// Get forced variation for experiment and user ID.
-    ///
     func getForcedVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
             result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
@@ -261,7 +259,6 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     }
     
     /// Set forced variation for experiment and user ID to variationKey.
-    ///
     func setForcedVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
             result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
