@@ -269,20 +269,19 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
         var result = await sdk.getOptimizelyConfig();
-        var config = result.optimizelyConfig;
 
         expect(result.success, equals(true));
-        expect(result.optimizelyConfig, isNotNull);
+        expect(result.sdkKey, isNotNull);
         expect(result.reason, equals(Constants.optimizelyConfigFound));
 
-        expect(config["sdkKey"], equals(testSDKKey));
-        expect(config["environmentKey"], equals("production"));
-        expect(config["attributes"].length, equals(1));
-        expect(config["events"].length, equals(1));
-        expect(config["revision"], equals("130"));
-        expect(config["experimentsMap"], isNotNull);
-        expect(config["featuresMap"], isNotNull);
-        expect(config["datafile"], isNotNull);
+        expect(result.sdkKey, equals(testSDKKey));
+        expect(result.environmentKey, equals("production"));
+        expect(result.attributes.length, equals(1));
+        expect(result.events.length, equals(1));
+        expect(result.revision, equals("130"));
+        expect(result.experimentsMap, isNotNull);
+        expect(result.featuresMap, isNotNull);
+        expect(result.datafile, isNotNull);
       });
     });
     group("createUserContext()", () {
