@@ -33,7 +33,7 @@ export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decisi
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_context.dart'
     show OptimizelyDecisionContext;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart'
-    show OptimizelyDecideOption;
+    show OptimizelyUserContext, OptimizelyDecideOption;
 export 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart'
     show Decision;
 export 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart'
