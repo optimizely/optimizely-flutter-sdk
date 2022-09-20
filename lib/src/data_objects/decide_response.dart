@@ -42,8 +42,8 @@ class Decision {
     if (json[Constants.userContext] is Map<dynamic, dynamic>) {
       Map<String, dynamic> _userContext =
           Map<String, dynamic>.from(json[Constants.userContext]);
-      if (_userContext[Constants.userID] is String) {
-        userContext[Constants.userID] = _userContext[Constants.userID];
+      if (_userContext[Constants.userId] is String) {
+        userContext[Constants.userId] = _userContext[Constants.userId];
       }
       if (_userContext[Constants.attributes] is Map<dynamic, dynamic>) {
         userContext[Constants.attributes] =

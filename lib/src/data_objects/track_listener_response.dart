@@ -26,8 +26,8 @@ class TrackListenerResponse {
     if (json[Constants.eventKey] is String) {
       eventKey = json[Constants.eventKey];
     }
-    if (json[Constants.userID] is String) {
-      userId = json[Constants.userID];
+    if (json[Constants.userId] is String) {
+      userId = json[Constants.userId];
     }
 
     if (json[Constants.attributes] is Map<dynamic, dynamic>) {

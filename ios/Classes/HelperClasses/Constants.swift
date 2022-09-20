@@ -38,6 +38,7 @@ struct API {
 
 struct NotificationType {
     static let track = "track"
+    static let activate = "activate"
     static let decision = "decision"
     static let logEvent = "logEvent"
     static let projectConfigUpdate = "projectConfigUpdate"
@@ -53,7 +54,7 @@ struct DecideOption {
 
 struct RequestParameterKey {
     static let sdkKey = "sdkKey"
-    static let userId = "userID"
+    static let userId = "userId"
     static let userContextId = "userContextId"
     static let notificationId = "id"
     static let notificationType = "type"

@@ -85,12 +85,26 @@ public class Utils: NSObject {
         return listener
     }
     
+    /// Returns callback required for ActivateListener
+    static func getActivateCallback(id: Int) -> ActivateListener {
+        let listener : ActivateListener = {(experiment, userId, attributes, variation, logEvents) in
+            let listenerDict : [String : Any] = [
+                "experiment"   : experiment,
+                "userId"       : userId,
+                "attributes"   : attributes as Any,
+                "variation"    : variation
+            ]
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.activate)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.activate, RequestParameterKey.notificationPayload: listenerDict])
+        }
+        return listener
+    }
+    
     /// Returns callback required for DecisionListener
     static func getDecisionCallback(id: Int) -> DecisionListener {
         let listener : DecisionListener = {(type, userId, attributes, decisionInfo) in
             let listenerDict : [String : Any] = [
                 "type"        : type,
-                "userID"      : userId,
+                "userId"      : userId,
                 "attributes"  : attributes as Any,
                 "decisionInfo": decisionInfo
             ]
@@ -106,7 +120,7 @@ public class Utils: NSObject {
                 "attributes"   : attributes as Any,
                 "eventKey"     : eventKey,
                 "eventTags"    : eventTags as Any,
-                "userID"       : userId,
+                "userId"       : userId,
                 //                "event": event as Any, This is causing codec related exceptions on flutter side, need to debug
             ]
             SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.track)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])

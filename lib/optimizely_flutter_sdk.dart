@@ -17,10 +17,12 @@
 library optimizely_flutter_sdk;
 
 import 'dart:async';
+import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
@@ -78,16 +80,14 @@ class OptimizelyFlutterSdk {
   ///  The activate call will conditionally activate an experiment for a user based on the provided experiment key and a randomized hash of the provided user ID.
   ///  If the user satisfies audience conditions for the experiment and the experiment is valid and running, the function returns the variation the user is bucketed into.
   ///  Otherwise, activate returns empty variationKey. Make sure that your code adequately deals with the case when the experiment is not activated (e.g. execute the default variation).
-  Future<GetForcedDecisionResponse> activate(
-      String experimentKey, String userId,
+  Future<ActivateResponse> activate(String experimentKey, String userId,
       [Map<String, dynamic> attributes = const {}]) async {
     return await OptimizelyClientWrapper.activate(
         _sdkKey, experimentKey, userId, attributes);
   }
 
   /// Get variation for experiment and user ID with user attributes.
-  Future<GetForcedDecisionResponse> getVariation(
-      String experimentKey, String userId,
+  Future<GetVariationResponse> getVariation(String experimentKey, String userId,
       [Map<String, dynamic> attributes = const {}]) async {
     return await OptimizelyClientWrapper.getVariation(
         _sdkKey, experimentKey, userId, attributes);
@@ -112,24 +112,41 @@ class OptimizelyFlutterSdk {
     return await OptimizelyClientWrapper.close(_sdkKey);
   }
 
+  /// Allows user to listen to supported Activate notifications.
+  Future<CancelListening> addActivateNotificationListener(
+      ActivateNotificationCallback callback) async {
+    return await _addActivateNotificationListener(callback);
+  }
+
+  /// Allows user to listen to supported Decision notifications.
   Future<CancelListening> addDecisionNotificationListener(
       DecisionNotificationCallback callback) async {
     return await _addDecisionNotificationListener(callback);
   }
 
+  /// Allows user to listen to supported Track notifications.
   Future<CancelListening> addTrackNotificationListener(
       TrackNotificationCallback callback) async {
     return await _addTrackNotificationListener(callback);
   }
 
+  /// Allows user to listen to supported LogEvent notifications.
+  Future<CancelListening> addLogEventNotificationListener(
+      LogEventNotificationCallback callback) async {
+    return await _addLogEventNotificationListener(callback);
+  }
+
+  /// Allows user to listen to supported Project Config Update notifications.
   Future<CancelListening> addUpdateConfigNotificationListener(
       MultiUseCallback callback) async {
     return await _addConfigUpdateNotificationListener(callback);
   }
 
-  Future<CancelListening> addLogEventNotificationListener(
-      LogEventNotificationCallback callback) async {
-    return await _addLogEventNotificationListener(callback);
+  /// Allows user to listen to supported Activate notifications.
+  Future<CancelListening> _addActivateNotificationListener(
+      ActivateNotificationCallback callback) async {
+    return await OptimizelyClientWrapper.addActivateNotificationListener(
+        _sdkKey, callback);
   }
 
   /// Allows user to listen to supported Decision notifications.

@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
         await flutterSDK.addDecisionNotificationListener((notification) {
       print("Parsed decision event ....................");
       print(notification.type);
-      print(notification.userID);
+      print(notification.userId);
       print(notification);
       print("decide notification received");
     });

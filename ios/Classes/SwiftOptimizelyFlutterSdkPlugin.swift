@@ -133,30 +133,28 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
+        var notificationId = 0
         switch type {
+        case NotificationType.activate:
+            notificationId = (optimizelyClient.notificationCenter?.addActivateNotificationListener(activateListener: Utils.getActivateCallback(id: id)))!
         case NotificationType.decision:
-            let notificationId = optimizelyClient.notificationCenter?.addDecisionNotificationListener(decisionListener: Utils.getDecisionCallback(id: id))!
-            notificationIdsTracker[id] = notificationId
-            result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
+            notificationId = (optimizelyClient.notificationCenter?.addDecisionNotificationListener(decisionListener: Utils.getDecisionCallback(id: id)))!
             break
         case NotificationType.track:
-            let notificationId = optimizelyClient.notificationCenter?.addTrackNotificationListener(trackListener: Utils.getTrackCallback(id: id))
-            notificationIdsTracker[id] = notificationId
-            result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
+            notificationId = (optimizelyClient.notificationCenter?.addTrackNotificationListener(trackListener: Utils.getTrackCallback(id: id)))!
             break
         case NotificationType.logEvent:
-            let notificationId = optimizelyClient.notificationCenter?.addLogEventNotificationListener(logEventListener: Utils.getLogEventCallback(id: id))
-            notificationIdsTracker[id] = notificationId
-            result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
+            notificationId = (optimizelyClient.notificationCenter?.addLogEventNotificationListener(logEventListener: Utils.getLogEventCallback(id: id)))!
             break
         case NotificationType.projectConfigUpdate:
             let notificationId = optimizelyClient.notificationCenter?.addDatafileChangeNotificationListener(datafileListener:  Utils.getProjectConfigUpdateCallback(id: id))
-            notificationIdsTracker[id] = notificationId
-            result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
             break
         default:
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
         }
+        notificationIdsTracker[id] = notificationId
+        result(self.createResponse(success: true, reason: SuccessMessage.listenerAdded))
     }
     
     /// Removes notification listeners from the optimizely client as requested
