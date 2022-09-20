@@ -35,6 +35,7 @@ import android.os.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optimizely.ab.android.sdk.OptimizelyManager;
+import com.optimizely.ab.android.shared.DatafileConfig;
 import com.optimizely.ab.error.RaiseExceptionErrorHandler;
 import com.optimizely.ab.event.BatchEventProcessor;
 import com.optimizely.ab.event.EventProcessor;
@@ -47,12 +48,14 @@ import com.optimizely.ab.optimizelyconfig.OptimizelyConfig;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecision;
 import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
+import com.optimizely.optimizely_flutter_sdk.helper_classes.Utils;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +64,7 @@ public class OptimizelyFlutterClient {
     protected Activity activity;
 
     protected static final Map<String, OptimizelyManager> optimizelyManagerTracker = new HashMap<>();
-    protected static final Map<String, OptimizelyUserContext> userContextsTracker = new HashMap<>();
+    protected static final Map<String, Map<String, OptimizelyUserContext>> userContextsTracker = new HashMap<>();
     protected static final Map<Integer, Integer> notificationIdsTracker = new HashMap<>();
 
 
@@ -105,6 +108,14 @@ public class OptimizelyFlutterClient {
         if (argumentsParser.getDatafilePeriodicDownloadInterval() != null) {
             datafilePeriodicDownloadInterval = argumentsParser.getDatafilePeriodicDownloadInterval();
         }
+
+        // String default datafile host
+        String defaultDatafileHost = "https://cdn.optimizely.com";
+        String environmentUrlSuffix = "/datafiles/%s.json";
+
+        DatafileConfig.defaultHost = argumentsParser.getDatafileHostPrefix() != null ? argumentsParser.getDatafileHostPrefix() : defaultDatafileHost;
+        DatafileConfig.environmentUrlSuffix = argumentsParser.getDatafileHostSuffix() != null ? argumentsParser.getDatafileHostSuffix() : environmentUrlSuffix;
+
         // Delete old user context
         userContextsTracker.remove(sdkKey);
         if (getOptimizelyClient(sdkKey) != null) {
@@ -152,18 +163,23 @@ public class OptimizelyFlutterClient {
             return;
         }
         try {
-            OptimizelyUserContext optlyUserContext = null;
-            if (attributes != null) {
-                optlyUserContext = optimizelyClient.createUserContext(userId, attributes);
-                userContextsTracker.put(sdkKey, optlyUserContext);
+            String userContextId = Utils.getRandomUUID();
+
+            OptimizelyUserContext optlyUserContext = optimizelyClient.createUserContext(userId, attributes);
+            if (optlyUserContext != null) {
+                if (userContextsTracker.containsKey(sdkKey)) {
+                    userContextsTracker.get(sdkKey).put(userContextId, optlyUserContext);
+                } else {
+                    Map<String, OptimizelyUserContext> idContextMap = new HashMap<>();
+                    idContextMap.put(userContextId, optlyUserContext);
+                    userContextsTracker.put(sdkKey, idContextMap);
+                }
+                result.success(createResponse(true,
+                        Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, userContextId),
+                        SuccessMessage.USER_CONTEXT_CREATED));
             } else {
-                optlyUserContext = optimizelyClient.createUserContext(userId);
-                userContextsTracker.put(sdkKey, optlyUserContext);
-            }
-            if (optlyUserContext != null)
-                result.success(createResponse(true, SuccessMessage.USER_CONTEXT_CREATED));
-            else
                 result.success(createResponse(false, "User context not created "));
+            }
         } catch (Exception ex) {
             result.success(createResponse(false, ex.getMessage()));
         }
@@ -176,7 +192,7 @@ public class OptimizelyFlutterClient {
             return;
         }
 
-        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
@@ -210,7 +226,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
-        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
@@ -240,7 +256,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
-        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
@@ -267,7 +283,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
-        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
@@ -295,7 +311,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
-        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
         if (userContext == null) {
             result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
             return;
@@ -333,7 +349,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
-        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
 
         String eventKey = argumentsParser.getEventKey();
         Map<String, Object> eventTags = argumentsParser.getEventTags();
@@ -357,13 +373,31 @@ public class OptimizelyFlutterClient {
         }
     }
 
+    protected void getUserId(ArgumentsParser argumentsParser, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+        result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.USER_ID, userContext.getUserId()), ""));
+    }
+
+    protected void getAttributes(ArgumentsParser argumentsParser, @NonNull Result result) {
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (userContext == null) {
+            result.success(createResponse(false, ErrorMessage.USER_CONTEXT_NOT_FOUND));
+            return;
+        }
+        result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.ATTRIBUTES, userContext.getAttributes()), ""));
+    }
+
     protected void setAttribute(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         if (sdkKey == null) {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
-        OptimizelyUserContext userContext = getUserContext(sdkKey);
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
 
         Map<String, Object> attributes = argumentsParser.getAttributes();
         if (userContext == null) {
@@ -377,7 +411,7 @@ public class OptimizelyFlutterClient {
         for (String attributeKey : attributes.keySet()) {
             userContext.setAttribute(attributeKey, attributes.get(attributeKey));
         }
-        userContextsTracker.put(sdkKey, userContext);
+        userContextsTracker.get(sdkKey).put(argumentsParser.getUserContextId(), userContext);
         result.success(createResponse(true, userContext.getAttributes(), SuccessMessage.ATTRIBUTES_ADDED));
     }
 
@@ -446,8 +480,13 @@ public class OptimizelyFlutterClient {
         return optimizelyManagerTracker.get(SDKKey) == null? null : optimizelyManagerTracker.get(SDKKey).getOptimizely();
     }
 
-    public OptimizelyUserContext getUserContext(String SDKKey) {
-        return userContextsTracker.get(SDKKey);
+    public OptimizelyUserContext getUserContext(ArgumentsParser argumentsParser) {
+        String SDKKey = argumentsParser.getSdkKey();
+        String userContextId = argumentsParser.getUserContextId();
+        if (userContextId == null || userContextsTracker.get(SDKKey) == null || !userContextsTracker.get(SDKKey).containsKey(userContextId)) {
+            return null;
+        }
+        return userContextsTracker.get(SDKKey).get(userContextId);
     }
 
     protected void addNotificationListener(ArgumentsParser argumentsParser, @NonNull Result result) {

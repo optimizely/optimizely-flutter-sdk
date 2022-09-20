@@ -18,7 +18,9 @@ import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_attributes_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_user_id_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
@@ -45,15 +47,37 @@ enum OptimizelyDecideOption {
 ///
 class OptimizelyUserContext {
   final String _sdkKey;
+  final String _userContextId;
   final MethodChannel _channel;
 
-  OptimizelyUserContext(this._sdkKey, this._channel);
+  OptimizelyUserContext(this._sdkKey, this._userContextId, this._channel);
+
+  /// Returns userId for the user context.
+  Future<GetUserIdResponse> getUserId() async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getUserIdMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+    }));
+    return GetUserIdResponse(result);
+  }
+
+  /// Returns attributes for the user context.
+  Future<GetAttributesResponse> getAttributes() async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getAttributesMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+    }));
+    return GetAttributesResponse(result);
+  }
 
   /// Sets attributes for the user context.
   Future<BaseResponse> setAttributes(Map<String, dynamic> attributes) async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setAttributesMethod, {
       Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
     return BaseResponse(result);
@@ -65,6 +89,7 @@ class OptimizelyUserContext {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.trackEventMethod, {
       Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
       Constants.eventKey: eventKey,
       Constants.eventTags: Utils.convertToTypedMap(eventTags)
     }));
@@ -101,6 +126,7 @@ class OptimizelyUserContext {
     var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
       Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
       Constants.keys: keys,
       Constants.optimizelyDecideOption: convertedOptions,
     }));
@@ -112,6 +138,7 @@ class OptimizelyUserContext {
       OptimizelyForcedDecision decision) async {
     Map<String, dynamic> request = {
       Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
       Constants.flagKey: context.flagKey,
       Constants.variationKey: decision.variationKey
     };
@@ -128,6 +155,7 @@ class OptimizelyUserContext {
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
       Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
       Constants.flagKey: context.flagKey,
     };
     if (context.ruleKey != null) {
@@ -144,6 +172,7 @@ class OptimizelyUserContext {
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
       Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
       Constants.flagKey: context.flagKey,
     };
     if (context.ruleKey != null) {
@@ -159,6 +188,7 @@ class OptimizelyUserContext {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
       Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
     }));
     return BaseResponse(result);
   }
