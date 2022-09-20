@@ -483,7 +483,7 @@ public class OptimizelyFlutterClient {
     public OptimizelyUserContext getUserContext(ArgumentsParser argumentsParser) {
         String SDKKey = argumentsParser.getSdkKey();
         String userContextId = argumentsParser.getUserContextId();
-        if (userContextId == null || !userContextsTracker.get(SDKKey).containsKey(userContextId)) {
+        if (userContextId == null || userContextsTracker.get(SDKKey) == null || !userContextsTracker.get(SDKKey).containsKey(userContextId)) {
             return null;
         }
         return userContextsTracker.get(SDKKey).get(userContextId);
