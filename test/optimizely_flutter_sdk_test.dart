@@ -122,7 +122,7 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           expect(methodCall.arguments[Constants.experimentKey],
               equals(experimentKey));
-          expect(methodCall.arguments[Constants.userID], equals(userId));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
           expect(methodCall.arguments[Constants.variationKey],
               equals(variationKey));
           return {
@@ -133,7 +133,7 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           expect(methodCall.arguments[Constants.experimentKey],
               equals(experimentKey));
-          expect(methodCall.arguments[Constants.userID], equals(userId));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
           return {
             Constants.responseSuccess: true,
             Constants.responseResult: {Constants.variationKey: variationKey},

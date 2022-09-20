@@ -21,7 +21,6 @@ import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
@@ -94,7 +93,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Get forced variation for experiment and user ID.
-  Future<GetForcedDecisionResponse> getForcedVariation(
+  Future<GetVariationResponse> getForcedVariation(
       String experimentKey, String userId) async {
     return await OptimizelyClientWrapper.getForcedVariation(
         _sdkKey, experimentKey, userId);

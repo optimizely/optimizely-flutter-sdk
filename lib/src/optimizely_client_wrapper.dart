@@ -116,15 +116,15 @@ class OptimizelyClientWrapper {
   }
 
   /// Get forced variation for experiment and user ID.
-  static Future<GetForcedDecisionResponse> getForcedVariation(
+  static Future<GetVariationResponse> getForcedVariation(
       String sdkKey, String experimentKey, String userId) async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.getForcedVariation, {
       Constants.sdkKey: sdkKey,
       Constants.experimentKey: experimentKey,
-      Constants.userID: userId,
+      Constants.userId: userId,
     }));
-    return GetForcedDecisionResponse(result);
+    return GetVariationResponse(result);
   }
 
   /// Set forced variation for experiment and user ID to variationKey.
@@ -134,7 +134,7 @@ class OptimizelyClientWrapper {
     Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
       Constants.experimentKey: experimentKey,
-      Constants.userID: userId,
+      Constants.userId: userId,
     };
     if (variationKey != "") {
       request[Constants.variationKey] = variationKey;
