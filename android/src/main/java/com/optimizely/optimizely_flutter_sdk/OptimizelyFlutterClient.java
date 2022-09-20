@@ -173,7 +173,7 @@ public class OptimizelyFlutterClient {
                     userContextsTracker.put(sdkKey, Collections.singletonMap(userContextId, optlyUserContext));
                 }
                 result.success(createResponse(true,
-                        Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, optlyUserContext),
+                        Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, userContextId),
                         SuccessMessage.USER_CONTEXT_CREATED));
             } else {
                 result.success(createResponse(false, "User context not created "));
