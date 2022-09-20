@@ -15,6 +15,7 @@
 ///**************************************************************************/
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
@@ -24,6 +25,8 @@ import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
 enum ListenerType { track, decision, logEvent, projectConfigUpdate }
+
+enum ClientPlatform { iOS, android }
 
 typedef DecisionNotificationCallback = void Function(
     DecisionListenerResponse msg);
@@ -43,8 +46,11 @@ class OptimizelyClientWrapper {
   static Map<int, MultiUseCallback> configUpdateCallbacksById = {};
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey and options.
-  static Future<BaseResponse> initializeClient(String sdkKey,
-      int datafilePeriodicDownloadInterval, EventOptions eventOptions) async {
+  static Future<BaseResponse> initializeClient(
+      String sdkKey,
+      EventOptions eventOptions,
+      int datafilePeriodicDownloadInterval,
+      Map<ClientPlatform, DatafileHostOptions> datafileHostOptions) async {
     _channel.setMethodCallHandler(methodCallHandler);
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
@@ -54,6 +60,19 @@ class OptimizelyClientWrapper {
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
     };
+
+    datafileHostOptions.forEach((platform, datafileoptions) {
+      // Pass datafile host only if non empty value for current platform is provided
+      if (platform.name == defaultTargetPlatform.name &&
+          datafileoptions.datafileHostPrefix.isNotEmpty &&
+          datafileoptions.datafileHostSuffix.isNotEmpty) {
+        requestDict[Constants.datafileHostPrefix] =
+            datafileoptions.datafileHostPrefix;
+        requestDict[Constants.datafileHostSuffix] =
+            datafileoptions.datafileHostSuffix;
+      }
+    });
+
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.initializeMethod, requestDict));
     return BaseResponse(result);
@@ -86,8 +105,12 @@ class OptimizelyClientWrapper {
       Constants.userID: userId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
+
     if (result[Constants.responseSuccess] == true) {
-      return OptimizelyUserContext(sdkKey, _channel);
+      final response =
+          Map<String, dynamic>.from(result[Constants.responseResult]);
+      return OptimizelyUserContext(
+          sdkKey, response[Constants.userContextId], _channel);
     }
     return null;
   }

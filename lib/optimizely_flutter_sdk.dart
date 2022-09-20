@@ -18,11 +18,14 @@ library optimizely_flutter_sdk;
 
 import 'dart:async';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 
+export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
+    show ClientPlatform;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decision.dart'
     show OptimizelyForcedDecision;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_context.dart'
@@ -39,6 +42,8 @@ export 'package:optimizely_flutter_sdk/src/data_objects/logevent_listener_respon
     show LogEventListenerResponse;
 export 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart'
     show EventOptions;
+export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
+    show DatafileHostOptions;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
@@ -48,20 +53,24 @@ export 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart'
 /// Once done, all API's should be available.
 class OptimizelyFlutterSdk {
   final String _sdkKey;
-  final int _datafilePeriodicDownloadInterval;
   final EventOptions _eventOptions;
+  final int _datafilePeriodicDownloadInterval;
+  final Map<ClientPlatform, DatafileHostOptions> _datafileHostOptions;
 
-  OptimizelyFlutterSdk(this._sdkKey,
-      {datafilePeriodicDownloadInterval =
-          10 * 60, // Default time interval in seconds
-      EventOptions eventOptions = const EventOptions()})
-      : _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
-        _eventOptions = eventOptions;
+  OptimizelyFlutterSdk(
+    this._sdkKey, {
+    EventOptions eventOptions = const EventOptions(),
+    int datafilePeriodicDownloadInterval =
+        10 * 60, // Default time interval in seconds
+    Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
+  })  : _eventOptions = eventOptions,
+        _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
+        _datafileHostOptions = datafileHostOptions;
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   Future<BaseResponse> initializeClient() async {
-    return await OptimizelyClientWrapper.initializeClient(
-        _sdkKey, _datafilePeriodicDownloadInterval, _eventOptions);
+    return await OptimizelyClientWrapper.initializeClient(_sdkKey,
+        _eventOptions, _datafilePeriodicDownloadInterval, _datafileHostOptions);
   }
 
   /// Returns a snapshot of the current project configuration.
