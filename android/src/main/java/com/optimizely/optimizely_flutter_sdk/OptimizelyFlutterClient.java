@@ -170,7 +170,9 @@ public class OptimizelyFlutterClient {
                 if (userContextsTracker.containsKey(sdkKey)) {
                     userContextsTracker.get(sdkKey).put(userContextId, optlyUserContext);
                 } else {
-                    userContextsTracker.put(sdkKey, Collections.singletonMap(userContextId, optlyUserContext));
+                    Map<String, OptimizelyUserContext> idContextMap = new HashMap<>();
+                    idContextMap.put(userContextId, optlyUserContext);
+                    userContextsTracker.put(sdkKey, idContextMap);
                 }
                 result.success(createResponse(true,
                         Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, userContextId),
