@@ -198,7 +198,7 @@ public class OptimizelyFlutterClient {
         }
 
         String experimentKey = argumentsParser.getExperimentKey();
-        String userId = argumentsParser.getUserID();
+        String userId = argumentsParser.getUserId();
         Map<String, Object> attributes = argumentsParser.getAttributes();
 
         if (userId == null || experimentKey == null) {
@@ -229,7 +229,7 @@ public class OptimizelyFlutterClient {
         }
 
         String experimentKey = argumentsParser.getExperimentKey();
-        String userId = argumentsParser.getUserID();
+        String userId = argumentsParser.getUserId();
         Map<String, Object> attributes = argumentsParser.getAttributes();
 
         if (userId == null || experimentKey == null) {
