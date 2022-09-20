@@ -172,10 +172,12 @@ public class OptimizelyFlutterClient {
                 if (userContextsTracker.containsKey(sdkKey)) {
                     userContextsTracker.get(sdkKey).put(userContextId, optlyUserContext);
                 } else {
-                    userContextsTracker.put(sdkKey, Collections.singletonMap(userContextId, optlyUserContext));
+                    Map<String, OptimizelyUserContext> idContextMap = new HashMap<>();
+                    idContextMap.put(userContextId, optlyUserContext);
+                    userContextsTracker.put(sdkKey, idContextMap);
                 }
                 result.success(createResponse(true,
-                        Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, optlyUserContext),
+                        Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, userContextId),
                         SuccessMessage.USER_CONTEXT_CREATED));
             } else {
                 result.success(createResponse(false, "User context not created "));
@@ -546,7 +548,7 @@ public class OptimizelyFlutterClient {
     public OptimizelyUserContext getUserContext(ArgumentsParser argumentsParser) {
         String SDKKey = argumentsParser.getSdkKey();
         String userContextId = argumentsParser.getUserContextId();
-        if (userContextId == null || !userContextsTracker.get(SDKKey).containsKey(userContextId)) {
+        if (userContextId == null || userContextsTracker.get(SDKKey) == null || !userContextsTracker.get(SDKKey).containsKey(userContextId)) {
             return null;
         }
         return userContextsTracker.get(SDKKey).get(userContextId);
