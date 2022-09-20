@@ -37,6 +37,7 @@ public class Constants {
     }
 
     public static class NotificationType {
+        public static final String ACTIVATE="activate";
         public static final String TRACK="track";
         public static final String DECISION = "decision";
         public static final String LOG_EVENT = "logEvent";
@@ -94,6 +95,13 @@ public class Constants {
         public static final String USER_ID = "userId";
         public static final String ATTRIBUTES = "attributes";
         public static final String DECISION_INFO = "decisionInfo";
+    }
+
+    public static class ActivateListenerKeys {
+        public static final String EXPERIMENT_KEY = "experimentKey";
+        public static final String USER_ID = "userId";
+        public static final String ATTRIBUTES = "attributes";
+        public static final String VARIATION_KEY = "variationKey";
     }
 
     public static class TrackListenerKeys {
