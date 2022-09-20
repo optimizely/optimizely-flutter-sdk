@@ -98,7 +98,7 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           expect(methodCall.arguments[Constants.experimentKey],
               equals(experimentKey));
-          expect(methodCall.arguments[Constants.userID], equals(userId));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
           expect(methodCall.arguments[Constants.attributes]["abc"],
               equals(attributes["abc"]));
           return {
@@ -110,7 +110,7 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           expect(methodCall.arguments[Constants.experimentKey],
               equals(experimentKey));
-          expect(methodCall.arguments[Constants.userID], equals(userId));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
           expect(methodCall.arguments[Constants.attributes]["abc"],
               equals(attributes["abc"]));
           return {
@@ -148,7 +148,7 @@ void main() {
           };
         case Constants.createUserContextMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          expect(methodCall.arguments[Constants.userID], equals(userId));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
           expect(methodCall.arguments[Constants.attributes]["abc"],
               equals(attributes["abc"]));
           expect(methodCall.arguments[Constants.userContextId], isNull);
@@ -164,7 +164,7 @@ void main() {
           return {
             Constants.responseSuccess: true,
             Constants.responseResult: {
-              Constants.userID: userId,
+              Constants.userId: userId,
             },
           };
         case Constants.getAttributesMethod:
@@ -696,12 +696,14 @@ void main() {
       await sdk.addLogEventNotificationListener(callback);
       await sdk.addUpdateConfigNotificationListener(callback);
       await sdk.addTrackNotificationListener(callback);
+      await sdk.addActivateNotificationListener(callback);
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestDecisionNotifications(callHandler, 0);
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestTrackNotifications(callHandler, 2);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
       expect(notifications.length, equals(1));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
     });
@@ -722,18 +724,23 @@ void main() {
       await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestDecisionNotifications(callHandler, 0);
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 2);
       TestUtils.sendTestTrackNotifications(callHandler, 3);
-      expect(notifications.length, equals(4));
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
+      expect(notifications.length, equals(5));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 2),
           true);
       expect(TestUtils.testTrackNotificationPayload(notifications, 3), true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 4), true);
     });
 
     test("should receive notifications with several ListenerTypes", () async {
@@ -763,6 +770,12 @@ void main() {
       await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestDecisionNotifications(callHandler, 0);
@@ -773,7 +786,9 @@ void main() {
       TestUtils.sendTestTrackNotifications(callHandler, 5);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 6);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
-      expect(notifications.length, equals(8));
+      TestUtils.sendTestActivateNotifications(callHandler, 8);
+      TestUtils.sendTestActivateNotifications(callHandler, 9);
+      expect(notifications.length, equals(10));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testDecisionNotificationPayload(notifications, 1), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 2), true);
@@ -784,6 +799,8 @@ void main() {
           true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 7),
           true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 8), true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 9), true);
     });
 
     test("should receive notifications with multiple sdkKeys", () async {
@@ -803,6 +820,9 @@ void main() {
       await sdk1.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk1.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
 
       await sdk2.addDecisionNotificationListener((msg) {
         notifications.add(msg);
@@ -816,6 +836,9 @@ void main() {
       await sdk2.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk2.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
@@ -823,21 +846,25 @@ void main() {
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestTrackNotifications(callHandler, 2);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
-      TestUtils.sendTestDecisionNotifications(callHandler, 4);
-      TestUtils.sendTestLogEventNotifications(callHandler, 5);
-      TestUtils.sendTestTrackNotifications(callHandler, 6);
-      TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
-      expect(notifications.length, equals(8));
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
+      TestUtils.sendTestDecisionNotifications(callHandler, 5);
+      TestUtils.sendTestLogEventNotifications(callHandler, 6);
+      TestUtils.sendTestTrackNotifications(callHandler, 7);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 8);
+      TestUtils.sendTestActivateNotifications(callHandler, 9);
+      expect(notifications.length, equals(10));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
       expect(TestUtils.testTrackNotificationPayload(notifications, 2), true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 3),
           true);
-      expect(TestUtils.testDecisionNotificationPayload(notifications, 4), true);
-      expect(TestUtils.testLogEventNotificationPayload(notifications, 5), true);
-      expect(TestUtils.testTrackNotificationPayload(notifications, 6), true);
-      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 7),
+      expect(TestUtils.testActivateNotificationPayload(notifications, 4), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 5), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 6), true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 7), true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 8),
           true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 9), true);
     });
 
     test("should receive 4 notification because of listener removals",
@@ -857,6 +884,9 @@ void main() {
       await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
 
       var cancel = await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
@@ -874,6 +904,10 @@ void main() {
         notifications.add(msg);
       });
       cancel();
+      cancel = await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
+      cancel();
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
@@ -881,16 +915,19 @@ void main() {
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestTrackNotifications(callHandler, 2);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
-      TestUtils.sendTestDecisionNotifications(callHandler, 4);
-      TestUtils.sendTestLogEventNotifications(callHandler, 5);
-      TestUtils.sendTestTrackNotifications(callHandler, 6);
-      TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
-      expect(notifications.length, equals(4));
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
+      TestUtils.sendTestDecisionNotifications(callHandler, 5);
+      TestUtils.sendTestLogEventNotifications(callHandler, 6);
+      TestUtils.sendTestTrackNotifications(callHandler, 7);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 8);
+      TestUtils.sendTestActivateNotifications(callHandler, 9);
+      expect(notifications.length, equals(5));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
       expect(TestUtils.testTrackNotificationPayload(notifications, 2), true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 3),
           true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 4), true);
     });
   });
 }

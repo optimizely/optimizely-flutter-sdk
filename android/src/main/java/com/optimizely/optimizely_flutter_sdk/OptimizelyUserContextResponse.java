@@ -20,17 +20,17 @@ import com.optimizely.ab.OptimizelyUserContext;
 import java.util.Map;
 
 public class OptimizelyUserContextResponse {
-    private final String userID;
+    private final String userId;
 
     private final Map<String, Object> attributes;
 
     public OptimizelyUserContextResponse(OptimizelyUserContext optimizelyUserContext) {
-        this.userID = optimizelyUserContext.getUserId();
+        this.userId = optimizelyUserContext.getUserId();
         this.attributes = optimizelyUserContext.getAttributes();
     }
 
-    public String getUserID() {
-        return userID;
+    public String getUserId() {
+        return userId;
     }
 
     public Map<String, Object> getAttributes() {

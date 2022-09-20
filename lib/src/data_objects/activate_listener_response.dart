@@ -14,18 +14,29 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
-import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
-class GetUserIdResponse extends BaseResponse {
-  String userId = "";
+class ActivateListenerResponse {
+  String userId = '';
+  Map<String, dynamic> attributes = {};
+  Map<String, dynamic> experiment = {};
+  Map<String, dynamic> variation = {};
 
-  GetUserIdResponse(Map<String, dynamic> json) : super(json) {
-    if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
-      var response = Map<String, dynamic>.from(json[Constants.responseResult]);
-      if (response[Constants.userId] is String) {
-        userId = response[Constants.userId];
-      }
+  ActivateListenerResponse(Map<String, dynamic> json) {
+    if (json[Constants.userId] is String) {
+      userId = json[Constants.userId];
+    }
+
+    if (json[Constants.attributes] is Map<dynamic, dynamic>) {
+      attributes = Map<String, dynamic>.from(json[Constants.attributes]);
+    }
+
+    if (json[Constants.experiment] is Map<dynamic, dynamic>) {
+      experiment = Map<String, dynamic>.from(json[Constants.experiment]);
+    }
+
+    if (json[Constants.variation] is Map<dynamic, dynamic>) {
+      variation = Map<String, dynamic>.from(json[Constants.variation]);
     }
   }
 }

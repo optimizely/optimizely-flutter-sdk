@@ -48,7 +48,9 @@ class Constants {
   static const String sdkKey = "sdkKey";
   static const String userContextId = "userContextId";
   static const String userContext = "userContext";
-  static const String userID = "userID";
+  static const String experiment = "experiment";
+  static const String variation = "variation";
+  static const String userId = "userId";
   static const String experimentKey = "experimentKey";
   static const String attributes = "attributes";
   static const String decisionInfo = "decisionInfo";
@@ -75,6 +77,7 @@ class Constants {
   static const String datafileHostPrefix = "datafileHostPrefix";
   static const String datafileHostSuffix = "datafileHostSuffix";
   static const String trackCallBackListener = "trackCallbackListener";
+  static const String activateCallBackListener = "activateCallbackListener";
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";
   static const String configUpdateCallBackListener =

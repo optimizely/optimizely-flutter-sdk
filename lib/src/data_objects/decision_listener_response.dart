@@ -18,7 +18,7 @@ import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class DecisionListenerResponse {
   String type = '';
-  String userID = '';
+  String userId = '';
   Map<String, dynamic> attributes = {};
   Map<String, dynamic> decisionInfo = {};
 
@@ -26,8 +26,8 @@ class DecisionListenerResponse {
     if (json[Constants.type] is String) {
       type = json[Constants.type];
     }
-    if (json[Constants.userID] is String) {
-      userID = json[Constants.userID];
+    if (json[Constants.userId] is String) {
+      userId = json[Constants.userId];
     }
 
     if (json[Constants.attributes] is Map<dynamic, dynamic>) {

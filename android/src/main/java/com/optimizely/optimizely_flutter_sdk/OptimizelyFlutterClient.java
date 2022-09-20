@@ -157,7 +157,7 @@ public class OptimizelyFlutterClient {
             return;
         }
 
-        String userId = argumentsParser.getUserID();
+        String userId = argumentsParser.getUserId();
         Map<String, Object> attributes = argumentsParser.getAttributes();
         if (userId == null) {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));

@@ -33,7 +33,7 @@ class TestUtils {
     Constants.reasons: ["test_reason"],
     Constants.variationKey: "16906801184",
     Constants.userContext: {
-      Constants.userID: "934391.0003922911",
+      Constants.userId: "934391.0003922911",
       Constants.attributes: {"attr_1": "hola"}
     },
     Constants.ruleKey: "16941022436",
@@ -70,11 +70,24 @@ class TestUtils {
     return true;
   }
 
+  static sendTestActivateNotifications(
+      Function(MethodCall message) handler, int id) {
+    handler(MethodCall(Constants.activateCallBackListener, {
+      Constants.id: id,
+      Constants.payload: {
+        Constants.experiment: {"test": id},
+        Constants.userId: "test",
+        Constants.attributes: {"test": id},
+        Constants.variation: {"test": id},
+      },
+    }));
+  }
+
   static sendTestDecisionNotifications(
       Function(MethodCall message) handler, int id) {
     handler(MethodCall(Constants.decisionCallBackListener, {
       Constants.id: id,
-      Constants.payload: {Constants.type: "$id", Constants.userID: "test"}
+      Constants.payload: {Constants.type: "$id", Constants.userId: "test"}
     }));
   }
 
@@ -95,7 +108,7 @@ class TestUtils {
       Constants.id: id,
       Constants.payload: {
         Constants.eventKey: "$id",
-        Constants.userID: "test",
+        Constants.userId: "test",
         Constants.attributes: {"test", id},
         Constants.eventTags: {"testTag", id}
       }
@@ -110,8 +123,18 @@ class TestUtils {
     }));
   }
 
+  static bool testActivateNotificationPayload(List notifications, int id) {
+    if (notifications[id].experiment != {"test", id} &&
+        notifications[id].userId != "test" &&
+        notifications[id].variation != {"test", id} &&
+        notifications[id].attributes != {"test", id}) {
+      return false;
+    }
+    return true;
+  }
+
   static bool testDecisionNotificationPayload(List notifications, int id) {
-    if (notifications[id].type != "$id" && notifications[id].userID != "test") {
+    if (notifications[id].type != "$id" && notifications[id].userId != "test") {
       return false;
     }
     return true;
@@ -119,7 +142,7 @@ class TestUtils {
 
   static bool testTrackNotificationPayload(List notifications, int id) {
     if (notifications[id].eventKey != "$id" &&
-        notifications[id].userID != "test" &&
+        notifications[id].userId != "test" &&
         notifications[id].attributes != {"test", id}) {
       return false;
     }
