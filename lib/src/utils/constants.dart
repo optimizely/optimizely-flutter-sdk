@@ -91,6 +91,7 @@ class Constants {
   static const String name = "name";
   static const String revision = "revision";
   static const String variationsMap = "variationsMap";
+  static const String variablesMap = "variablesMap";
 
   // Response keys
   static const String responseSuccess = "success";

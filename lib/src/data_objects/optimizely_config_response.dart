@@ -100,6 +100,7 @@ class OptimizelyConfigResponse extends BaseResponse {
   }
 }
 
+// Represents the Audiences list in {@link OptimizelyConfigResponse}
 class OptimizelyAudience {
   final String? id;
   final String? name;
@@ -114,6 +115,7 @@ class OptimizelyAudience {
   }
 }
 
+// Represents the Events's map in {@link OptimizelyConfigResponse}
 class OptimizelyEvent {
   final String? id;
   final String? key;
@@ -128,6 +130,7 @@ class OptimizelyEvent {
   }
 }
 
+// Represents the Attribute's map in {@link OptimizelyConfigResponse}
 class OptimizelyAttribute {
   final String? id;
   final String? key;
@@ -140,6 +143,7 @@ class OptimizelyAttribute {
   }
 }
 
+// Represents the feature's map in {@link OptimizelyConfigResponse}
 class OptimizelyFeature {
   final String? id;
   final String? key;
@@ -178,6 +182,7 @@ class OptimizelyFeature {
   }
 }
 
+// Represents the experiment's map in {@link OptimizelyConfigResponse}
 class OptimizelyExperiment {
   final String? id;
   final String? key;
@@ -207,17 +212,54 @@ class OptimizelyExperiment {
   }
 }
 
+// Details of variation in {@link OptimizelyExperiment}
 class OptimizelyVariation {
   final String? id;
   final String? key;
   final bool featureEnabled;
+  final Map<String, OptimizelyVariable> variablesMap;
 
-  OptimizelyVariation({this.id, this.key, this.featureEnabled = false});
+  OptimizelyVariation(
+      {this.id,
+      this.key,
+      this.featureEnabled = false,
+      this.variablesMap = const {}});
 
   factory OptimizelyVariation.fromJson(Map<String, dynamic> parsedJson) {
+    Map<String, OptimizelyVariable>? tempVariablesMap = {};
+    if (parsedJson[Constants.variablesMap] is Map<dynamic, dynamic>) {
+      final variablesMapDynamic =
+          Map<String, dynamic>.from(parsedJson[Constants.variablesMap]);
+      variablesMapDynamic.forEach((k, v) => {
+            if (v is Map<dynamic, dynamic>)
+              {
+                tempVariablesMap[k] =
+                    OptimizelyVariable.fromJson(Map<String, dynamic>.from(v))
+              }
+          });
+    }
     return OptimizelyVariation(
         id: parsedJson[Constants.id],
         key: parsedJson[Constants.key],
-        featureEnabled: parsedJson[Constants.featureEnabled]);
+        featureEnabled: parsedJson[Constants.featureEnabled],
+        variablesMap: tempVariablesMap);
+  }
+}
+
+// Details of feature variable in {@link OptimizelyVariation}
+class OptimizelyVariable {
+  final String? id;
+  final String? key;
+  final String? type;
+  final String? value;
+
+  OptimizelyVariable({this.id, this.key, this.type, this.value});
+
+  factory OptimizelyVariable.fromJson(Map<String, dynamic> parsedJson) {
+    return OptimizelyVariable(
+        id: parsedJson[Constants.id],
+        key: parsedJson[Constants.key],
+        type: parsedJson[Constants.type],
+        value: parsedJson[Constants.value]);
   }
 }
