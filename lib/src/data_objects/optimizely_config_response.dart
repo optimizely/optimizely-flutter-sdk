@@ -18,14 +18,14 @@ import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class OptimizelyConfigResponse extends BaseResponse {
-  late Map<String, OptimizelyExperiment> experimentsMap = {};
-  late Map<String, OptimizelyFeature> featuresMap = {};
-  late List<OptimizelyAttribute> attributes;
-  late List<OptimizelyEvent> events;
-  late List<OptimizelyAudience> audiences;
-  late String revision;
-  late String sdkKey;
-  late String environmentKey;
+  Map<String, OptimizelyExperiment> experimentsMap = {};
+  Map<String, OptimizelyFeature> featuresMap = {};
+  List<OptimizelyAttribute> attributes = [];
+  List<OptimizelyEvent> events = [];
+  List<OptimizelyAudience> audiences = [];
+  String? revision;
+  String? sdkKey;
+  String? environmentKey;
   String? datafile;
 
   OptimizelyConfigResponse(Map<String, dynamic> json) : super(json) {
