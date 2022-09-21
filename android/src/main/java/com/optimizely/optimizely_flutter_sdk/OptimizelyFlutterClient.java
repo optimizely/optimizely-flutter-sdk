@@ -250,6 +250,7 @@ public class OptimizelyFlutterClient {
 
     }
 
+    /// Get forced variation for experiment and user ID.
     protected void getForcedVariation(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         if (sdkKey == null) {
@@ -280,6 +281,7 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(false));
     }
 
+    /// Set forced variation for experiment and user ID to variationKey.
     protected void setForcedVariation(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         if (sdkKey == null) {
