@@ -329,17 +329,17 @@ void main() {
         var result = await sdk.getOptimizelyConfig();
 
         expect(result.success, equals(true));
-        expect(result.sdkKey, isNotNull);
         expect(result.reason, equals(Constants.optimizelyConfigFound));
 
-        expect(result.sdkKey, equals(testSDKKey));
-        expect(result.environmentKey, equals("production"));
-        expect(result.attributes.length, equals(1));
-        expect(result.events.length, equals(1));
-        expect(result.revision, equals("130"));
-        expect(result.experimentsMap, isNotNull);
-        expect(result.featuresMap, isNotNull);
-        expect(result.datafile, isNotNull);
+        expect(result.optimizelyConfig?.sdkKey, isNotNull);
+        expect(result.optimizelyConfig?.sdkKey, equals(testSDKKey));
+        expect(result.optimizelyConfig?.environmentKey, equals("production"));
+        expect(result.optimizelyConfig?.attributes.length, equals(1));
+        expect(result.optimizelyConfig?.events.length, equals(1));
+        expect(result.optimizelyConfig?.revision, equals("130"));
+        expect(result.optimizelyConfig?.experimentsMap, isNotNull);
+        expect(result.optimizelyConfig?.featuresMap, isNotNull);
+        expect(result.optimizelyConfig?.datafile, isNotNull);
       });
     });
     group("createUserContext()", () {
