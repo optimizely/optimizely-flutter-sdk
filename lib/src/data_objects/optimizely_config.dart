@@ -92,6 +92,31 @@ class OptimizelyConfig {
       datafile = optimizelyConfig[Constants.datafile] as String;
     }
   }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> dynamicExpMap = {};
+    experimentsMap.forEach((k, v) => {dynamicExpMap[k] = v.toJson()});
+    Map<String, dynamic> dynamicFeaturesMap = {};
+    featuresMap.forEach((k, v) => {dynamicFeaturesMap[k] = v.toJson()});
+    var dynamicAttributes = [];
+    attributes.forEach((v) => {dynamicAttributes.add(v.toJson())});
+    var dynamicEvents = [];
+    events.forEach((v) => {dynamicEvents.add(v.toJson())});
+    var dynamicAudiences = [];
+    audiences.forEach((v) => {dynamicAudiences.add(v.toJson())});
+
+    return {
+      'experimentsMap': dynamicExpMap,
+      'featuresMap': dynamicFeaturesMap,
+      'attributes': dynamicAttributes,
+      'events': dynamicEvents,
+      'audiences': dynamicAudiences,
+      'revision': revision,
+      'sdkKey': sdkKey,
+      'environmentKey': environmentKey,
+      'datafile': datafile
+    };
+  }
 }
 
 // Represents the Audiences list in {@link OptimizelyConfigResponse}
@@ -107,6 +132,9 @@ class OptimizelyAudience {
         name: parsedJson[Constants.name],
         conditions: parsedJson[Constants.conditions]);
   }
+
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'name': name, 'conditions': conditions};
 }
 
 // Represents the Events's map in {@link OptimizelyConfigResponse}
@@ -122,6 +150,9 @@ class OptimizelyEvent {
         key: parsedJson[Constants.key],
         experimentIds: List<String>.from(parsedJson[Constants.experimentIds]));
   }
+
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'key': key, 'experimentIds': experimentIds};
 }
 
 // Represents the Attribute's map in {@link OptimizelyConfigResponse}
@@ -135,6 +166,7 @@ class OptimizelyAttribute {
     return OptimizelyAttribute(
         id: parsedJson[Constants.id], key: parsedJson[Constants.key]);
   }
+  Map<String, dynamic> toJson() => {'id': id, 'key': key};
 }
 
 // Represents the feature's map in {@link OptimizelyConfigResponse}
@@ -170,9 +202,23 @@ class OptimizelyFeature {
     }
     return OptimizelyFeature(
         id: parsedJson[Constants.id],
-        key: parsedJson[Constants.name],
+        key: parsedJson[Constants.key],
         deliveryRules: tempDeliveryRules,
         experimentRules: tempExperimentRules);
+  }
+
+  Map<String, dynamic> toJson() {
+    var dynamicDeliveryRules = [];
+    deliveryRules.forEach((v) => {dynamicDeliveryRules.add(v.toJson())});
+
+    var dynamicExperimentRules = [];
+    experimentRules.forEach((v) => {dynamicExperimentRules.add(v.toJson())});
+    return {
+      'id': id,
+      'key': key,
+      'deliveryRules': dynamicDeliveryRules,
+      'experimentRules': dynamicExperimentRules
+    };
   }
 }
 
@@ -203,6 +249,18 @@ class OptimizelyExperiment {
         key: parsedJson[Constants.key],
         audiences: parsedJson[Constants.audiences],
         variationsMap: tempVariationsMap);
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> dynamicVariationsMap = {};
+    variationsMap.forEach((k, v) => {dynamicVariationsMap[k] = v.toJson()});
+
+    return {
+      'id': id,
+      'key': key,
+      'audiences': audiences,
+      'variationsMap': dynamicVariationsMap
+    };
   }
 }
 
@@ -238,6 +296,18 @@ class OptimizelyVariation {
         featureEnabled: parsedJson[Constants.featureEnabled],
         variablesMap: tempVariablesMap);
   }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> dynamicVariablesMap = {};
+    variablesMap.forEach((k, v) => {dynamicVariablesMap[k] = v.toJson()});
+
+    return {
+      'id': id,
+      'key': key,
+      'featureEnabled': featureEnabled,
+      'variablesMap': dynamicVariablesMap
+    };
+  }
 }
 
 // Details of feature variable in {@link OptimizelyVariation}
@@ -256,4 +326,7 @@ class OptimizelyVariable {
         type: parsedJson[Constants.type],
         value: parsedJson[Constants.value]);
   }
+
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'key': key, 'type': type, 'value': value};
 }
