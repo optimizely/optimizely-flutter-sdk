@@ -20,6 +20,8 @@ public class Constants {
         public static final String CLOSE = "close";
         public static final String ACTIVATE = "activate";
         public static final String GET_VARIATION = "getVariation";
+        public static final String GET_FORCED_VARIATION = "getForcedVariation";
+        public static final String SET_FORCED_VARIATION = "setForcedVariation";
         public static final String INITIALIZE = "initialize";
         public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
         public static final String CREATE_USER_CONTEXT = "createUserContext";

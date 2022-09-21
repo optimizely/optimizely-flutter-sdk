@@ -54,6 +54,14 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         getVariation(argumentsParser, result);
         break;
       }
+      case APIs.GET_FORCED_VARIATION: {
+        getForcedVariation(argumentsParser, result);
+        break;
+      }
+      case APIs.SET_FORCED_VARIATION: {
+        setForcedVariation(argumentsParser, result);
+        break;
+      }
       case APIs.ADD_NOTIFICATION_LISTENER: {
         addNotificationListener(argumentsParser, result);
         break;

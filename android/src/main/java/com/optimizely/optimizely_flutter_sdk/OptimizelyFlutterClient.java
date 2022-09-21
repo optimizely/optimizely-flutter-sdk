@@ -250,6 +250,62 @@ public class OptimizelyFlutterClient {
 
     }
 
+    protected void getForcedVariation(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (optimizelyClient == null) {
+            result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
+            return;
+        }
+
+        String experimentKey = argumentsParser.getExperimentKey();
+        String userId = argumentsParser.getUserId();
+        if (userId == null || experimentKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        Variation variation = optimizelyClient.getForcedVariation(experimentKey, userId);
+        if (variation != null) {
+            String variationKey = variation.getKey();
+            result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VARIATION_KEY, variationKey), ""));
+            return;
+        }
+
+        result.success(createResponse(false));
+    }
+
+    protected void setForcedVariation(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        if (sdkKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (optimizelyClient == null) {
+            result.success(createResponse(false, ErrorMessage.OPTIMIZELY_CLIENT_NOT_FOUND));
+            return;
+        }
+
+        String experimentKey = argumentsParser.getExperimentKey();
+        String userId = argumentsParser.getUserId();
+        if (userId == null || experimentKey == null) {
+            result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        String variationKey = argumentsParser.getVariationKey();
+        boolean success = optimizelyClient.setForcedVariation(experimentKey, userId, variationKey);
+
+        result.success(createResponse(success));
+    }
+
     protected void decide(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         if (sdkKey == null) {
@@ -535,6 +591,10 @@ public class OptimizelyFlutterClient {
         response.put(ResponseKey.REASON, reason);
 
         return response;
+    }
+
+    public Map<String, ?> createResponse(Boolean success) {
+        return createResponse(success, null, "");
     }
 
     public Map<String, ?> createResponse(Boolean success, String reason) {
