@@ -41,6 +41,7 @@ import com.optimizely.ab.error.RaiseExceptionErrorHandler;
 import com.optimizely.ab.event.BatchEventProcessor;
 import com.optimizely.ab.event.EventProcessor;
 import com.optimizely.ab.event.LogEvent;
+import com.optimizely.ab.notification.ActivateNotification;
 import com.optimizely.ab.notification.DecisionNotification;
 import com.optimizely.ab.notification.NotificationCenter;
 import com.optimizely.ab.notification.TrackNotification;
@@ -171,10 +172,12 @@ public class OptimizelyFlutterClient {
                 if (userContextsTracker.containsKey(sdkKey)) {
                     userContextsTracker.get(sdkKey).put(userContextId, optlyUserContext);
                 } else {
-                    userContextsTracker.put(sdkKey, Collections.singletonMap(userContextId, optlyUserContext));
+                    Map<String, OptimizelyUserContext> idContextMap = new HashMap<>();
+                    idContextMap.put(userContextId, optlyUserContext);
+                    userContextsTracker.put(sdkKey, idContextMap);
                 }
                 result.success(createResponse(true,
-                        Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, optlyUserContext),
+                        Collections.singletonMap(RequestParameterKey.USER_CONTEXT_ID, userContextId),
                         SuccessMessage.USER_CONTEXT_CREATED));
             } else {
                 result.success(createResponse(false, "User context not created "));
@@ -198,7 +201,7 @@ public class OptimizelyFlutterClient {
         }
 
         String experimentKey = argumentsParser.getExperimentKey();
-        String userId = argumentsParser.getUserID();
+        String userId = argumentsParser.getUserId();
         Map<String, Object> attributes = argumentsParser.getAttributes();
 
         if (userId == null || experimentKey == null) {
@@ -229,7 +232,7 @@ public class OptimizelyFlutterClient {
         }
 
         String experimentKey = argumentsParser.getExperimentKey();
-        String userId = argumentsParser.getUserID();
+        String userId = argumentsParser.getUserId();
         Map<String, Object> attributes = argumentsParser.getAttributes();
 
         if (userId == null || experimentKey == null) {
@@ -545,7 +548,7 @@ public class OptimizelyFlutterClient {
     public OptimizelyUserContext getUserContext(ArgumentsParser argumentsParser) {
         String SDKKey = argumentsParser.getSdkKey();
         String userContextId = argumentsParser.getUserContextId();
-        if (userContextId == null || !userContextsTracker.get(SDKKey).containsKey(userContextId)) {
+        if (userContextId == null || userContextsTracker.get(SDKKey) == null || !userContextsTracker.get(SDKKey).containsKey(userContextId)) {
             return null;
         }
         return userContextsTracker.get(SDKKey).get(userContextId);
@@ -570,9 +573,10 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
             return;
         }
+        int notificationId = 0;
         switch (type) {
             case NotificationType.DECISION: {
-                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(DecisionNotification.class, decisionNotification -> {
+                notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(DecisionNotification.class, decisionNotification -> {
                     Map<String, Object> notificationMap = new HashMap<>();
                     notificationMap.put(DecisionListenerKeys.TYPE, decisionNotification.getType());
                     notificationMap.put(DecisionListenerKeys.USER_ID, decisionNotification.getUserId());
@@ -580,12 +584,21 @@ public class OptimizelyFlutterClient {
                     notificationMap.put(DecisionListenerKeys.DECISION_INFO, decisionNotification.getDecisionInfo());
                     invokeNotification(id, NotificationType.DECISION, notificationMap);
                 });
-                notificationIdsTracker.put(id, notificationId);
-                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
+                break;
+            }
+            case NotificationType.ACTIVATE: {
+                notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(ActivateNotification.class, activateNotification -> {
+                    Map<String, Object> notificationMap = new HashMap<>();
+                    notificationMap.put(ActivateListenerKeys.EXPERIMENT_KEY, activateNotification.getExperiment().getKey());
+                    notificationMap.put(ActivateListenerKeys.USER_ID, activateNotification.getUserId());
+                    notificationMap.put(ActivateListenerKeys.ATTRIBUTES, activateNotification.getAttributes());
+                    notificationMap.put(ActivateListenerKeys.VARIATION_KEY, activateNotification.getVariation().getKey());
+                    invokeNotification(id, NotificationType.ACTIVATE, notificationMap);
+                });
                 break;
             }
             case NotificationType.TRACK: {
-                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(TrackNotification.class, trackNotification -> {
+                notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(TrackNotification.class, trackNotification -> {
                     Map<String, Object> notificationMap = new HashMap<>();
                     notificationMap.put(TrackListenerKeys.EVENT_KEY, trackNotification.getEventKey());
                     notificationMap.put(TrackListenerKeys.USER_ID, trackNotification.getUserId());
@@ -593,12 +606,10 @@ public class OptimizelyFlutterClient {
                     notificationMap.put(TrackListenerKeys.EVENT_TAGS, trackNotification.getEventTags());
                     invokeNotification(id, NotificationType.TRACK, notificationMap);
                 });
-                notificationIdsTracker.put(id, notificationId);
-                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
                 break;
             }
             case NotificationType.LOG_EVENT: {
-                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(LogEvent.class, logEvent -> {
+                notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(LogEvent.class, logEvent -> {
                     ObjectMapper mapper = new ObjectMapper();
                     Map<String, Object> eventParams = mapper.readValue(logEvent.getBody(), Map.class);
                     Map<String, Object> listenerMap = new HashMap<>();
@@ -606,23 +617,21 @@ public class OptimizelyFlutterClient {
                     listenerMap.put(LogEventListenerKeys.PARAMS, eventParams);
                     invokeNotification(id, NotificationType.LOG_EVENT, listenerMap);
                 });
-                notificationIdsTracker.put(id, notificationId);
-                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
                 break;
             }
             case NotificationType.CONFIG_UPDATE: {
-                int notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(UpdateConfigNotification.class, configUpdate -> {
+                notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(UpdateConfigNotification.class, configUpdate -> {
                     Map<String, Object> listenerMap = new HashMap<>();
                     listenerMap.put("Config-update", Collections.emptyMap());
                     invokeNotification(id, NotificationType.CONFIG_UPDATE, listenerMap);
                 });
-                notificationIdsTracker.put(id, notificationId);
-                result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
                 break;
             }
             default:
                 result.success(createResponse(false, ErrorMessage.INVALID_PARAMS));
         }
+        notificationIdsTracker.put(id, notificationId);
+        result.success(createResponse(true, SuccessMessage.LISTENER_ADDED));
     }
 
     private void invokeNotification(int id, String notificationType, Map notificationMap) {

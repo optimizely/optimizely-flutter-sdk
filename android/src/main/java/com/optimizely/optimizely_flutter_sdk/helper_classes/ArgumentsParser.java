@@ -39,7 +39,7 @@ public class ArgumentsParser {
         return (String) arguments.get(Constants.RequestParameterKey.NOTIFICATION_TYPE);
     }
 
-    public String getUserID() {
+    public String getUserId() {
         return (String) arguments.get(Constants.RequestParameterKey.USER_ID);
     }
 
