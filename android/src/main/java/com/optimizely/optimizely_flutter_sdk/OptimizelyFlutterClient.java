@@ -370,7 +370,7 @@ public class OptimizelyFlutterClient {
             return;
         }
 
-        result.success(createResponse(false, ""));
+        result.success(createResponse(false));
     }
 
     protected void getForcedDecision(ArgumentsParser argumentsParser, @NonNull Result result) {
@@ -397,7 +397,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VARIATION_KEY, forcedDecision.getVariationKey()), ""));
         }
 
-        result.success(createResponse(false, ""));
+        result.success(createResponse(false));
     }
 
     protected void removeForcedDecision(ArgumentsParser argumentsParser, @NonNull Result result) {
@@ -425,7 +425,7 @@ public class OptimizelyFlutterClient {
             return;
         }
 
-        result.success(createResponse(false, ""));
+        result.success(createResponse(false));
     }
 
     protected void removeAllForcedDecisions(ArgumentsParser argumentsParser, @NonNull Result result) {
@@ -444,7 +444,7 @@ public class OptimizelyFlutterClient {
             result.success(createResponse(true, SuccessMessage.REMOVED_ALL_FORCED_DECISION));
         }
 
-        result.success(createResponse(false, ""));
+        result.success(createResponse(false));
     }
 
     protected void close(ArgumentsParser argumentsParser, @NonNull Result result) {
@@ -586,7 +586,7 @@ public class OptimizelyFlutterClient {
         result.success(createResponse(true, optimizelyConfigMap, SuccessMessage.OPTIMIZELY_CONFIG_FOUND));
     }
 
-    public Map<String, ?> createResponse(Boolean success, Object result, String reason) {
+    private Map<String, ?> createResponse(Boolean success, Object result, String reason) {
         Map<String, Object> response = new HashMap<>();
         response.put(ResponseKey.SUCCESS, success);
         response.put(ResponseKey.RESULT, result);
@@ -595,11 +595,11 @@ public class OptimizelyFlutterClient {
         return response;
     }
 
-    public Map<String, ?> createResponse(Boolean success) {
+    private Map<String, ?> createResponse(Boolean success) {
         return createResponse(success, null, "");
     }
 
-    public Map<String, ?> createResponse(Boolean success, String reason) {
+    private Map<String, ?> createResponse(Boolean success, String reason) {
         return createResponse(success, null, reason);
     }
 
