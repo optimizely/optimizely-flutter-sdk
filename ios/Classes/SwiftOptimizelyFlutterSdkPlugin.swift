@@ -72,8 +72,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Initializes optimizely client with the provided sdkKey
     func initialize(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
-            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
         
@@ -108,7 +107,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         // Delete old user context
         userContextsTracker.removeValue(forKey: sdkKey)
         // Close and remove old client
-        getOptimizelyClient(arguments: call.arguments)?.close()
+        getOptimizelyClient(sdkKey: sdkKey)?.close()
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
@@ -127,11 +126,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Adds notification listeners to the optimizely client as requested
     func addNotificationListener(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let id = parameters[RequestParameterKey.notificationId] as? Int, let type = parameters[RequestParameterKey.notificationType] as? String else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let id = parameters[RequestParameterKey.notificationId] as? Int, let type = parameters[RequestParameterKey.notificationType] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -161,30 +162,29 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Removes notification listeners from the optimizely client as requested
     func removeNotificationListener(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let id = parameters[RequestParameterKey.notificationId] as? Int else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let id = parameters[RequestParameterKey.notificationId] as? Int, let notificationID = notificationIdsTracker[id] else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
-        if let notificationID = notificationIdsTracker[id] {
-            optimizelyClient.notificationCenter?.removeNotificationListener(notificationId: notificationID)
-            notificationIdsTracker.removeValue(forKey: id)
-            result(self.createResponse(success: true, reason: SuccessMessage.listenerRemoved))
-        } else {
-            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
-        }
+        optimizelyClient.notificationCenter?.removeNotificationListener(notificationId: notificationID)
+        notificationIdsTracker.removeValue(forKey: id)
+        result(self.createResponse(success: true, reason: SuccessMessage.listenerRemoved))
     }
     
     /// Returns a snapshot of the current project configuration.
     func getOptimizelyConfig(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (_,sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
         guard let optimizelyConfig = try? optimizelyClient.getOptimizelyConfig(), let optlyConfigDict = optimizelyConfig.dict else {
             result(self.createResponse(success: false, reason: ErrorMessage.optimizelyConfigNotFound))
             return
@@ -200,12 +200,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
      * Otherwise, activate returns nil. Make sure that your code adequately deals with the case when the experiment is not activated (e.g. execute the default variation).
      */
     func activate(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -220,12 +221,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Get variation for experiment and user ID with user attributes.
     func getVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -240,15 +242,17 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Get forced variation for experiment and user ID.
     func getForcedVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
+        
         if let variationKey = optimizelyClient.getForcedVariation(experimentKey: experimentKey, userId: userId) {
             result(self.createResponse(success: true, result: [RequestParameterKey.variationKey: variationKey]))
             return
@@ -258,15 +262,17 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Set forced variation for experiment and user ID to variationKey.
     func setForcedVariation(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let experimentKey = parameters[RequestParameterKey.experimentKey] as? String, let userId = parameters[RequestParameterKey.userId] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
+        
         let variationKey = parameters[RequestParameterKey.variationKey] as? String
         let success = optimizelyClient.setForcedVariation(experimentKey: experimentKey, userId: userId, variationKey: variationKey)
         result(self.createResponse(success: success))
@@ -275,11 +281,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     /// Creates a context of the user for which decision APIs will be called.
     /// A user context will only be created successfully when the SDK is fully configured using initializeClient.
     func createUserContext(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let userId = parameters[RequestParameterKey.userId] as? String, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let userId = parameters[RequestParameterKey.userId] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -296,8 +304,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Returns userId for the user context.
     func getUserId(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
             return
         }
         result(createResponse(success: true, result: [RequestParameterKey.userId: usrContext.userId]))
@@ -305,8 +315,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Returns attributes for the user context.
     func getAttributes(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
             return
         }
         result(createResponse(success: true, result: [RequestParameterKey.attributes: usrContext.attributes]))
@@ -314,12 +326,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Sets attributes for the user context.
     func setAttributes(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let attributes = Utils.getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any) else {
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
+            return
+        }
+        guard let attributes = Utils.getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any) else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -332,12 +345,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Tracks an event.
     func trackEvent(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let eventKey = parameters[RequestParameterKey.eventKey] as? String else {
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
+            return
+        }
+        guard let eventKey = parameters[RequestParameterKey.eventKey] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -353,23 +367,20 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Returns a key-map of decision results for multiple flag keys and a user context.
     func decide(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
             return
         }
         
-        var parameters: Dictionary<String, Any?>?
-        if let params = call.arguments as? Dictionary<String, Any?> {
-            parameters = params
-        }
-        
         var decideKeys: [String]?
-        if let keys = parameters?[RequestParameterKey.decideKeys] as? [String] {
+        if let keys = parameters[RequestParameterKey.decideKeys] as? [String] {
             decideKeys = keys
         }
         
         var decideOptions: [String]?
-        if let options = parameters?[RequestParameterKey.decideOptions] as? [String] {
+        if let options = parameters[RequestParameterKey.decideOptions] as? [String] {
             decideOptions = options
         }
         
@@ -392,12 +403,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Sets the forced decision for a given decision context.
     func setForcedDecision(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let flagKey = parameters[RequestParameterKey.flagKey] as? String, let variationKey = parameters[RequestParameterKey.variationKey] as? String else {
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
+            return
+        }
+        guard let flagKey = parameters[RequestParameterKey.flagKey] as? String, let variationKey = parameters[RequestParameterKey.variationKey] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -411,15 +423,17 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Returns the forced decision for a given decision context.
     func getForcedDecision(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let flagKey = parameters[RequestParameterKey.flagKey] as? String else {
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
+            return
+        }
+        guard let flagKey = parameters[RequestParameterKey.flagKey] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
+        
         if let variationKey = usrContext.getForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String))?.variationKey {
             result(self.createResponse(success: true, result: [ResponseKey.variationKey: variationKey]))
             return
@@ -429,15 +443,17 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Removes the forced decision for a given decision context.
     func removeForcedDecision(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let flagKey = parameters[RequestParameterKey.flagKey] as? String else {
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
+            return
+        }
+        guard let flagKey = parameters[RequestParameterKey.flagKey] as? String else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
+        
         if usrContext.removeForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String)) {
             result(self.createResponse(success: true, reason: SuccessMessage.forcedDecisionRemoved))
             return
@@ -447,8 +463,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Removes all forced decisions bound to this user context.
     func removeAllForcedDecisions(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let usrContext = getUserContext(arguments: call.arguments) else  {
-            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let usrContext = getUserContext(parameters: parameters, sdkKey: sdkKey, result: result) else  {
             return
         }
         
@@ -461,14 +479,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Closes optimizely client after Flushing/batching all events
     func close(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        
-        guard let parameters = call.arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
-            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+        guard let (_, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        
-        guard let optimizelyClient = getOptimizelyClient(arguments: call.arguments) else {
-            result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
         
@@ -479,19 +493,31 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     }
     
     /// Returns saved optimizely client
-    func getOptimizelyClient(arguments: Any?) -> OptimizelyClient? {
-        guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+    func getOptimizelyClient(sdkKey: String, result: FlutterResult? = nil) -> OptimizelyClient? {
+        guard let optimizelyClient = optimizelyClientsTracker[sdkKey] as? OptimizelyClient else {
+            if let _result = result {
+                _result(self.createResponse(success: false, reason: ErrorMessage.optlyClientNotFound))
+            }
             return nil
         }
-        return optimizelyClientsTracker[sdkKey] ?? nil
+        return optimizelyClient
     }
     
     /// Returns saved user context
-    func getUserContext(arguments: Any?) -> OptimizelyUserContext? {
-        guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String, let userContextId = parameters[RequestParameterKey.userContextId] as? String else {
+    func getUserContext(parameters: Dictionary<String, Any?>, sdkKey: String, result: @escaping FlutterResult) -> OptimizelyUserContext? {
+        guard let userContextId = parameters[RequestParameterKey.userContextId] as? String, let userContext = userContextsTracker[sdkKey]?[userContextId] as? OptimizelyUserContext else {
+            result(self.createResponse(success: false, reason: ErrorMessage.userContextNotFound))
             return nil
         }
-        return userContextsTracker[sdkKey]?[userContextId] ?? nil
+        return userContext
+    }
+    
+    func getParametersAndSdkKey(arguments: Any?, result: @escaping FlutterResult) -> (Dictionary<String, Any?>, String)? {
+        guard let parameters = arguments as? Dictionary<String, Any?>, let sdkKey = parameters[RequestParameterKey.sdkKey] as? String else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return nil
+        }
+        return (parameters, sdkKey)
     }
     
     func createResponse(success: Bool, result: Any? = nil, reason: String? = nil) -> [String: Any] {
