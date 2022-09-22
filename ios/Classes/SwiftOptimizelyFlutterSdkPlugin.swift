@@ -253,7 +253,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             result(self.createResponse(success: true, result: [RequestParameterKey.variationKey: variationKey]))
             return
         }
-        result(self.createResponse(success: false))
+        result(self.createResponse(success: true))
     }
     
     /// Set forced variation for experiment and user ID to variationKey.

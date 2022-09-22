@@ -278,7 +278,7 @@ public class OptimizelyFlutterClient {
             return;
         }
 
-        result.success(createResponse(false));
+        result.success(createResponse(true));
     }
 
     /// Set forced variation for experiment and user ID to variationKey.
