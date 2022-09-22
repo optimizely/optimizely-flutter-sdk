@@ -91,7 +91,6 @@ void main() {
 
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.instanceCreated,
           };
         case Constants.activate:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
@@ -143,7 +142,6 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.optimizelyConfigFound,
             Constants.responseResult: mockOptimizelyConfig,
           };
         case Constants.createUserContextMethod:
@@ -154,7 +152,6 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.userContextCreated,
             Constants.responseResult: {Constants.userContextId: userContextId},
           };
         case Constants.getUserIdMethod:
@@ -185,7 +182,6 @@ void main() {
               equals(attributes1["abc"]));
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.attributesAdded,
           };
         case Constants.trackEventMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
@@ -214,7 +210,6 @@ void main() {
           }
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.decideCalled,
             Constants.responseResult: result,
           };
         case Constants.setForcedDecision:
@@ -227,7 +222,6 @@ void main() {
               equals(variationKey));
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.forcedDecisionSet,
           };
         case Constants.getForcedDecision:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
@@ -262,21 +256,18 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.listenerAdded,
           };
         case Constants.removeNotificationListenerMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.listenerRemoved,
           };
         case Constants.close:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.optimizelyClientClosed,
           };
         default:
           return null;
@@ -306,7 +297,6 @@ void main() {
         var response = await sdk.initializeClient();
 
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.instanceCreated));
       });
 
       test("with no eventOptions and no datafileOptions", () async {
@@ -320,7 +310,6 @@ void main() {
         var response = await sdk.initializeClient();
 
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.instanceCreated));
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -351,7 +340,6 @@ void main() {
         var response = await sdk.initializeClient();
 
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.instanceCreated));
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -382,7 +370,6 @@ void main() {
         var response = await sdk.initializeClient();
 
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.instanceCreated));
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -409,7 +396,6 @@ void main() {
         var response = await sdk.initializeClient();
 
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.instanceCreated));
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -430,7 +416,6 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var response = await sdk.close();
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.optimizelyClientClosed));
       });
     });
 
@@ -483,7 +468,6 @@ void main() {
 
         expect(result.success, isTrue);
         expect(result.optimizelyConfig, isNotNull);
-        expect(result.reason, equals(Constants.optimizelyConfigFound));
 
         expect(config["sdkKey"], equals(testSDKKey));
         expect(config["environmentKey"], equals("production"));
@@ -532,7 +516,6 @@ void main() {
         var response = await userContext!.setAttributes(attributes1);
 
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.attributesAdded));
       });
     });
 
@@ -574,7 +557,6 @@ void main() {
 
         expect(response.success, isTrue);
         expect(response.decision, isNotNull);
-        expect(response.reason, Constants.decideCalled);
         expect(
             TestUtils.compareDecisions(
                 {response.decision!.flagKey: response.decision!}),
@@ -593,7 +575,6 @@ void main() {
 
         expect(response.success, isTrue);
         expect(response.decisions.length, equals(2));
-        expect(response.reason, Constants.decideCalled);
         expect(TestUtils.compareDecisions(response.decisions), isTrue);
         expect(decideOptions.length == 5, isTrue);
         expect(assertDecideOptions(options, decideOptions), isTrue);
@@ -608,7 +589,6 @@ void main() {
 
         expect(response.success, isTrue);
         expect(response.decisions.length, equals(3));
-        expect(response.reason, Constants.decideCalled);
         expect(TestUtils.compareDecisions(response.decisions), isTrue);
         expect(decideOptions.length == 5, isTrue);
         expect(assertDecideOptions(options, decideOptions), isTrue);
@@ -634,7 +614,6 @@ void main() {
             OptimizelyForcedDecision(variationKey));
 
         expect(response.success, isTrue);
-        expect(response.reason, equals(Constants.forcedDecisionSet));
       });
     });
 
