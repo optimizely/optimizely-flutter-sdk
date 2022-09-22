@@ -375,11 +375,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        if userContext.setForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String), decision: OptimizelyForcedDecision(variationKey: variationKey)) {
-            result(self.createResponse(success: true))
-            return
-        }
-        result(self.createResponse(success: false))
+        let success = userContext.setForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String), decision: OptimizelyForcedDecision(variationKey: variationKey))
+        result(self.createResponse(success: success))
     }
     
     /// Returns the forced decision for a given decision context.
@@ -396,7 +393,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             result(self.createResponse(success: true, result: [ResponseKey.variationKey: variationKey]))
             return
         }
-        result(self.createResponse(success: false))
+        result(self.createResponse(success: true))
     }
     
     /// Removes the forced decision for a given decision context.
@@ -409,11 +406,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        if userContext.removeForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String)) {
-            result(self.createResponse(success: true))
-            return
-        }
-        result(self.createResponse(success: false))
+        let success = userContext.removeForcedDecision(context: OptimizelyDecisionContext(flagKey: flagKey, ruleKey: parameters[RequestParameterKey.ruleKey] as? String))
+        result(self.createResponse(success: success))
     }
     
     /// Removes all forced decisions bound to this user context.
@@ -422,11 +416,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        if userContext.removeAllForcedDecisions() {
-            result(self.createResponse(success: true))
-            return
-        }
-        result(self.createResponse(success: false))
+        let success = userContext.removeAllForcedDecisions()
+        result(self.createResponse(success: success))
     }
     
     /// Closes optimizely client after Flushing/batching all events

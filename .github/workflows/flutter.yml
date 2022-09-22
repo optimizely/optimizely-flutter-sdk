@@ -7,6 +7,25 @@ on:
     branches: [ "master" ]
 
 jobs:
+  unit_test_coverage:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        architecture: x64
+    - name: Install app dependencies
+      run: flutter pub get
+    - name: Test app
+      run: flutter test --coverage
+    - name: Upload coverage to Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.CI_USER_TOKEN }}
+
   integration_android_tests:
     runs-on: ubuntu-latest
     steps:
