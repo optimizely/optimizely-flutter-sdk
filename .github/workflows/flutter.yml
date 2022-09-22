@@ -9,7 +9,7 @@ on:
 jobs:
   unit_test_coverage:
     runs-on: macos-latest
-
+    
     steps:
     - uses: actions/checkout@v3
     - name: Install Flutter
