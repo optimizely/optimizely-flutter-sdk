@@ -21,7 +21,6 @@ import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
@@ -34,7 +33,7 @@ export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decisi
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_context.dart'
     show OptimizelyDecisionContext;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart'
-    show OptimizelyDecideOption;
+    show OptimizelyUserContext, OptimizelyDecideOption;
 export 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart'
     show Decision;
 export 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart'
@@ -91,6 +90,20 @@ class OptimizelyFlutterSdk {
       [Map<String, dynamic> attributes = const {}]) async {
     return await OptimizelyClientWrapper.getVariation(
         _sdkKey, experimentKey, userId, attributes);
+  }
+
+  /// Get forced variation for experiment and user ID.
+  Future<GetVariationResponse> getForcedVariation(
+      String experimentKey, String userId) async {
+    return await OptimizelyClientWrapper.getForcedVariation(
+        _sdkKey, experimentKey, userId);
+  }
+
+  /// Set forced variation for experiment and user ID to variationKey.
+  Future<BaseResponse> setForcedVariation(String experimentKey, String userId,
+      [String variationKey = ""]) async {
+    return await OptimizelyClientWrapper.setForcedVariation(
+        _sdkKey, experimentKey, userId, variationKey);
   }
 
   /// Returns a snapshot of the current project configuration.

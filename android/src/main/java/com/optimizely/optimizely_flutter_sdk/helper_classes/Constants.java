@@ -20,6 +20,8 @@ public class Constants {
         public static final String CLOSE = "close";
         public static final String ACTIVATE = "activate";
         public static final String GET_VARIATION = "getVariation";
+        public static final String GET_FORCED_VARIATION = "getForcedVariation";
+        public static final String SET_FORCED_VARIATION = "setForcedVariation";
         public static final String INITIALIZE = "initialize";
         public static final String GET_OPTIMIZELY_CONFIG = "getOptimizelyConfig";
         public static final String CREATE_USER_CONTEXT = "createUserContext";
@@ -70,24 +72,11 @@ public class Constants {
 
     public static class ErrorMessage {
         public static final String INVALID_PARAMS = "Invalid parameters provided.";
+        public static final String INVALID_OPTIMIZELY_CLIENT = "Optimizely client is invalid.";
         public static final String OPTIMIZELY_CONFIG_NOT_FOUND = "No optimizely config found.";
         public static final String OPTIMIZELY_CLIENT_NOT_FOUND = "Optimizely client not found.";
         public static final String USER_CONTEXT_NOT_FOUND = "User context not found.";
-    }
-
-    public static class SuccessMessage {
-        public static final String INSTANCE_CREATED = "Optimizely instance created successfully.";
-        public static final String OPTIMIZELY_CONFIG_FOUND = "Optimizely config found.";
-        public static final String OPTIMIZELY_CLIENT_CLOSED = "Optimizely client closed successfully.";
-        public static final String USER_CONTEXT_CREATED = "User context created successfully.";
-        public static final String LISTENER_REMOVED = "Listener removed successfully.";
-        public static final String DECIDE_CALLED = "Decide called successfully.";
-        public static final String LISTENER_ADDED = "Listener added successfully.";
-        public static final String ATTRIBUTES_ADDED = "Attributes added successfully.";
-        public static final String EVENT_TRACKED = "Event Tracked successfully.";
-        public static final String FORCED_DECISION_SET = "Forced decision set successfully.";
-        public static final String REMOVED_FORCED_DECISION = "Forced decision removed successfully.";
-        public static final String REMOVED_ALL_FORCED_DECISION = "All Forced decisions removed successfully.";
+        public static final String USER_CONTEXT_NOT_CREATED = "User context not created.";
     }
 
     public static class DecisionListenerKeys {

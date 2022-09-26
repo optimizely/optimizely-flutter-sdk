@@ -21,6 +21,8 @@ struct API {
     static let getOptimizelyConfig = "getOptimizelyConfig"
     static let activate = "activate"
     static let getVariation = "getVariation"
+    static let getForcedVariation = "getForcedVariation"
+    static let setForcedVariation = "setForcedVariation"
     static let createUserContext = "createUserContext"
     static let getUserId = "getUserId"
     static let getAttributes = "getAttributes"
@@ -92,20 +94,6 @@ struct ErrorMessage {
     static let optimizelyConfigNotFound = "No optimizely config found."
     static let optlyClientNotFound = "Optimizely client not found."
     static let userContextNotFound = "User context not found."
-}
-
-struct SuccessMessage {
-    static let instanceCreated = "Optimizely instance created successfully."
-    static let optimizelyConfigFound = "Optimizely config found."
-    static let optimizelyClientClosed = "Optimizely client closed successfully."
-    static let userContextCreated = "User context created successfully."
-    static let attributesAdded = "Attributes added successfully."
-    static let listenerAdded = "Listener added successfully."
-    static let listenerRemoved = "Listener removed successfully."
-    static let decideCalled = "Decide called successfully."
-    static let forcedDecisionSet = "Forced decision set successfully."
-    static let forcedDecisionRemoved = "Forced decision removed successfully."
-    static let allForcedDecisionsRemoved = "All Forced decisions removed successfully."
 }
 
 //Sohail: There is one issue, can we make sure the types remain same, probably we will need to write unit test separately for type.
