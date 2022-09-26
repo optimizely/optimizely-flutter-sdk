@@ -15,15 +15,17 @@
 ///**************************************************************************/
 
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class OptimizelyConfigResponse extends BaseResponse {
-  Map<String, dynamic> optimizelyConfig = {};
+  OptimizelyConfig? optimizelyConfig;
 
   OptimizelyConfigResponse(Map<String, dynamic> json) : super(json) {
     if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
-      optimizelyConfig =
+      var optlyConfigJSON =
           Map<String, dynamic>.from(json[Constants.responseResult]);
+      optimizelyConfig = OptimizelyConfig(optlyConfigJSON);
     }
   }
 }
