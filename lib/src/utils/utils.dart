@@ -82,10 +82,6 @@ class Utils {
 
   static List<String> convertDecideOptions(
       Set<OptimizelyDecideOption> options) {
-    List<String> convertedOptions = [];
-    for (var option in options) {
-      convertedOptions.add(Utils.decideOptions[option]!);
-    }
-    return convertedOptions;
+    return options.map((option) => Utils.decideOptions[option]!).toList();
   }
 }

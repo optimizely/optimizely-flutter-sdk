@@ -30,6 +30,15 @@ void main() {
   const String testSDKKey = "KZbunNn9bVfBWLpZPq2XC4";
   const String testSDKKey2 = "KZbunNn9bVfBWLpZPq2XC12";
   const String userId = "uid-351ea8";
+  const String experimentKey = "exp_1";
+  const String flagKey = "flag_1";
+  const String ruleKey = "rule_1";
+  const String variationKey = "var_1";
+  const String eventKey = "event-key";
+  const Map<String, dynamic> attributes = {"abc": 123};
+  const Map<String, dynamic> attributes1 = {"abc": 1234};
+  const Map<String, dynamic> eventTags = {"abcd": 1234};
+  const String userContextId = "123";
   // To check if decide options properly reached the native sdk through channel
   List<String> decideOptions = [];
   // To check if event options and datafileOptions reached the native sdk through channel
@@ -61,6 +70,8 @@ void main() {
       // reason from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
       switch (methodCall.method) {
         case Constants.initializeMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
           // To Check if eventOptions were received
           eventOptions = EventOptions(
               batchSize: methodCall.arguments[Constants.eventBatchSize],
@@ -80,44 +91,112 @@ void main() {
 
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.instanceCreated,
           };
-        case Constants.getOptimizelyConfigMethod:
+        case Constants.activate:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          expect(methodCall.arguments[Constants.experimentKey],
+              equals(experimentKey));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
+          expect(methodCall.arguments[Constants.attributes]["abc"],
+              equals(attributes["abc"]));
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.optimizelyConfigFound,
+            Constants.responseResult: {Constants.variationKey: variationKey},
+          };
+        case Constants.getVariation:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          expect(methodCall.arguments[Constants.experimentKey],
+              equals(experimentKey));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
+          expect(methodCall.arguments[Constants.attributes]["abc"],
+              equals(attributes["abc"]));
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: {Constants.variationKey: variationKey},
+          };
+        case Constants.setForcedVariation:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          expect(methodCall.arguments[Constants.experimentKey],
+              equals(experimentKey));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
+          expect(methodCall.arguments[Constants.variationKey],
+              equals(variationKey));
+          return {
+            Constants.responseSuccess: true,
+          };
+        case Constants.getForcedVariation:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          expect(methodCall.arguments[Constants.experimentKey],
+              equals(experimentKey));
+          expect(methodCall.arguments[Constants.userId], equals(userId));
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: {Constants.variationKey: variationKey},
+          };
+        case Constants.getOptimizelyConfigMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          return {
+            Constants.responseSuccess: true,
             Constants.responseResult: mockOptimizelyConfig,
           };
         case Constants.createUserContextMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userId], equals(userId));
+          expect(methodCall.arguments[Constants.attributes]["abc"],
+              equals(attributes["abc"]));
+          expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.userContextCreated,
-            Constants.responseResult: {Constants.userContextId: "123"},
+            Constants.responseResult: {Constants.userContextId: userContextId},
           };
         case Constants.getUserIdMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
           return {
             Constants.responseSuccess: true,
             Constants.responseResult: {
-              Constants.userID: userId,
+              Constants.userId: userId,
             },
           };
         case Constants.getAttributesMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
           return {
             Constants.responseSuccess: true,
             Constants.responseResult: {
-              Constants.attributes: {"abc": 123}
+              Constants.attributes: attributes,
             },
           };
         case Constants.setAttributesMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          expect(methodCall.arguments[Constants.attributes]["abc"],
+              equals(attributes1["abc"]));
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.attributesAdded,
           };
         case Constants.trackEventMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          expect(methodCall.arguments[Constants.eventKey], equals(eventKey));
+          expect(methodCall.arguments[Constants.eventTags]["abcd"],
+              equals(eventTags["abcd"]));
           return {
             Constants.responseSuccess: true,
           };
         case Constants.decideMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
           var keys = List<String>.from(methodCall.arguments[Constants.keys]);
           decideOptions.addAll(List<String>.from(
               methodCall.arguments[Constants.optimizelyDecideOption]));
@@ -131,43 +210,64 @@ void main() {
           }
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.decideCalled,
             Constants.responseResult: result,
           };
         case Constants.setForcedDecision:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          expect(methodCall.arguments[Constants.flagKey], equals(flagKey));
+          expect(methodCall.arguments[Constants.ruleKey], equals(ruleKey));
+          expect(methodCall.arguments[Constants.variationKey],
+              equals(variationKey));
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.forcedDecisionSet,
           };
         case Constants.getForcedDecision:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          expect(methodCall.arguments[Constants.flagKey], equals(flagKey));
+          expect(methodCall.arguments[Constants.ruleKey], equals(ruleKey));
           return {
             Constants.responseSuccess: true,
-            Constants.responseResult: {Constants.variationKey: "123"},
+            Constants.responseResult: {Constants.variationKey: variationKey},
           };
         case Constants.removeForcedDecision:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          expect(methodCall.arguments[Constants.flagKey], equals(flagKey));
+          expect(methodCall.arguments[Constants.ruleKey], equals(ruleKey));
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.removeForcedDecision,
           };
         case Constants.removeAllForcedDecisions:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
           return {
             Constants.responseSuccess: true,
             Constants.responseReason: Constants.removeAllForcedDecisions,
           };
         case Constants.addNotificationListenerMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.listenerAdded,
           };
         case Constants.removeNotificationListenerMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.listenerRemoved,
           };
         case Constants.close:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseReason: Constants.optimizelyClientClosed,
           };
         default:
           return null;
@@ -189,14 +289,14 @@ void main() {
         expect(sdk.runtimeType == OptimizelyFlutterSdk, isTrue);
       });
     });
+
     group("initializeClient()", () {
       test("with valid SDK Key should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
         var response = await sdk.initializeClient();
 
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.instanceCreated));
+        expect(response.success, isTrue);
       });
 
       test("with no eventOptions and no datafileOptions", () async {
@@ -209,8 +309,7 @@ void main() {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var response = await sdk.initializeClient();
 
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.instanceCreated));
+        expect(response.success, isTrue);
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -240,8 +339,7 @@ void main() {
             });
         var response = await sdk.initializeClient();
 
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.instanceCreated));
+        expect(response.success, isTrue);
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -271,8 +369,7 @@ void main() {
             });
         var response = await sdk.initializeClient();
 
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.instanceCreated));
+        expect(response.success, isTrue);
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -298,8 +395,7 @@ void main() {
             eventOptions: expectedEventOptions);
         var response = await sdk.initializeClient();
 
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.instanceCreated));
+        expect(response.success, isTrue);
         expect(eventOptions.batchSize, equals(expectedEventOptions.batchSize));
         expect(eventOptions.maxQueueSize,
             equals(expectedEventOptions.maxQueueSize));
@@ -314,22 +410,63 @@ void main() {
         debugDefaultTargetPlatformOverride = null;
       });
     });
+
     group("close()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var response = await sdk.close();
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.optimizelyClientClosed));
+        expect(response.success, isTrue);
       });
     });
+
+    group("activate()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.activate(experimentKey, userId, attributes);
+        expect(result.success, isTrue);
+        expect(result.variationKey, equals(variationKey));
+      });
+    });
+
+    group("getVariation()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.getVariation(experimentKey, userId, attributes);
+        expect(result.success, isTrue);
+        expect(result.variationKey, equals(variationKey));
+      });
+    });
+
+    group("getForcedVariation()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result = await sdk.getForcedVariation(experimentKey, userId);
+        expect(result.success, isTrue);
+        expect(result.variationKey, equals(variationKey));
+      });
+    });
+
+    group("setForcedVariation()", () {
+      test("should succeed", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var result =
+            await sdk.setForcedVariation(experimentKey, userId, variationKey);
+        expect(result.success, isTrue);
+      });
+    });
+
     group("getOptimizelyConfig()", () {
       test("returns valid digested OptimizelyConfig should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
         var result = await sdk.getOptimizelyConfig();
 
-        expect(result.success, equals(true));
-        expect(result.reason, equals(Constants.optimizelyConfigFound));
+        expect(result.success, isTrue);
+        expect(result.optimizelyConfig, isNotNull);
 
         expect(result.optimizelyConfig?.sdkKey, isNotNull);
         expect(result.optimizelyConfig?.sdkKey, equals(testSDKKey));
@@ -342,56 +479,56 @@ void main() {
         expect(result.optimizelyConfig?.datafile, isNotNull);
       });
     });
+
     group("createUserContext()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
         expect(userContext, isNotNull);
       });
     });
+
     group("getUserId()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var response = await userContext!.getUserId();
 
-        expect(response.success, equals(true));
+        expect(response.success, isTrue);
         expect(response.userId, equals(userId));
       });
     });
     group("getAttributes()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var response = await userContext!.getAttributes();
 
-        expect(response.success, equals(true));
-        expect(response.attributes, equals({"abc": 123}));
+        expect(response.success, isTrue);
+        expect(response.attributes["abc"], equals(attributes["abc"]));
       });
     });
+
     group("setAttributes()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
-        var attributes = <String, dynamic>{};
+        var userContext = await sdk.createUserContext(userId, attributes);
+        var response = await userContext!.setAttributes(attributes1);
 
-        var response = await userContext!.setAttributes(attributes);
-
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.attributesAdded));
+        expect(response.success, isTrue);
       });
     });
+
     group("trackEvent()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
-        var eventKey = "event-key";
+        var userContext = await sdk.createUserContext(userId, attributes);
+        var response = await userContext!.trackEvent(eventKey, eventTags);
 
-        var response = await userContext!.trackEvent(eventKey);
-
-        expect(response.success, equals(true));
+        expect(response.success, isTrue);
       });
     });
+
     group("decide()", () {
       bool assertDecideOptions(
           Set<OptimizelyDecideOption> options, List<String> convertedOptions) {
@@ -413,51 +550,48 @@ void main() {
 
       test("decide() should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var decideKey = "decide-key";
 
         var response = await userContext!.decide(decideKey, options);
 
-        expect(response.success, equals(true));
-        expect(response.decision != null, equals(true));
-        expect(response.reason, Constants.decideCalled);
+        expect(response.success, isTrue);
+        expect(response.decision, isNotNull);
         expect(
             TestUtils.compareDecisions(
                 {response.decision!.flagKey: response.decision!}),
             equals(true));
-        expect(decideOptions.length == 5, equals(true));
-        expect(assertDecideOptions(options, decideOptions), equals(true));
+        expect(decideOptions.length == 5, isTrue);
+        expect(assertDecideOptions(options, decideOptions), isTrue);
         decideOptions = [];
       });
 
       test("decideForKeys should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var decideKeys = ["decide-key-1", "decide-key-2"];
 
         var response = await userContext!.decideForKeys(decideKeys, options);
 
-        expect(response.success, equals(true));
+        expect(response.success, isTrue);
         expect(response.decisions.length, equals(2));
-        expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response.decisions), equals(true));
-        expect(decideOptions.length == 5, equals(true));
-        expect(assertDecideOptions(options, decideOptions), equals(true));
+        expect(TestUtils.compareDecisions(response.decisions), isTrue);
+        expect(decideOptions.length == 5, isTrue);
+        expect(assertDecideOptions(options, decideOptions), isTrue);
         decideOptions = [];
       });
 
       test("decideAll() should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!.decideAll(options);
 
-        expect(response.success, equals(true));
+        expect(response.success, isTrue);
         expect(response.decisions.length, equals(3));
-        expect(response.reason, Constants.decideCalled);
-        expect(TestUtils.compareDecisions(response.decisions), equals(true));
-        expect(decideOptions.length == 5, equals(true));
-        expect(assertDecideOptions(options, decideOptions), equals(true));
+        expect(TestUtils.compareDecisions(response.decisions), isTrue);
+        expect(decideOptions.length == 5, isTrue);
+        expect(assertDecideOptions(options, decideOptions), isTrue);
         decideOptions = [];
       });
 
@@ -465,56 +599,57 @@ void main() {
         final convertedOptions = Utils.convertDecideOptions(
           options,
         );
-        expect(convertedOptions.length == 5, equals(true));
-        expect(assertDecideOptions(options, convertedOptions), equals(true));
+        expect(convertedOptions.length == 5, isTrue);
+        expect(assertDecideOptions(options, convertedOptions), isTrue);
       });
     });
 
     group("setForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!.setForcedDecision(
-            OptimizelyDecisionContext("flagKey", "ruleKey"),
-            OptimizelyForcedDecision("123"));
+            OptimizelyDecisionContext(flagKey, ruleKey),
+            OptimizelyForcedDecision(variationKey));
 
-        expect(response.success, equals(true));
-        expect(response.reason, equals(Constants.forcedDecisionSet));
+        expect(response.success, isTrue);
       });
     });
+
     group("getForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!
-            .getForcedDecision(OptimizelyDecisionContext("flagKey", "ruleKey"));
+            .getForcedDecision(OptimizelyDecisionContext(flagKey, ruleKey));
 
-        expect(response.success, equals(true));
-        expect(response.variationKey, equals("123"));
+        expect(response.success, isTrue);
+        expect(response.variationKey, equals(variationKey));
       });
     });
+
     group("removeForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
-        var response = await userContext!.removeForcedDecision(
-            OptimizelyDecisionContext("flagKey", "ruleKey"));
+        var response = await userContext!
+            .removeForcedDecision(OptimizelyDecisionContext(flagKey, ruleKey));
 
-        expect(response.success, equals(true));
+        expect(response.success, isTrue);
         expect(response.reason, equals(Constants.removeForcedDecision));
       });
     });
 
     test("removeAllForcedDecisions() should succeed", () async {
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      var userContext = await sdk.createUserContext(userId);
+      var userContext = await sdk.createUserContext(userId, attributes);
 
       var response = await userContext!.removeAllForcedDecisions();
 
-      expect(response.success, equals(true));
+      expect(response.success, isTrue);
       expect(response.reason, equals(Constants.removeAllForcedDecisions));
     });
 
@@ -540,12 +675,14 @@ void main() {
       await sdk.addLogEventNotificationListener(callback);
       await sdk.addUpdateConfigNotificationListener(callback);
       await sdk.addTrackNotificationListener(callback);
+      await sdk.addActivateNotificationListener(callback);
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestDecisionNotifications(callHandler, 0);
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestTrackNotifications(callHandler, 2);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
       expect(notifications.length, equals(1));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
     });
@@ -566,18 +703,23 @@ void main() {
       await sdk.addTrackNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestDecisionNotifications(callHandler, 0);
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 2);
       TestUtils.sendTestTrackNotifications(callHandler, 3);
-      expect(notifications.length, equals(4));
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
+      expect(notifications.length, equals(5));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 2),
           true);
       expect(TestUtils.testTrackNotificationPayload(notifications, 3), true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 4), true);
     });
 
     test("should receive notifications with several ListenerTypes", () async {
@@ -607,6 +749,12 @@ void main() {
       await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestDecisionNotifications(callHandler, 0);
@@ -617,7 +765,9 @@ void main() {
       TestUtils.sendTestTrackNotifications(callHandler, 5);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 6);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
-      expect(notifications.length, equals(8));
+      TestUtils.sendTestActivateNotifications(callHandler, 8);
+      TestUtils.sendTestActivateNotifications(callHandler, 9);
+      expect(notifications.length, equals(10));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testDecisionNotificationPayload(notifications, 1), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 2), true);
@@ -628,6 +778,8 @@ void main() {
           true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 7),
           true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 8), true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 9), true);
     });
 
     test("should receive notifications with multiple sdkKeys", () async {
@@ -647,6 +799,9 @@ void main() {
       await sdk1.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk1.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
 
       await sdk2.addDecisionNotificationListener((msg) {
         notifications.add(msg);
@@ -660,6 +815,9 @@ void main() {
       await sdk2.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk2.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
@@ -667,21 +825,25 @@ void main() {
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestTrackNotifications(callHandler, 2);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
-      TestUtils.sendTestDecisionNotifications(callHandler, 4);
-      TestUtils.sendTestLogEventNotifications(callHandler, 5);
-      TestUtils.sendTestTrackNotifications(callHandler, 6);
-      TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
-      expect(notifications.length, equals(8));
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
+      TestUtils.sendTestDecisionNotifications(callHandler, 5);
+      TestUtils.sendTestLogEventNotifications(callHandler, 6);
+      TestUtils.sendTestTrackNotifications(callHandler, 7);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 8);
+      TestUtils.sendTestActivateNotifications(callHandler, 9);
+      expect(notifications.length, equals(10));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
       expect(TestUtils.testTrackNotificationPayload(notifications, 2), true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 3),
           true);
-      expect(TestUtils.testDecisionNotificationPayload(notifications, 4), true);
-      expect(TestUtils.testLogEventNotificationPayload(notifications, 5), true);
-      expect(TestUtils.testTrackNotificationPayload(notifications, 6), true);
-      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 7),
+      expect(TestUtils.testActivateNotificationPayload(notifications, 4), true);
+      expect(TestUtils.testDecisionNotificationPayload(notifications, 5), true);
+      expect(TestUtils.testLogEventNotificationPayload(notifications, 6), true);
+      expect(TestUtils.testTrackNotificationPayload(notifications, 7), true);
+      expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 8),
           true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 9), true);
     });
 
     test("should receive 4 notification because of listener removals",
@@ -701,6 +863,9 @@ void main() {
       await sdk.addUpdateConfigNotificationListener((msg) {
         notifications.add(msg);
       });
+      await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
 
       var cancel = await sdk.addDecisionNotificationListener((msg) {
         notifications.add(msg);
@@ -718,6 +883,10 @@ void main() {
         notifications.add(msg);
       });
       cancel();
+      cancel = await sdk.addActivateNotificationListener((msg) {
+        notifications.add(msg);
+      });
+      cancel();
 
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
@@ -725,16 +894,19 @@ void main() {
       TestUtils.sendTestLogEventNotifications(callHandler, 1);
       TestUtils.sendTestTrackNotifications(callHandler, 2);
       TestUtils.sendTestUpdateConfigNotifications(callHandler, 3);
-      TestUtils.sendTestDecisionNotifications(callHandler, 4);
-      TestUtils.sendTestLogEventNotifications(callHandler, 5);
-      TestUtils.sendTestTrackNotifications(callHandler, 6);
-      TestUtils.sendTestUpdateConfigNotifications(callHandler, 7);
-      expect(notifications.length, equals(4));
+      TestUtils.sendTestActivateNotifications(callHandler, 4);
+      TestUtils.sendTestDecisionNotifications(callHandler, 5);
+      TestUtils.sendTestLogEventNotifications(callHandler, 6);
+      TestUtils.sendTestTrackNotifications(callHandler, 7);
+      TestUtils.sendTestUpdateConfigNotifications(callHandler, 8);
+      TestUtils.sendTestActivateNotifications(callHandler, 9);
+      expect(notifications.length, equals(5));
       expect(TestUtils.testDecisionNotificationPayload(notifications, 0), true);
       expect(TestUtils.testLogEventNotificationPayload(notifications, 1), true);
       expect(TestUtils.testTrackNotificationPayload(notifications, 2), true);
       expect(TestUtils.testUpdateConfigNotificationPayload(notifications, 3),
           true);
+      expect(TestUtils.testActivateNotificationPayload(notifications, 4), true);
     });
   });
 }

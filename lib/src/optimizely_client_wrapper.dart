@@ -18,16 +18,21 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/activate_listener_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
-enum ListenerType { track, decision, logEvent, projectConfigUpdate }
+enum ListenerType { activate, track, decision, logEvent, projectConfigUpdate }
 
 enum ClientPlatform { iOS, android }
 
+typedef ActivateNotificationCallback = void Function(
+    ActivateListenerResponse msg);
 typedef DecisionNotificationCallback = void Function(
     DecisionListenerResponse msg);
 typedef TrackNotificationCallback = void Function(TrackListenerResponse msg);
@@ -40,6 +45,7 @@ typedef CancelListening = void Function();
 class OptimizelyClientWrapper {
   static const MethodChannel _channel = MethodChannel('optimizely_flutter_sdk');
   static int nextCallbackId = 0;
+  static Map<int, ActivateNotificationCallback> activateCallbacksById = {};
   static Map<int, DecisionNotificationCallback> decisionCallbacksById = {};
   static Map<int, TrackNotificationCallback> trackCallbacksById = {};
   static Map<int, LogEventNotificationCallback> logEventCallbacksById = {};
@@ -78,6 +84,66 @@ class OptimizelyClientWrapper {
     return BaseResponse(result);
   }
 
+  /// Use the activate method to start an experiment.
+  ///  The activate call will conditionally activate an experiment for a user based on the provided experiment key and a randomized hash of the provided user ID.
+  ///  If the user satisfies audience conditions for the experiment and the experiment is valid and running, the function returns the variation the user is bucketed into.
+  ///  Otherwise, activate returns empty variationKey. Make sure that your code adequately deals with the case when the experiment is not activated (e.g. execute the default variation).
+  static Future<ActivateResponse> activate(
+      String sdkKey, String experimentKey, String userId,
+      [Map<String, dynamic> attributes = const {}]) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.activate, {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userId: userId,
+      Constants.attributes: Utils.convertToTypedMap(attributes)
+    }));
+    return ActivateResponse(result);
+  }
+
+  /// Get variation for experiment and user ID with user attributes.
+  static Future<GetVariationResponse> getVariation(
+      String sdkKey, String experimentKey, String userId,
+      [Map<String, dynamic> attributes = const {}]) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getVariation, {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userId: userId,
+      Constants.attributes: Utils.convertToTypedMap(attributes)
+    }));
+    return GetVariationResponse(result);
+  }
+
+  /// Get forced variation for experiment and user ID.
+  static Future<GetVariationResponse> getForcedVariation(
+      String sdkKey, String experimentKey, String userId) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getForcedVariation, {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userId: userId,
+    }));
+    return GetVariationResponse(result);
+  }
+
+  /// Set forced variation for experiment and user ID to variationKey.
+  static Future<BaseResponse> setForcedVariation(
+      String sdkKey, String experimentKey, String userId,
+      [String variationKey = ""]) async {
+    Map<String, dynamic> request = {
+      Constants.sdkKey: sdkKey,
+      Constants.experimentKey: experimentKey,
+      Constants.userId: userId,
+    };
+    if (variationKey != "") {
+      request[Constants.variationKey] = variationKey;
+    }
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.setForcedVariation, request));
+    return BaseResponse(result);
+  }
+
   /// Returns a snapshot of the current project configuration.
   static Future<OptimizelyConfigResponse> getOptimizelyConfig(
       String sdkKey) async {
@@ -102,7 +168,7 @@ class OptimizelyClientWrapper {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.createUserContextMethod, {
       Constants.sdkKey: sdkKey,
-      Constants.userID: userId,
+      Constants.userId: userId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
 
@@ -116,6 +182,11 @@ class OptimizelyClientWrapper {
   }
 
   static bool checkCallBackExist(dynamic callback) {
+    for (var k in activateCallbacksById.keys) {
+      if (activateCallbacksById[k] == callback) {
+        return true;
+      }
+    }
     for (var k in decisionCallbacksById.keys) {
       if (decisionCallbacksById[k] == callback) {
         return true;
@@ -137,6 +208,32 @@ class OptimizelyClientWrapper {
       }
     }
     return false;
+  }
+
+  static Future<CancelListening> addActivateNotificationListener(
+      String sdkKey, ActivateNotificationCallback callback) async {
+    _channel.setMethodCallHandler(methodCallHandler);
+
+    if (checkCallBackExist(callback)) {
+      // ignore: avoid_print
+      print("callback already exists.");
+      return () {};
+    }
+
+    int currentListenerId = nextCallbackId++;
+    activateCallbacksById[currentListenerId] = callback;
+    final listenerTypeStr = ListenerType.activate.name;
+    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+      Constants.sdkKey: sdkKey,
+      Constants.id: currentListenerId,
+      Constants.type: listenerTypeStr
+    });
+    // Returning a callback function that allows the user to remove the added notification listener
+    return () {
+      _channel.invokeMethod(Constants.removeNotificationListenerMethod,
+          {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
+      activateCallbacksById.remove(currentListenerId);
+    };
   }
 
   static Future<CancelListening> addDecisionNotificationListener(
@@ -249,6 +346,13 @@ class OptimizelyClientWrapper {
     final payload = call.arguments[Constants.payload];
     if (id is int && payload != null) {
       switch (call.method) {
+        case Constants.activateCallBackListener:
+          final response =
+              ActivateListenerResponse(Map<String, dynamic>.from(payload));
+          if (activateCallbacksById.containsKey(id)) {
+            activateCallbacksById[id]!(response);
+          }
+          break;
         case Constants.decisionCallBackListener:
           final response =
               DecisionListenerResponse(Map<String, dynamic>.from(payload));

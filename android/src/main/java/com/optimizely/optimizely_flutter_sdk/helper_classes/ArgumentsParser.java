@@ -39,7 +39,7 @@ public class ArgumentsParser {
         return (String) arguments.get(Constants.RequestParameterKey.NOTIFICATION_TYPE);
     }
 
-    public String getUserID() {
+    public String getUserId() {
         return (String) arguments.get(Constants.RequestParameterKey.USER_ID);
     }
 
@@ -101,5 +101,9 @@ public class ArgumentsParser {
 
     public String getDatafileHostPrefix() {
         return (String) arguments.get(Constants.RequestParameterKey.DATAFILE_HOST_PREFIX);
+    }
+
+    public String getExperimentKey() {
+        return (String) arguments.get(Constants.RequestParameterKey.EXPERIMENT_KEY);
     }
 }

@@ -24,6 +24,10 @@ class Constants {
   // Supported Method Names
   static const String initializeMethod = "initialize";
   static const String close = "close";
+  static const String activate = "activate";
+  static const String getVariation = "getVariation";
+  static const String getForcedVariation = "getForcedVariation";
+  static const String setForcedVariation = "setForcedVariation";
   static const String getOptimizelyConfigMethod = "getOptimizelyConfig";
   static const String createUserContextMethod = "createUserContext";
   static const String getUserIdMethod = "getUserId";
@@ -44,7 +48,10 @@ class Constants {
   static const String sdkKey = "sdkKey";
   static const String userContextId = "userContextId";
   static const String userContext = "userContext";
-  static const String userID = "userID";
+  static const String experiment = "experiment";
+  static const String variation = "variation";
+  static const String userId = "userId";
+  static const String experimentKey = "experimentKey";
   static const String attributes = "attributes";
   static const String decisionInfo = "decisionInfo";
   static const String variables = "variables";
@@ -70,6 +77,7 @@ class Constants {
   static const String datafileHostPrefix = "datafileHostPrefix";
   static const String datafileHostSuffix = "datafileHostSuffix";
   static const String trackCallBackListener = "trackCallbackListener";
+  static const String activateCallBackListener = "activateCallbackListener";
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";
   static const String configUpdateCallBackListener =
@@ -97,22 +105,4 @@ class Constants {
   static const String responseSuccess = "success";
   static const String responseResult = "result";
   static const String responseReason = "reason";
-
-  // SuccessMessage from ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift
-  // These are unique only to flutter SDK. This helps in testing if correct native code was called.
-  static const String instanceCreated =
-      "Optimizely instance created successfully.";
-  static const String optimizelyConfigFound = "Optimizely config found.";
-  static const String optimizelyClientClosed =
-      "Optimizely client closed successfully.";
-  static const String userContextCreated = "User context created successfully.";
-  static const String attributesAdded = "Attributes added successfully.";
-  static const String listenerAdded = "Listener added successfully.";
-  static const String listenerRemoved = "Listener removed successfully.";
-  static const String decideCalled = "Decide called successfully.";
-  static const String forcedDecisionSet = "Forced decision set successfully.";
-  static const String forcedDecisionRemoved =
-      "Forced decision removed successfully.";
-  static const String allForcedDecisionsRemoved =
-      "All Forced decisions removed successfully.";
 }

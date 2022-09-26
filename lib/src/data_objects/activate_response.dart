@@ -17,14 +17,14 @@
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
-class GetUserIdResponse extends BaseResponse {
-  String userId = "";
+class ActivateResponse extends BaseResponse {
+  String variationKey = '';
 
-  GetUserIdResponse(Map<String, dynamic> json) : super(json) {
+  ActivateResponse(Map<String, dynamic> json) : super(json) {
     if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
       var response = Map<String, dynamic>.from(json[Constants.responseResult]);
-      if (response[Constants.userId] is String) {
-        userId = response[Constants.userId];
+      if (response[Constants.variationKey] is String) {
+        variationKey = response[Constants.variationKey];
       }
     }
   }
