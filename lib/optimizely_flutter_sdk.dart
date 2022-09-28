@@ -148,12 +148,14 @@ class OptimizelyFlutterSdk {
   }
 
   /// Checks if eventHandler are Closeable and calls close on them.
+  ///
   /// Returns [BaseResponse] A object containing success result or reason of failure.
   Future<BaseResponse> close() async {
     return await OptimizelyClientWrapper.close(_sdkKey);
   }
 
   /// Allows user to listen to supported Activate notifications.
+  ///
   /// Takes [callback] A [ActivateNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> addActivateNotificationListener(
@@ -162,6 +164,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported Decision notifications.
+  ///
   /// Takes [callback] A [DecisionNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> addDecisionNotificationListener(
@@ -170,6 +173,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported Track notifications.
+  ///
   /// Takes [callback] A [TrackNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> addTrackNotificationListener(
@@ -178,6 +182,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported LogEvent notifications.
+  ///
   /// Takes [callback] A [LogEventNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> addLogEventNotificationListener(
@@ -186,6 +191,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported Project Config Update notifications.
+  ///
   /// Takes [callback] A [MultiUseCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> addUpdateConfigNotificationListener(
@@ -194,6 +200,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported Activate notifications.
+  ///
   /// Takes [callback] A [ActivateNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> _addActivateNotificationListener(
@@ -203,6 +210,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported Decision notifications.
+  ///
   /// Takes [callback] A [DecisionNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> _addDecisionNotificationListener(
@@ -212,6 +220,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported Track notifications.
+  ///
   /// Takes [callback] A [TrackNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> _addTrackNotificationListener(
@@ -221,6 +230,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported LogEvent notifications.
+  ///
   /// Takes [callback] A [LogEventNotificationCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> _addLogEventNotificationListener(
@@ -230,6 +240,7 @@ class OptimizelyFlutterSdk {
   }
 
   /// Allows user to listen to supported Project Config Update notifications.
+  ///
   /// Takes [callback] A [MultiUseCallback] notification handler to be added.
   /// Returns [CancelListening] A callback function that allows the user to remove the added notification listener.
   Future<CancelListening> _addConfigUpdateNotificationListener(
