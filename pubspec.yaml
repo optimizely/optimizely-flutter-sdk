@@ -27,3 +27,7 @@ flutter:
         pluginClass: OptimizelyFlutterSdkPlugin
       ios:
         pluginClass: OptimizelyFlutterSdkPlugin
+      macos:
+        pluginClass: OptimizelyFlutterSdkPlugin
+      windows:
+        pluginClass: OptimizelyFlutterSdkPluginCApi
