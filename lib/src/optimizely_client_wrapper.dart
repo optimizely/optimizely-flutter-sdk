@@ -23,7 +23,6 @@ import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
-import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 

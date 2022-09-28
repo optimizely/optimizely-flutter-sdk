@@ -52,7 +52,7 @@ class OptimizelyUserContext {
 
   OptimizelyUserContext(this._sdkKey, this._userContextId, this._channel);
 
-  /// Returns userId for the user context.
+  /// Returns [GetUserIdResponse] object containing userId for the user context.
   Future<GetUserIdResponse> getUserId() async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.getUserIdMethod, {
@@ -62,7 +62,7 @@ class OptimizelyUserContext {
     return GetUserIdResponse(result);
   }
 
-  /// Returns attributes for the user context.
+  /// Returns [GetAttributesResponse] object containing attributes for the user context.
   Future<GetAttributesResponse> getAttributes() async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.getAttributesMethod, {
@@ -73,6 +73,9 @@ class OptimizelyUserContext {
   }
 
   /// Sets attributes for the user context.
+  ///
+  /// Takes [attributes] A [Map] of custom key-value string pairs specifying attributes for the user.
+  /// Returns [BaseResponse]
   Future<BaseResponse> setAttributes(Map<String, dynamic> attributes) async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.setAttributesMethod, {
@@ -84,6 +87,10 @@ class OptimizelyUserContext {
   }
 
   /// Tracks an event.
+  ///
+  /// Takes [eventKey] The event name.
+  /// Optional [eventTags] A [Map] of event tag names to event tag values.
+  /// Returns [BaseResponse]
   Future<BaseResponse> trackEvent(String eventKey,
       [Map<String, dynamic> eventTags = const {}]) async {
     final result = Map<String, dynamic>.from(
@@ -97,6 +104,10 @@ class OptimizelyUserContext {
   }
 
   /// Returns a decision result for a given flag key and a user context, which contains all data required to deliver the flag or experiment.
+  ///
+  /// Takes [key] A flag key for which a decision will be made.
+  /// Optional [options] A set of [OptimizelyDecideOption] for decision-making.
+  /// Returns [DecideResponse] A decision result.
   Future<DecideResponse> decide(String key,
       [Set<OptimizelyDecideOption> options = const {}]) async {
     // passing key as an array since decide has a single generic implementation which takes array of keys as an argument
@@ -105,6 +116,10 @@ class OptimizelyUserContext {
   }
 
   /// Returns a key-map of decision results for multiple flag keys and a user context.
+  ///
+  /// Takes [keys] A [List] of flag keys for which decisions will be made.
+  /// Optional [options] A set of [OptimizelyDecideOption] for decision-making.
+  /// Returns [DecideForKeysResponse] All decision results mapped by flag keys.
   Future<DecideForKeysResponse> decideForKeys(List<String> keys,
       [Set<OptimizelyDecideOption> options = const {}]) async {
     final result = await _decide(keys, options);
@@ -112,6 +127,9 @@ class OptimizelyUserContext {
   }
 
   /// Returns a key-map of decision results for all active flag keys.
+  ///
+  /// Optional [options] A set of [OptimizelyDecideOption] for decision-making.
+  /// Returns [DecideForKeysResponse] All decision results mapped by flag keys.
   Future<DecideForKeysResponse> decideAll(
       [Set<OptimizelyDecideOption> options = const {}]) async {
     final result = await _decide([], options);
@@ -134,6 +152,10 @@ class OptimizelyUserContext {
   }
 
   /// Sets the forced decision for a given decision context.
+  ///
+  /// Takes [context] The [OptimizelyDecisionContext] containing flagKey and ruleKey.
+  /// Takes [decision] The [OptimizelyForcedDecision] containing the variationKey.
+  /// Returns [BaseResponse]
   Future<BaseResponse> setForcedDecision(OptimizelyDecisionContext context,
       OptimizelyForcedDecision decision) async {
     Map<String, dynamic> request = {
@@ -151,6 +173,9 @@ class OptimizelyUserContext {
   }
 
   /// Returns the forced decision for a given decision context.
+  ///
+  /// Takes [context] The [OptimizelyDecisionContext] containing flagKey and ruleKey.
+  /// Returns [GetForcedDecisionResponse] containing a variationKey for a given forced decision
   Future<GetForcedDecisionResponse> getForcedDecision(
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
@@ -168,6 +193,9 @@ class OptimizelyUserContext {
   }
 
   /// Removes the forced decision for a given decision context.
+  ///
+  /// Takes [context] The [OptimizelyDecisionContext] containing flagKey and ruleKey.
+  /// Returns [BaseResponse]
   Future<BaseResponse> removeForcedDecision(
       OptimizelyDecisionContext context) async {
     Map<String, dynamic> request = {
@@ -184,6 +212,8 @@ class OptimizelyUserContext {
   }
 
   /// Removes all forced decisions bound to this user context.
+  ///
+  /// Returns [BaseResponse]
   Future<BaseResponse> removeAllForcedDecisions() async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
