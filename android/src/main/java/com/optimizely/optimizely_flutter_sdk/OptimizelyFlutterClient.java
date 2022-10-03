@@ -199,8 +199,7 @@ public class OptimizelyFlutterClient {
 
         try {
             Variation variation = optimizelyClient.activate(experimentKey, userId, attributes);
-            String variationKey = variation != null ? variation.getKey() : null;
-            result.success(createResponse(Collections.singletonMap(RequestParameterKey.VARIATION_KEY, variationKey)));
+            result.success(createResponse(Collections.singletonMap(RequestParameterKey.VARIATION_KEY, variation.getKey())));
         } catch (Exception ex) {
             result.success(createResponse(ex.getMessage()));
         }
@@ -225,8 +224,7 @@ public class OptimizelyFlutterClient {
 
         try {
             Variation variation = optimizelyClient.getVariation(experimentKey, userId, attributes);
-            String variationKey = variation != null ? variation.getKey() : null;
-            result.success(createResponse(Collections.singletonMap(RequestParameterKey.VARIATION_KEY, variationKey)));
+            result.success(createResponse(Collections.singletonMap(RequestParameterKey.VARIATION_KEY, variation.getKey())));
         } catch (Exception ex) {
             result.success(createResponse(ex.getMessage()));
         }
@@ -276,9 +274,9 @@ public class OptimizelyFlutterClient {
         }
 
         String variationKey = argumentsParser.getVariationKey();
-        optimizelyClient.setForcedVariation(experimentKey, userId, variationKey);
+        Boolean success = optimizelyClient.setForcedVariation(experimentKey, userId, variationKey);
 
-        result.success(createResponse());
+        result.success(createResponse(success));
     }
 
     protected void decide(ArgumentsParser argumentsParser, @NonNull Result result) {
@@ -532,10 +530,19 @@ public class OptimizelyFlutterClient {
             case NotificationType.ACTIVATE: {
                 notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(ActivateNotification.class, activateNotification -> {
                     Map<String, Object> notificationMap = new HashMap<>();
-                    notificationMap.put(ActivateListenerKeys.EXPERIMENT_KEY, activateNotification.getExperiment().getKey());
+
+                    Map<String, String> experimentMap = new HashMap<>();
+                    experimentMap.put(ActivateListenerKeys.ID, activateNotification.getExperiment().getId());
+                    experimentMap.put(ActivateListenerKeys.KEY, activateNotification.getExperiment().getKey());
+
+                    Map<String, String> variationMap = new HashMap<>();
+                    variationMap.put(ActivateListenerKeys.ID, activateNotification.getVariation().getId());
+                    variationMap.put(ActivateListenerKeys.KEY, activateNotification.getVariation().getKey());
+
+                    notificationMap.put(ActivateListenerKeys.EXPERIMENT, experimentMap);
                     notificationMap.put(ActivateListenerKeys.USER_ID, activateNotification.getUserId());
                     notificationMap.put(ActivateListenerKeys.ATTRIBUTES, activateNotification.getAttributes());
-                    notificationMap.put(ActivateListenerKeys.VARIATION_KEY, activateNotification.getVariation().getKey());
+                    notificationMap.put(ActivateListenerKeys.VARIATION, variationMap);
                     invokeNotification(id, NotificationType.ACTIVATE, notificationMap);
                 });
                 break;
@@ -597,6 +604,11 @@ public class OptimizelyFlutterClient {
         response.put(ResponseKey.REASON, reason);
 
         return response;
+    }
+
+    // Create response with success, empty reason and null object response
+    private Map<String, ?> createResponse(Boolean success) {
+        return createResponse(success, null, "");
     }
 
     // Create response with empty reason and null object response when success is true
