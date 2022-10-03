@@ -87,10 +87,12 @@ public class Constants {
     }
 
     public static class ActivateListenerKeys {
-        public static final String EXPERIMENT_KEY = "experimentKey";
+        public static final String ID = "id";
+        public static final String KEY = "key";
+        public static final String EXPERIMENT = "experiment";
         public static final String USER_ID = "userId";
         public static final String ATTRIBUTES = "attributes";
-        public static final String VARIATION_KEY = "variationKey";
+        public static final String VARIATION = "variation";
     }
 
     public static class TrackListenerKeys {
