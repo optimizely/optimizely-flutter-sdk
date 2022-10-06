@@ -1,6 +1,6 @@
 name: optimizely_flutter_sdk
 description: Optimizely Flutter SDK.
-version: 0.0.1
+version: 0.1.0-beta
 homepage: https://github.com/optimizely/optimizely-flutter-sdk
 
 environment:
