@@ -1,5 +1,5 @@
 
-## [0.1.0] - October 6th, 2022
+## [0.1.0-beta] - October 6th, 2022
 ### Beta release of the Optimizely X Full Stack Flutter SDK.
 *Following are the apis added in Flutter SDK.*
 * activate

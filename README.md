@@ -18,7 +18,7 @@ Refer to the [Flutter SDK developer documentation](https://docs.developers.optim
 
 See the [pubspec.yaml](https://github.com/optimizely/optimizely-flutter-sdk/blob/master/pubspec.yaml) file for Flutter version requirements.
 
-On the Android platform, the SDK requires a minimum SDK version of 21.
+On the Android platform, the SDK requires a minimum SDK version of 14 or higher and compile SDK version of 32.
 
 On the iOS platform, the SDK requires a minimum version of 10.0.
 
@@ -29,7 +29,7 @@ Other Flutter platforms are not currently supported by this SDK.
 To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
 
 ```
-   optimizely_flutter_sdk: ^1.0.0
+   optimizely_flutter_sdk: ^0.1.0
 ```
 
 Then, import the package in your application code:
@@ -38,13 +38,33 @@ Then, import the package in your application code:
    import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 ```
 
-### Samples
+## Usage
 
-A sample code for SDK initialization and experiments:
+### Instantiation
+
+A sample code for SDK initialization:
 
 ```
    var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
    var response = await flutterSDK.initializeClient();
+```
+
+### Feature Rollouts
+```
+   import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+
+   var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
+
+   // instantiate a client
+   var response = await flutterSDK.initializeClient();
+
+   // User attributes are optional and used for targeting and results segmentation
+   var attributes = {
+      "state": "California",
+      "likes_donuts": true
+   };
+   var user = await flutterSDK.createUserContext("optimizely end user", attributes);
+   var decideReponse = await user!.decide("binary_feature");
 ```
 
 ## Testing in Terminal
