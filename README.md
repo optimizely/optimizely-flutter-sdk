@@ -1,5 +1,5 @@
 # Optimizely Flutter SDK
-[![Apache 2.0](https://img.shields.io/github/license/nebula-plugins/gradle-extra-configurations-plugin.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Apache 2.0](https://img.shields.io/github/license/nebula-plugins/gradle-extra-configurations-plugin.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Build Status](https://github.com/optimizely/optimizely-flutter-sdk/actions/workflows/flutter.yml/badge.svg?branch=master)](https://github.com/optimizely/optimizely-flutter-sdk/actions)
 [![Pub](https://img.shields.io/pub/v/optimizely_flutter_sdk.svg)](https://pub.dev/packages/optimizely_flutter_sdk)
 [![Coverage Status](https://coveralls.io/repos/github/optimizely/optimizely-flutter-sdk/badge.svg?branch=master)](https://coveralls.io/github/optimizely/optimizely-flutter-sdk?branch=master)
@@ -29,7 +29,7 @@ Other Flutter platforms are not currently supported by this SDK.
 To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
 
 ```
-   optimizely_flutter_sdk: ^0.1.0
+   optimizely_flutter_sdk: ^0.1.0-beta
 ```
 
 Then, import the package in your application code:
