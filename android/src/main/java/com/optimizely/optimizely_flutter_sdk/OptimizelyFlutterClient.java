@@ -53,6 +53,7 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 import com.optimizely.optimizely_flutter_sdk.helper_classes.Utils;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.getNotificationType;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -470,7 +471,7 @@ public class OptimizelyFlutterClient {
             return;
         }
 
-        Integer id = argumentsParser.getNotificaitonID();
+        Integer id = argumentsParser.getNotificationID();
         String type = argumentsParser.getNotificationType();
 
         if (id == null || type == null) {
@@ -479,6 +480,28 @@ public class OptimizelyFlutterClient {
         }
         optimizelyClient.getNotificationCenter().removeNotificationListener(id);
         notificationIdsTracker.remove(id);
+        result.success(createResponse());
+    }
+
+    protected void removeAllNotificationListeners(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (!isOptimizelyClientValid(sdkKey, optimizelyClient, result)) {
+            return;
+        }
+
+        String type = argumentsParser.getNotificationType();
+        List<Integer> callBackIds = argumentsParser.getCallBackIds();
+
+        if (type == null) {
+            optimizelyClient.getNotificationCenter().clearAllNotificationListeners();
+            notificationIdsTracker.clear();
+        } else {
+            optimizelyClient.getNotificationCenter().clearNotificationListeners(getNotificationType(type));
+            for (Integer id: callBackIds) {
+                notificationIdsTracker.remove(id);
+            }
+        }
         result.success(createResponse());
     }
 
@@ -507,7 +530,7 @@ public class OptimizelyFlutterClient {
             return;
         }
 
-        Integer id = argumentsParser.getNotificaitonID();
+        Integer id = argumentsParser.getNotificationID();
         String type = argumentsParser.getNotificationType();
 
         if (id == null || type == null) {

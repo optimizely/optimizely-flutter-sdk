@@ -42,7 +42,8 @@ class Constants {
   static const String addNotificationListenerMethod = "addNotificationListener";
   static const String removeNotificationListenerMethod =
       "removeNotificationListener";
-
+  static const String removeAllNotificationListenersMethod =
+      "removeAllNotificationListeners";
   // Request parameter keys
   static const String id = "id";
   static const String sdkKey = "sdkKey";
@@ -69,6 +70,7 @@ class Constants {
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";
+  static const String callbackIds = "callbackIds";
   static const String eventBatchSize = "eventBatchSize";
   static const String eventTimeInterval = "eventTimeInterval";
   static const String eventMaxQueueSize = "eventMaxQueueSize";

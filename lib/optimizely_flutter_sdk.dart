@@ -147,6 +147,16 @@ class OptimizelyFlutterSdk {
         _sdkKey, userId, attributes);
   }
 
+  /// Allows user to check and remove all notification listeners.
+  ///
+  /// Takes [ListenerType] An optional parameter which allows user to remove only specific type of listeners.
+  /// Returns [BaseResponse] A object containing success result or reason of failure.
+  Future<BaseResponse> removeAllNotificationListeners(
+    [ListenerType? listenerType]) async {
+    return await OptimizelyClientWrapper.removeAllNotificationListeners(
+        _sdkKey, listenerType);
+  }
+
   /// Checks if eventHandler are Closeable and calls close on them.
   ///
   /// Returns [BaseResponse] A object containing success result or reason of failure.

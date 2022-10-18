@@ -151,6 +151,25 @@ class OptimizelyClientWrapper {
     return OptimizelyConfigResponse(result);
   }
 
+  /// Removes all notification listeners.
+  static Future<BaseResponse> removeAllNotificationListeners(
+      String sdkKey,
+      [ListenerType? listenerType]) async {
+
+    var callbackIds = _removeAllCallbacks(listenerType);
+
+    Map<String, dynamic> request = {
+      Constants.sdkKey: sdkKey,
+      Constants.callbackIds: callbackIds
+    };
+    if (listenerType != null) {
+      request[Constants.type] = listenerType.name;
+    }
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.removeAllNotificationListenersMethod, request));
+    return BaseResponse(result);
+  }
+
   /// Returns a success true if optimizely client closed successfully.
   static Future<BaseResponse> close(String sdkKey) async {
     final result = Map<String, dynamic>.from(await _channel
@@ -178,6 +197,39 @@ class OptimizelyClientWrapper {
           sdkKey, response[Constants.userContextId], _channel);
     }
     return null;
+  }
+
+  static List<int> _removeAllCallbacks([ListenerType? listenerType]) {
+    var callbackIds = <int>[];
+    switch (listenerType) {
+      case ListenerType.activate:
+        callbackIds.addAll(activateCallbacksById.keys);
+        activateCallbacksById.clear();
+        break;
+      case ListenerType.decision:
+        callbackIds.addAll(decisionCallbacksById.keys);
+        decisionCallbacksById.clear();
+        break;
+      case ListenerType.logEvent:
+        callbackIds.addAll(logEventCallbacksById.keys);
+        logEventCallbacksById.clear();
+        break;
+      case ListenerType.projectConfigUpdate:
+        callbackIds.addAll(configUpdateCallbacksById.keys);
+        configUpdateCallbacksById.clear();
+        break;
+      case ListenerType.track:
+        callbackIds.addAll(trackCallbacksById.keys);
+        trackCallbacksById.clear();
+        break;
+      default:
+        activateCallbacksById.clear();
+        decisionCallbacksById.clear();
+        trackCallbacksById.clear();
+        logEventCallbacksById.clear();
+        configUpdateCallbacksById.clear();
+    }
+    return callbackIds;
   }
 
   static bool checkCallBackExist(dynamic callback) {

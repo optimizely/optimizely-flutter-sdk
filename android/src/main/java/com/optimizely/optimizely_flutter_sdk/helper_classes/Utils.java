@@ -24,6 +24,11 @@ import java.util.UUID;
 import static com.optimizely.ab.notification.DecisionNotification.FeatureVariableDecisionNotificationBuilder.SOURCE_INFO;
 
 import com.google.common.base.CaseFormat;
+import com.optimizely.ab.event.LogEvent;
+import com.optimizely.ab.notification.ActivateNotification;
+import com.optimizely.ab.notification.DecisionNotification;
+import com.optimizely.ab.notification.TrackNotification;
+import com.optimizely.ab.notification.UpdateConfigNotification;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 
 public class Utils {
@@ -59,5 +64,23 @@ public class Utils {
             }
         }
         return convertedOptions;
+    }
+
+    public static Class getNotificationType(String notificationType) {
+        if (notificationType == null || notificationType.isEmpty()) {
+            return null;
+        }
+
+        Class listenerClass = null;
+        switch (notificationType) {
+            case Constants.NotificationType.ACTIVATE -> listenerClass = ActivateNotification.class;
+            case Constants.NotificationType.CONFIG_UPDATE -> listenerClass = UpdateConfigNotification.class;
+            case Constants.NotificationType.DECISION -> listenerClass = DecisionNotification.class;
+            case Constants.NotificationType.LOG_EVENT -> listenerClass = LogEvent.class;
+            case Constants.NotificationType.TRACK -> listenerClass = TrackNotification.class;
+            default -> {
+            }
+        }
+        return listenerClass;
     }
 }
