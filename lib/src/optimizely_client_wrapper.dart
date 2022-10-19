@@ -44,11 +44,15 @@ typedef CancelListening = void Function();
 class OptimizelyClientWrapper {
   static const MethodChannel _channel = MethodChannel('optimizely_flutter_sdk');
   static int nextCallbackId = 0;
-  static Map<int, ActivateNotificationCallback> activateCallbacksById = {};
-  static Map<int, DecisionNotificationCallback> decisionCallbacksById = {};
-  static Map<int, TrackNotificationCallback> trackCallbacksById = {};
-  static Map<int, LogEventNotificationCallback> logEventCallbacksById = {};
-  static Map<int, MultiUseCallback> configUpdateCallbacksById = {};
+  static Map<String, Map<int, ActivateNotificationCallback>>
+      activateCallbacksById = {};
+  static Map<String, Map<int, DecisionNotificationCallback>>
+      decisionCallbacksById = {};
+  static Map<String, Map<int, TrackNotificationCallback>> trackCallbacksById =
+      {};
+  static Map<String, Map<int, LogEventNotificationCallback>>
+      logEventCallbacksById = {};
+  static Map<String, Map<int, MultiUseCallback>> configUpdateCallbacksById = {};
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey and options.
   static Future<BaseResponse> initializeClient(
@@ -152,11 +156,9 @@ class OptimizelyClientWrapper {
   }
 
   /// Removes all notification listeners.
-  static Future<BaseResponse> removeAllNotificationListeners(
-      String sdkKey,
+  static Future<BaseResponse> removeAllNotificationListeners(String sdkKey,
       [ListenerType? listenerType]) async {
-
-    var callbackIds = _removeAllCallbacks(listenerType);
+    var callbackIds = _removeAllCallbacks(sdkKey, listenerType);
 
     Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
@@ -165,8 +167,8 @@ class OptimizelyClientWrapper {
     if (listenerType != null) {
       request[Constants.type] = listenerType.name;
     }
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.removeAllNotificationListenersMethod, request));
+    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
+        Constants.removeAllNotificationListenersMethod, request));
     return BaseResponse(result);
   }
 
@@ -199,63 +201,77 @@ class OptimizelyClientWrapper {
     return null;
   }
 
-  static List<int> _removeAllCallbacks([ListenerType? listenerType]) {
+  static List<int> _removeAllCallbacks(String sdkKey,
+      [ListenerType? listenerType]) {
     var callbackIds = <int>[];
-    switch (listenerType) {
-      case ListenerType.activate:
-        callbackIds.addAll(activateCallbacksById.keys);
-        activateCallbacksById.clear();
-        break;
-      case ListenerType.decision:
-        callbackIds.addAll(decisionCallbacksById.keys);
-        decisionCallbacksById.clear();
-        break;
-      case ListenerType.logEvent:
-        callbackIds.addAll(logEventCallbacksById.keys);
-        logEventCallbacksById.clear();
-        break;
-      case ListenerType.projectConfigUpdate:
-        callbackIds.addAll(configUpdateCallbacksById.keys);
-        configUpdateCallbacksById.clear();
-        break;
-      case ListenerType.track:
-        callbackIds.addAll(trackCallbacksById.keys);
-        trackCallbacksById.clear();
-        break;
-      default:
-        activateCallbacksById.clear();
-        decisionCallbacksById.clear();
-        trackCallbacksById.clear();
-        logEventCallbacksById.clear();
-        configUpdateCallbacksById.clear();
+    if (listenerType == null || listenerType == ListenerType.activate) {
+      if (activateCallbacksById.containsKey(sdkKey)) {
+        callbackIds.addAll(activateCallbacksById[sdkKey]!.keys);
+        activateCallbacksById[sdkKey]!.clear();
+      }
+    }
+    if (listenerType == null || listenerType == ListenerType.decision) {
+      if (decisionCallbacksById.containsKey(sdkKey)) {
+        callbackIds.addAll(decisionCallbacksById[sdkKey]!.keys);
+        decisionCallbacksById[sdkKey]!.clear();
+      }
+    }
+    if (listenerType == null || listenerType == ListenerType.logEvent) {
+      if (logEventCallbacksById.containsKey(sdkKey)) {
+        callbackIds.addAll(logEventCallbacksById[sdkKey]!.keys);
+        logEventCallbacksById[sdkKey]!.clear();
+      }
+    }
+    if (listenerType == null ||
+        listenerType == ListenerType.projectConfigUpdate) {
+      if (configUpdateCallbacksById.containsKey(sdkKey)) {
+        callbackIds.addAll(configUpdateCallbacksById[sdkKey]!.keys);
+        configUpdateCallbacksById[sdkKey]!.clear();
+      }
+    }
+    if (listenerType == null || listenerType == ListenerType.track) {
+      if (trackCallbacksById.containsKey(sdkKey)) {
+        callbackIds.addAll(trackCallbacksById[sdkKey]!.keys);
+        trackCallbacksById[sdkKey]!.clear();
+      }
     }
     return callbackIds;
   }
 
-  static bool checkCallBackExist(dynamic callback) {
-    for (var k in activateCallbacksById.keys) {
-      if (activateCallbacksById[k] == callback) {
-        return true;
+  static bool checkCallBackExist(String sdkKey, dynamic callback) {
+    if (activateCallbacksById.containsKey(sdkKey)) {
+      for (var k in activateCallbacksById[sdkKey]!.keys) {
+        if (activateCallbacksById[sdkKey]![k] == callback) {
+          return true;
+        }
       }
     }
-    for (var k in decisionCallbacksById.keys) {
-      if (decisionCallbacksById[k] == callback) {
-        return true;
+    if (decisionCallbacksById.containsKey(sdkKey)) {
+      for (var k in decisionCallbacksById[sdkKey]!.keys) {
+        if (decisionCallbacksById[sdkKey]![k] == callback) {
+          return true;
+        }
       }
     }
-    for (var k in trackCallbacksById.keys) {
-      if (trackCallbacksById[k] == callback) {
-        return true;
+    if (trackCallbacksById.containsKey(sdkKey)) {
+      for (var k in trackCallbacksById[sdkKey]!.keys) {
+        if (trackCallbacksById[sdkKey]![k] == callback) {
+          return true;
+        }
       }
     }
-    for (var k in logEventCallbacksById.keys) {
-      if (logEventCallbacksById[k] == callback) {
-        return true;
+    if (logEventCallbacksById.containsKey(sdkKey)) {
+      for (var k in logEventCallbacksById[sdkKey]!.keys) {
+        if (logEventCallbacksById[sdkKey]![k] == callback) {
+          return true;
+        }
       }
     }
-    for (var k in configUpdateCallbacksById.keys) {
-      if (configUpdateCallbacksById[k] == callback) {
-        return true;
+    if (configUpdateCallbacksById.containsKey(sdkKey)) {
+      for (var k in configUpdateCallbacksById[sdkKey]!.keys) {
+        if (configUpdateCallbacksById[sdkKey]![k] == callback) {
+          return true;
+        }
       }
     }
     return false;
@@ -265,14 +281,15 @@ class OptimizelyClientWrapper {
       String sdkKey, ActivateNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    if (checkCallBackExist(callback)) {
+    if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
       print("callback already exists.");
       return () {};
     }
 
     int currentListenerId = nextCallbackId++;
-    activateCallbacksById[currentListenerId] = callback;
+    activateCallbacksById.putIfAbsent(sdkKey, () => {});
+    activateCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.activate.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -283,7 +300,7 @@ class OptimizelyClientWrapper {
     return () {
       _channel.invokeMethod(Constants.removeNotificationListenerMethod,
           {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
-      activateCallbacksById.remove(currentListenerId);
+      activateCallbacksById[sdkKey]?.remove(currentListenerId);
     };
   }
 
@@ -291,14 +308,15 @@ class OptimizelyClientWrapper {
       String sdkKey, DecisionNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    if (checkCallBackExist(callback)) {
+    if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
       print("callback already exists.");
       return () {};
     }
 
     int currentListenerId = nextCallbackId++;
-    decisionCallbacksById[currentListenerId] = callback;
+    decisionCallbacksById.putIfAbsent(sdkKey, () => {});
+    decisionCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.decision.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -309,7 +327,7 @@ class OptimizelyClientWrapper {
     return () {
       _channel.invokeMethod(Constants.removeNotificationListenerMethod,
           {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
-      decisionCallbacksById.remove(currentListenerId);
+      decisionCallbacksById[sdkKey]?.remove(currentListenerId);
     };
   }
 
@@ -317,14 +335,15 @@ class OptimizelyClientWrapper {
       String sdkKey, TrackNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    if (checkCallBackExist(callback)) {
+    if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
       print("callback already exists.");
       return () {};
     }
 
     int currentListenerId = nextCallbackId++;
-    trackCallbacksById[currentListenerId] = callback;
+    trackCallbacksById.putIfAbsent(sdkKey, () => {});
+    trackCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.track.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -335,7 +354,7 @@ class OptimizelyClientWrapper {
     return () {
       _channel.invokeMethod(Constants.removeNotificationListenerMethod,
           {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
-      trackCallbacksById.remove(currentListenerId);
+      trackCallbacksById[sdkKey]?.remove(currentListenerId);
     };
   }
 
@@ -343,14 +362,15 @@ class OptimizelyClientWrapper {
       String sdkKey, LogEventNotificationCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    if (checkCallBackExist(callback)) {
+    if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
       print("callback already exists.");
       return () {};
     }
 
     int currentListenerId = nextCallbackId++;
-    logEventCallbacksById[currentListenerId] = callback;
+    logEventCallbacksById.putIfAbsent(sdkKey, () => {});
+    logEventCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.logEvent.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -361,7 +381,7 @@ class OptimizelyClientWrapper {
     return () {
       _channel.invokeMethod(Constants.removeNotificationListenerMethod,
           {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
-      logEventCallbacksById.remove(currentListenerId);
+      logEventCallbacksById[sdkKey]?.remove(currentListenerId);
     };
   }
 
@@ -370,14 +390,15 @@ class OptimizelyClientWrapper {
       String sdkKey, MultiUseCallback callback) async {
     _channel.setMethodCallHandler(methodCallHandler);
 
-    if (checkCallBackExist(callback)) {
+    if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
       print("callback already exists.");
       return () {};
     }
 
     int currentListenerId = nextCallbackId++;
-    configUpdateCallbacksById[currentListenerId] = callback;
+    configUpdateCallbacksById.putIfAbsent(sdkKey, () => {});
+    configUpdateCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.projectConfigUpdate.name;
     await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
@@ -388,46 +409,52 @@ class OptimizelyClientWrapper {
     return () {
       _channel.invokeMethod(Constants.removeNotificationListenerMethod,
           {Constants.sdkKey: sdkKey, Constants.id: currentListenerId});
-      configUpdateCallbacksById.remove(currentListenerId);
+      configUpdateCallbacksById[sdkKey]?.remove(currentListenerId);
     };
   }
 
   static Future<void> methodCallHandler(MethodCall call) async {
     final id = call.arguments[Constants.id];
+    final sdkKey = call.arguments[Constants.sdkKey];
     final payload = call.arguments[Constants.payload];
     if (id is int && payload != null) {
       switch (call.method) {
         case Constants.activateCallBackListener:
           final response =
               ActivateListenerResponse(Map<String, dynamic>.from(payload));
-          if (activateCallbacksById.containsKey(id)) {
-            activateCallbacksById[id]!(response);
+          if (activateCallbacksById.containsKey(sdkKey) &&
+              activateCallbacksById[sdkKey]!.containsKey(id)) {
+            activateCallbacksById[sdkKey]![id]!(response);
           }
           break;
         case Constants.decisionCallBackListener:
           final response =
               DecisionListenerResponse(Map<String, dynamic>.from(payload));
-          if (decisionCallbacksById.containsKey(id)) {
-            decisionCallbacksById[id]!(response);
+          if (decisionCallbacksById.containsKey(sdkKey) &&
+              decisionCallbacksById[sdkKey]!.containsKey(id)) {
+            decisionCallbacksById[sdkKey]![id]!(response);
           }
           break;
         case Constants.trackCallBackListener:
           final response =
               TrackListenerResponse(Map<String, dynamic>.from(payload));
-          if (trackCallbacksById.containsKey(id)) {
-            trackCallbacksById[id]!(response);
+          if (trackCallbacksById.containsKey(sdkKey) &&
+              trackCallbacksById[sdkKey]!.containsKey(id)) {
+            trackCallbacksById[sdkKey]![id]!(response);
           }
           break;
         case Constants.logEventCallbackListener:
           final response =
               LogEventListenerResponse(Map<String, dynamic>.from(payload));
-          if (logEventCallbacksById.containsKey(id)) {
-            logEventCallbacksById[id]!(response);
+          if (logEventCallbacksById.containsKey(sdkKey) &&
+              logEventCallbacksById[sdkKey]!.containsKey(id)) {
+            logEventCallbacksById[sdkKey]![id]!(response);
           }
           break;
         case Constants.configUpdateCallBackListener:
-          if (configUpdateCallbacksById.containsKey(id)) {
-            configUpdateCallbacksById[id]!(payload);
+          if (configUpdateCallbacksById.containsKey(sdkKey) &&
+              configUpdateCallbacksById[sdkKey]!.containsKey(id)) {
+            configUpdateCallbacksById[sdkKey]![id]!(payload);
           }
           break;
         default:

@@ -67,7 +67,7 @@ public class OptimizelyFlutterClient {
 
     protected static final Map<String, OptimizelyManager> optimizelyManagerTracker = new HashMap<>();
     protected static final Map<String, Map<String, OptimizelyUserContext>> userContextsTracker = new HashMap<>();
-    protected static final Map<Integer, Integer> notificationIdsTracker = new HashMap<>();
+    protected static final Map<String, Map<Integer, Integer>> notificationIdsTracker = new HashMap<>();
 
 
     protected void initializeOptimizely(@NonNull ArgumentsParser argumentsParser, @NonNull Result result) {
@@ -124,7 +124,7 @@ public class OptimizelyFlutterClient {
             getOptimizelyClient(sdkKey).close();
         }
         optimizelyManagerTracker.remove(sdkKey);
-
+        notificationIdsTracker.remove(sdkKey);
         // Creating new instance
         OptimizelyManager optimizelyManager = OptimizelyManager.builder()
                 .withEventProcessor(batchProcessor)
@@ -479,7 +479,8 @@ public class OptimizelyFlutterClient {
             return;
         }
         optimizelyClient.getNotificationCenter().removeNotificationListener(id);
-        notificationIdsTracker.remove(id);
+        if (notificationIdsTracker.containsKey(sdkKey))
+            notificationIdsTracker.get(sdkKey).remove(id);
         result.success(createResponse());
     }
 
@@ -495,11 +496,12 @@ public class OptimizelyFlutterClient {
 
         if (type == null) {
             optimizelyClient.getNotificationCenter().clearAllNotificationListeners();
-            notificationIdsTracker.clear();
         } else {
             optimizelyClient.getNotificationCenter().clearNotificationListeners(getNotificationType(type));
+        }
+        if (notificationIdsTracker.containsKey(sdkKey)) {
             for (Integer id: callBackIds) {
-                notificationIdsTracker.remove(id);
+                notificationIdsTracker.get(sdkKey).remove(id);
             }
         }
         result.success(createResponse());
@@ -546,7 +548,7 @@ public class OptimizelyFlutterClient {
                     notificationMap.put(DecisionListenerKeys.USER_ID, decisionNotification.getUserId());
                     notificationMap.put(DecisionListenerKeys.ATTRIBUTES, decisionNotification.getAttributes());
                     notificationMap.put(DecisionListenerKeys.DECISION_INFO, decisionNotification.getDecisionInfo());
-                    invokeNotification(id, NotificationType.DECISION, notificationMap);
+                    invokeNotification(id, sdkKey, NotificationType.DECISION, notificationMap);
                 });
                 break;
             }
@@ -566,7 +568,7 @@ public class OptimizelyFlutterClient {
                     notificationMap.put(ActivateListenerKeys.USER_ID, activateNotification.getUserId());
                     notificationMap.put(ActivateListenerKeys.ATTRIBUTES, activateNotification.getAttributes());
                     notificationMap.put(ActivateListenerKeys.VARIATION, variationMap);
-                    invokeNotification(id, NotificationType.ACTIVATE, notificationMap);
+                    invokeNotification(id, sdkKey, NotificationType.ACTIVATE, notificationMap);
                 });
                 break;
             }
@@ -577,7 +579,7 @@ public class OptimizelyFlutterClient {
                     notificationMap.put(TrackListenerKeys.USER_ID, trackNotification.getUserId());
                     notificationMap.put(TrackListenerKeys.ATTRIBUTES, trackNotification.getAttributes());
                     notificationMap.put(TrackListenerKeys.EVENT_TAGS, trackNotification.getEventTags());
-                    invokeNotification(id, NotificationType.TRACK, notificationMap);
+                    invokeNotification(id, sdkKey, NotificationType.TRACK, notificationMap);
                 });
                 break;
             }
@@ -588,7 +590,7 @@ public class OptimizelyFlutterClient {
                     Map<String, Object> listenerMap = new HashMap<>();
                     listenerMap.put(LogEventListenerKeys.URL, logEvent.getEndpointUrl());
                     listenerMap.put(LogEventListenerKeys.PARAMS, eventParams);
-                    invokeNotification(id, NotificationType.LOG_EVENT, listenerMap);
+                    invokeNotification(id, sdkKey, NotificationType.LOG_EVENT, listenerMap);
                 });
                 break;
             }
@@ -596,14 +598,17 @@ public class OptimizelyFlutterClient {
                 notificationId = optimizelyClient.getNotificationCenter().addNotificationHandler(UpdateConfigNotification.class, configUpdate -> {
                     Map<String, Object> listenerMap = new HashMap<>();
                     listenerMap.put("Config-update", Collections.emptyMap());
-                    invokeNotification(id, NotificationType.CONFIG_UPDATE, listenerMap);
+                    invokeNotification(id, sdkKey, NotificationType.CONFIG_UPDATE, listenerMap);
                 });
                 break;
             }
             default:
                 result.success(createResponse(ErrorMessage.INVALID_PARAMS));
         }
-        notificationIdsTracker.put(id, notificationId);
+        if (!notificationIdsTracker.containsKey(sdkKey)) {
+            notificationIdsTracker.put(sdkKey, new HashMap<>());
+        }
+        notificationIdsTracker.get(sdkKey).put(id, notificationId);
         result.success(createResponse());
     }
 
@@ -673,9 +678,10 @@ public class OptimizelyFlutterClient {
         return true;
     }
 
-    private void invokeNotification(int id, String notificationType, Map notificationMap) {
+    private void invokeNotification(int id, String sdkKey, String notificationType, Map notificationMap) {
         Map<String, Object> listenerResponse = new HashMap<>();
         listenerResponse.put(RequestParameterKey.NOTIFICATION_ID, id);
+        listenerResponse.put(RequestParameterKey.SDK_KEY, sdkKey);
         listenerResponse.put(RequestParameterKey.NOTIFICATION_TYPE, notificationType);
         listenerResponse.put(RequestParameterKey.NOTIFICATION_PAYLOAD, notificationMap);
         Map<String, Object> listenerUnmodifiable = Collections.unmodifiableMap(listenerResponse);

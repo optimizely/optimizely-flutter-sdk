@@ -73,12 +73,12 @@ public class Utils {
 
         Class listenerClass = null;
         switch (notificationType) {
-            case Constants.NotificationType.ACTIVATE -> listenerClass = ActivateNotification.class;
-            case Constants.NotificationType.CONFIG_UPDATE -> listenerClass = UpdateConfigNotification.class;
-            case Constants.NotificationType.DECISION -> listenerClass = DecisionNotification.class;
-            case Constants.NotificationType.LOG_EVENT -> listenerClass = LogEvent.class;
-            case Constants.NotificationType.TRACK -> listenerClass = TrackNotification.class;
-            default -> {
+            case Constants.NotificationType.ACTIVATE: listenerClass = ActivateNotification.class; break;
+            case Constants.NotificationType.CONFIG_UPDATE: listenerClass = UpdateConfigNotification.class; break;
+            case Constants.NotificationType.DECISION: listenerClass = DecisionNotification.class; break;
+            case Constants.NotificationType.LOG_EVENT: listenerClass = LogEvent.class; break;
+            case Constants.NotificationType.TRACK: listenerClass = TrackNotification.class; break;
+            default: {
             }
         }
         return listenerClass;
