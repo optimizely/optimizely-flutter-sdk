@@ -70,6 +70,12 @@ class OptimizelyClientWrapper {
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
     };
 
+    activateCallbacksById.remove(sdkKey);
+    decisionCallbacksById.remove(sdkKey);
+    trackCallbacksById.remove(sdkKey);
+    logEventCallbacksById.remove(sdkKey);
+    configUpdateCallbacksById.remove(sdkKey);
+
     datafileHostOptions.forEach((platform, datafileoptions) {
       // Pass datafile host only if non empty value for current platform is provided
       if (platform.name == defaultTargetPlatform.name &&
