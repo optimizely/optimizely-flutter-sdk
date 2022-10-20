@@ -27,7 +27,7 @@ import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 
 export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
-    show ClientPlatform;
+    show ClientPlatform, ListenerType;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decision.dart'
     show OptimizelyForcedDecision;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_context.dart'
