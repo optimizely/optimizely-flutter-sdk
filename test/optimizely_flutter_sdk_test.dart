@@ -263,7 +263,13 @@ void main() {
           return {
             Constants.responseSuccess: true,
           };
-        case Constants.removeAllNotificationListenersMethod:
+        case Constants.clearNotificationsMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId], isNull);
+          return {
+            Constants.responseSuccess: true,
+          };
+        case Constants.clearAllNotificationsMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
@@ -900,26 +906,26 @@ void main() {
           notifications.add(msg);
         });
 
-        var cancel = await sdk.addDecisionNotificationListener((msg) {
+        var id = await sdk.addDecisionNotificationListener((msg) {
           notifications.add(msg);
         });
-        cancel();
-        cancel = await sdk.addLogEventNotificationListener((msg) {
+        await sdk.removeNotification(id);
+        id = await sdk.addLogEventNotificationListener((msg) {
           notifications.add(msg);
         });
-        cancel();
-        cancel = await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.removeNotification(id);
+        id = await sdk.addUpdateConfigNotificationListener((msg) {
           notifications.add(msg);
         });
-        cancel();
-        cancel = await sdk.addTrackNotificationListener((msg) {
+        await sdk.removeNotification(id);
+        id = await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        cancel();
-        cancel = await sdk.addActivateNotificationListener((msg) {
+        await sdk.removeNotification(id);
+        id = await sdk.addActivateNotificationListener((msg) {
           notifications.add(msg);
         });
-        cancel();
+        await sdk.removeNotification(id);
 
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
@@ -969,7 +975,7 @@ void main() {
           notifications.add(msg);
         });
 
-        await sdk.removeAllNotificationListeners(ListenerType.decision);
+        await sdk.clearNotifications(ListenerType.decision);
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         TestUtils.sendTestDecisionNotifications(callHandler, 0, testSDKKey);
@@ -1011,7 +1017,7 @@ void main() {
           notifications.add(msg);
         });
 
-        await sdk.removeAllNotificationListeners(ListenerType.logEvent);
+        await sdk.clearNotifications(ListenerType.logEvent);
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         TestUtils.sendTestDecisionNotifications(callHandler, 0, testSDKKey);
@@ -1053,7 +1059,7 @@ void main() {
           notifications.add(msg);
         });
 
-        await sdk.removeAllNotificationListeners(ListenerType.track);
+        await sdk.clearNotifications(ListenerType.track);
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         TestUtils.sendTestDecisionNotifications(callHandler, 0, testSDKKey);
@@ -1095,8 +1101,7 @@ void main() {
           notifications.add(msg);
         });
 
-        await sdk
-            .removeAllNotificationListeners(ListenerType.projectConfigUpdate);
+        await sdk.clearNotifications(ListenerType.projectConfigUpdate);
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         TestUtils.sendTestDecisionNotifications(callHandler, 0, testSDKKey);
@@ -1137,7 +1142,7 @@ void main() {
           notifications.add(msg);
         });
 
-        await sdk.removeAllNotificationListeners(ListenerType.activate);
+        await sdk.clearNotifications(ListenerType.activate);
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         TestUtils.sendTestDecisionNotifications(callHandler, 0, testSDKKey);
@@ -1178,7 +1183,7 @@ void main() {
           notifications.add(msg);
         });
 
-        await sdk.removeAllNotificationListeners();
+        await sdk.clearAllNotifications();
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         TestUtils.sendTestDecisionNotifications(callHandler, 0, testSDKKey);
@@ -1197,8 +1202,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        var baseResponse =
-            await sdk.removeAllNotificationListeners(ListenerType.decision);
+        var baseResponse = await sdk.clearNotifications(ListenerType.decision);
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         expect(baseResponse.success, true);
@@ -1212,7 +1216,7 @@ void main() {
           () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 
-        var baseResponse = await sdk.removeAllNotificationListeners();
+        var baseResponse = await sdk.clearAllNotifications();
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);
         expect(baseResponse.success, true);
@@ -1257,7 +1261,7 @@ void main() {
           notifications.add(msg);
         });
 
-        await sdk1.removeAllNotificationListeners();
+        await sdk1.clearAllNotifications();
 
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
         tester?.setMockMethodCallHandler(channel, callHandler);

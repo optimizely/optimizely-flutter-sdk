@@ -472,9 +472,7 @@ public class OptimizelyFlutterClient {
         }
 
         Integer id = argumentsParser.getNotificationID();
-        String type = argumentsParser.getNotificationType();
-
-        if (id == null || type == null) {
+        if (id == null) {
             result.success(createResponse(ErrorMessage.INVALID_PARAMS));
             return;
         }
@@ -484,7 +482,7 @@ public class OptimizelyFlutterClient {
         result.success(createResponse());
     }
 
-    protected void removeAllNotificationListeners(ArgumentsParser argumentsParser, @NonNull Result result) {
+    protected void clearAllNotifications(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
         if (!isOptimizelyClientValid(sdkKey, optimizelyClient, result)) {

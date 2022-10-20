@@ -36,7 +36,8 @@ public class Constants {
         public static final String DECIDE = "decide";
         public static final String ADD_NOTIFICATION_LISTENER = "addNotificationListener";
         public static final String REMOVE_NOTIFICATION_LISTENER = "removeNotificationListener";
-        public static final String REMOVE_ALL_NOTIFICATION_LISTENERS = "removeAllNotificationListeners";
+        public static final String CLEAR_ALL_NOTIFICATIONS = "clearAllNotifications";
+        public static final String CLEAR_NOTIFICATIONS = "clearNotifications";
     }
 
     public static class NotificationType {
