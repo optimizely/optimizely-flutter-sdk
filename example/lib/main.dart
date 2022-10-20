@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // To add decide listener
-    var cancelDecideListener =
+    var decideListenerId =
         await flutterSDK.addDecisionNotificationListener((notification) {
       print("Parsed decision event ....................");
       print(notification.type);
@@ -102,10 +102,10 @@ class _MyAppState extends State<MyApp> {
     // variationKey: off
 
     // To cancel decide listener
-    // cancelDecideListener();
+    // await flutterSDK.removeNotification(decideListenerId);
 
     // To add track listener
-    var cancelTrackListener =
+    var trackListenerID =
         await flutterSDK.addTrackNotificationListener((notification) {
       print("Parsed track event ....................");
       print(notification.attributes);
@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // To add logEvent listener
-    var cancelLogEventListener =
+    var logEventListenerId =
         await flutterSDK.addLogEventNotificationListener((notification) {
       print("Parsed log event ....................");
       print(notification.url);
@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // To cancel track listener
-    // cancelTrackListener();
+    //await flutterSDK.removeNotification(trackListenerID);
 
     if (!mounted) return;
   }
