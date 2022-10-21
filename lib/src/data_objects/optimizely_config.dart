@@ -14,6 +14,8 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
+import 'dart:convert';
+
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class OptimizelyConfig {
@@ -117,6 +119,23 @@ class OptimizelyConfig {
       'datafile': datafile
     };
   }
+
+  @override
+  String toString() {
+    var encodedExperimentsMap = json.encode(experimentsMap);
+    var encodedFeaturesMap = json.encode(featuresMap);
+    var encodedAttributes = json.encode(attributes);
+    var encodedEvents = json.encode(events);
+    var encodedAudiences = json.encode(audiences);
+    return 'OptimizelyConfig {revision="$revision",'
+        ' sdkKey="$sdkKey",'
+        ' environmentKey="$environmentKey",'
+        ' events="$encodedEvents",'
+        ' audiences="$encodedAudiences",'
+        ' attributes="$encodedAttributes",'
+        ' featuresMap="$encodedFeaturesMap",'
+        ' experimentsMap="$encodedExperimentsMap"}';
+  }
 }
 
 // Represents the Audiences list in {@link OptimizelyConfigResponse}
@@ -135,6 +154,11 @@ class OptimizelyAudience {
 
   Map<String, dynamic> toJson() =>
       {'id': id, 'name': name, 'conditions': conditions};
+
+  @override
+  String toString() {
+    return 'OptimizelyAudience {id="$id", name="$name", conditions="$conditions"}';
+  }
 }
 
 // Represents the Events's map in {@link OptimizelyConfigResponse}
@@ -153,6 +177,12 @@ class OptimizelyEvent {
 
   Map<String, dynamic> toJson() =>
       {'id': id, 'key': key, 'experimentIds': experimentIds};
+
+  @override
+  String toString() {
+    var encodedExperimentIds = json.encode(experimentIds);
+    return 'OptimizelyEvent {id="$id", key="$key", experimentIds="$encodedExperimentIds"}';
+  }
 }
 
 // Represents the Attribute's map in {@link OptimizelyConfigResponse}
@@ -167,6 +197,11 @@ class OptimizelyAttribute {
         id: parsedJson[Constants.id], key: parsedJson[Constants.key]);
   }
   Map<String, dynamic> toJson() => {'id': id, 'key': key};
+
+  @override
+  String toString() {
+    return 'OptimizelyAttribute {id="$id", key="$key"}';
+  }
 }
 
 // Represents the feature's map in {@link OptimizelyConfigResponse}
@@ -220,6 +255,13 @@ class OptimizelyFeature {
       'experimentRules': dynamicExperimentRules
     };
   }
+
+  @override
+  String toString() {
+    var encodedDeliveryRules = json.encode(deliveryRules);
+    var encodedExperimentRules = json.encode(experimentRules);
+    return 'OptimizelyFeature {id="$id", key="$key", deliveryRules="$encodedDeliveryRules", experimentRules="$encodedExperimentRules"}';
+  }
 }
 
 // Represents the experiment's map in {@link OptimizelyConfigResponse}
@@ -261,6 +303,12 @@ class OptimizelyExperiment {
       'audiences': audiences,
       'variationsMap': dynamicVariationsMap
     };
+  }
+
+  @override
+  String toString() {
+    var encodedVariationsMap = json.encode(variationsMap);
+    return 'OptimizelyExperiment {id="$id", key="$key", audiences="$audiences", variationsMap="$encodedVariationsMap"}';
   }
 }
 
@@ -308,6 +356,12 @@ class OptimizelyVariation {
       'variablesMap': dynamicVariablesMap
     };
   }
+
+  @override
+  String toString() {
+    var encodeVariablesMap = json.encode(variablesMap);
+    return 'OptimizelyVariation {id="$id", key="$key", featureEnabled="$featureEnabled", variablesMap="$encodeVariablesMap"}';
+  }
 }
 
 // Details of feature variable in {@link OptimizelyVariation}
@@ -329,4 +383,9 @@ class OptimizelyVariable {
 
   Map<String, dynamic> toJson() =>
       {'id': id, 'key': key, 'type': type, 'value': value};
+
+  @override
+  String toString() {
+    return 'OptimizelyVariable {id="$id", key="$key", type="$type", value="$value"}';
+  }
 }
