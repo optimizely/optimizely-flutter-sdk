@@ -42,10 +42,10 @@ class Constants {
   static const String addNotificationListenerMethod = "addNotificationListener";
   static const String removeNotificationListenerMethod =
       "removeNotificationListener";
-  static const String clearNotificationsMethod =
-      "clearNotifications";
-  static const String clearAllNotificationsMethod =
-      "clearAllNotifications";
+  static const String clearNotificationListenersMethod =
+      "clearNotificationListeners";
+  static const String clearAllNotificationListenersMethod =
+      "clearAllNotificationListeners";
   // Request parameter keys
   static const String id = "id";
   static const String sdkKey = "sdkKey";

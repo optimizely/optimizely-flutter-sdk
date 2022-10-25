@@ -66,7 +66,7 @@ public class Utils {
         return convertedOptions;
     }
 
-    public static Class getNotificationType(String notificationType) {
+    public static Class getNotificationListenerType(String notificationType) {
         if (notificationType == null || notificationType.isEmpty()) {
             return null;
         }

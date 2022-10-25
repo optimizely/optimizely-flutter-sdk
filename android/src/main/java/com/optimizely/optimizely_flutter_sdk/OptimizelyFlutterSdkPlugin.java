@@ -70,9 +70,9 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         removeNotificationListener(argumentsParser, result);
         break;
       }
-      case APIs.CLEAR_NOTIFICATIONS:
-      case APIs.CLEAR_ALL_NOTIFICATIONS: {
-        clearAllNotifications(argumentsParser, result);
+      case APIs.CLEAR_NOTIFICATION_LISTENERS:
+      case APIs.CLEAR_ALL_NOTIFICATION_LISTENERS: {
+        clearAllNotificationListeners(argumentsParser, result);
         break;
       }
       case APIs.GET_OPTIMIZELY_CONFIG: {

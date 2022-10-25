@@ -53,7 +53,7 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 import com.optimizely.optimizely_flutter_sdk.helper_classes.Utils;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
-import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.getNotificationType;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.getNotificationListenerType;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -482,7 +482,7 @@ public class OptimizelyFlutterClient {
         result.success(createResponse());
     }
 
-    protected void clearAllNotifications(ArgumentsParser argumentsParser, @NonNull Result result) {
+    protected void clearAllNotificationListeners(ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
         OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
         if (!isOptimizelyClientValid(sdkKey, optimizelyClient, result)) {
@@ -495,7 +495,7 @@ public class OptimizelyFlutterClient {
         if (type == null) {
             optimizelyClient.getNotificationCenter().clearAllNotificationListeners();
         } else {
-            optimizelyClient.getNotificationCenter().clearNotificationListeners(getNotificationType(type));
+            optimizelyClient.getNotificationCenter().clearNotificationListeners(getNotificationListenerType(type));
         }
         if (notificationIdsTracker.containsKey(sdkKey)) {
             for (Integer id: callBackIds) {

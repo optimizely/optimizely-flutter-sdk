@@ -147,27 +147,27 @@ class OptimizelyFlutterSdk {
         _sdkKey, userId, attributes);
   }
 
-  /// Allows user to clear all notification listeners of specific type.
+  /// Allows user to remove notification listener using id.
   ///
   /// Takes [int] id which allows user to remove that specific listener.
   /// Returns [BaseResponse] A object containing success result or reason of failure.
-  Future<BaseResponse> removeNotification(int id) async {
-    return await OptimizelyClientWrapper.removeNotification(_sdkKey, id);
+  Future<BaseResponse> removeNotificationListener(int id) async {
+    return await OptimizelyClientWrapper.removeNotificationListener(_sdkKey, id);
   }
 
   /// Allows user to clear all notification listeners of specific type.
   ///
   /// Takes [ListenerType] A listener type which allows user to remove only specific type of listeners.
   /// Returns [BaseResponse] A object containing success result or reason of failure.
-  Future<BaseResponse> clearNotifications(ListenerType listenerType) async {
-    return await OptimizelyClientWrapper.clearNotifications(_sdkKey, listenerType);
+  Future<BaseResponse> clearNotificationListeners(ListenerType listenerType) async {
+    return await OptimizelyClientWrapper.clearNotificationListeners(_sdkKey, listenerType);
   }
 
   /// Allows user to check and clear all notification listeners.
   ///
   /// Returns [BaseResponse] A object containing success result or reason of failure.
-  Future<BaseResponse> clearAllNotifications() async {
-    return await OptimizelyClientWrapper.clearAllNotifications(_sdkKey);
+  Future<BaseResponse> clearAllNotificationListeners() async {
+    return await OptimizelyClientWrapper.clearAllNotificationListeners(_sdkKey);
   }
 
   /// Checks if eventHandler are Closeable and calls close on them.

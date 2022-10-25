@@ -162,7 +162,7 @@ class OptimizelyClientWrapper {
   }
 
   /// Remove notification listener by notification id.
-  static Future<BaseResponse> removeNotification(String sdkKey, int id) async {
+  static Future<BaseResponse> removeNotificationListener(String sdkKey, int id) async {
     Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
       Constants.id: id
@@ -180,7 +180,7 @@ class OptimizelyClientWrapper {
   }
 
   /// Remove notification listeners by notification type.
-  static Future<BaseResponse> clearNotifications(String sdkKey, ListenerType listenerType) async {
+  static Future<BaseResponse> clearNotificationListeners(String sdkKey, ListenerType listenerType) async {
     var callbackIds = _clearAllCallbacks(sdkKey, listenerType);
     Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
@@ -188,19 +188,19 @@ class OptimizelyClientWrapper {
       Constants.callbackIds: callbackIds
     };
     final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.clearNotificationsMethod, request));
+        Constants.clearNotificationListenersMethod, request));
     return BaseResponse(result);
   }
 
   /// Removes all notification listeners.
-  static Future<BaseResponse> clearAllNotifications(String sdkKey) async {
+  static Future<BaseResponse> clearAllNotificationListeners(String sdkKey) async {
     var callbackIds = _clearAllCallbacks(sdkKey);
     Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
       Constants.callbackIds: callbackIds
     };
     final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.clearAllNotificationsMethod, request));
+        Constants.clearAllNotificationListenersMethod, request));
     return BaseResponse(result);
   }
 
