@@ -69,6 +69,7 @@ class OptimizelyClientWrapper {
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
     };
 
+    // clearing notification listeners, if they are mapped to the same sdkKey. 
     activateCallbacksById.remove(sdkKey);
     decisionCallbacksById.remove(sdkKey);
     trackCallbacksById.remove(sdkKey);
