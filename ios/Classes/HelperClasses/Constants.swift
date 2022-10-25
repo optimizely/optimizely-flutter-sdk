@@ -36,6 +36,8 @@ struct API {
     static let close = "close"
     static let addNotificationListener = "addNotificationListener"
     static let removeNotificationListener = "removeNotificationListener"
+    static let clearNotificationListeners = "clearNotificationListeners"
+    static let clearAllNotificationListeners = "clearAllNotificationListeners"
 }
 
 struct NotificationType {
@@ -60,6 +62,7 @@ struct RequestParameterKey {
     static let userContextId = "userContextId"
     static let notificationId = "id"
     static let notificationType = "type"
+    static let callbackIds = "callbackIds"
     static let notificationPayload = "payload"
     static let attributes = "attributes"
     static let decideKeys = "keys"

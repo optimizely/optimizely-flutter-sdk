@@ -22,7 +22,7 @@ import Foundation
 /// A wrapper around Optimizely Swift SDK that communicates with flutter using a channel
 public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     // to keep track of notification listener id's in-case they are to be removed in future
-    var notificationIdsTracker = [Int: Int]()
+    var notificationIdsTracker = [String: [Int: Int]]()
     // to keep track of optimizely clients against their sdkKeys
     var optimizelyClientsTracker = [String: OptimizelyClient?]()
     // to keep track of optimizely user contexts against their sdkKeys
@@ -50,6 +50,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.initialize: initialize(call, result: result)
         case API.addNotificationListener: addNotificationListener(call, result: result)
         case API.removeNotificationListener: removeNotificationListener(call, result: result)
+        case API.clearNotificationListeners, API.clearAllNotificationListeners: clearAllNotificationListeners(call, result: result)
         case API.getOptimizelyConfig: getOptimizelyConfig(call, result: result)
         case API.activate: activate(call, result: result)
         case API.getVariation: getVariation(call, result: result)
@@ -108,6 +109,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         userContextsTracker.removeValue(forKey: sdkKey)
         // Close and remove old client
         getOptimizelyClient(sdkKey: sdkKey)?.close()
+        notificationIdsTracker.removeValue(forKey: sdkKey)
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
@@ -126,7 +128,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Adds notification listeners to the optimizely client as requested
     func addNotificationListener(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let (parameters, optimizelyClient) = getParametersAndOptimizelyClient(arguments: call.arguments, result: result) else {
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
         guard let id = parameters[RequestParameterKey.notificationId] as? Int, let type = parameters[RequestParameterKey.notificationType] as? String else {
@@ -136,38 +141,73 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         var notificationId = 0
         switch type {
         case NotificationType.activate:
-            notificationId = (optimizelyClient.notificationCenter?.addActivateNotificationListener(activateListener: Utils.getActivateCallback(id: id)))!
+            notificationId = (optimizelyClient.notificationCenter?.addActivateNotificationListener(activateListener: Utils.getActivateCallback(id: id, sdkKey: sdkKey)))!
         case NotificationType.decision:
-            notificationId = (optimizelyClient.notificationCenter?.addDecisionNotificationListener(decisionListener: Utils.getDecisionCallback(id: id)))!
+            notificationId = (optimizelyClient.notificationCenter?.addDecisionNotificationListener(decisionListener: Utils.getDecisionCallback(id: id, sdkKey: sdkKey)))!
             break
         case NotificationType.track:
-            notificationId = (optimizelyClient.notificationCenter?.addTrackNotificationListener(trackListener: Utils.getTrackCallback(id: id)))!
+            notificationId = (optimizelyClient.notificationCenter?.addTrackNotificationListener(trackListener: Utils.getTrackCallback(id: id, sdkKey: sdkKey)))!
             break
         case NotificationType.logEvent:
-            notificationId = (optimizelyClient.notificationCenter?.addLogEventNotificationListener(logEventListener: Utils.getLogEventCallback(id: id)))!
+            notificationId = (optimizelyClient.notificationCenter?.addLogEventNotificationListener(logEventListener: Utils.getLogEventCallback(id: id, sdkKey: sdkKey)))!
             break
         case NotificationType.projectConfigUpdate:
-            let notificationId = optimizelyClient.notificationCenter?.addDatafileChangeNotificationListener(datafileListener:  Utils.getProjectConfigUpdateCallback(id: id))
+            let notificationId = optimizelyClient.notificationCenter?.addDatafileChangeNotificationListener(datafileListener:  Utils.getProjectConfigUpdateCallback(id: id, sdkKey: sdkKey))
             break
         default:
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
-        notificationIdsTracker[id] = notificationId
+        if notificationIdsTracker[sdkKey] == nil {
+            notificationIdsTracker[sdkKey] = [Int: Int]()
+        }
+        notificationIdsTracker[sdkKey]![id] = notificationId
         result(self.createResponse(success: true))
     }
     
     /// Removes notification listeners from the optimizely client as requested
     func removeNotificationListener(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let (parameters, optimizelyClient) = getParametersAndOptimizelyClient(arguments: call.arguments, result: result) else {
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
             return
         }
-        guard let id = parameters[RequestParameterKey.notificationId] as? Int, let notificationID = notificationIdsTracker[id] else {
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let notificationID = parameters[RequestParameterKey.notificationId] as? Int else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
         optimizelyClient.notificationCenter?.removeNotificationListener(notificationId: notificationID)
-        notificationIdsTracker.removeValue(forKey: id)
+        if notificationIdsTracker[sdkKey] != nil {
+            notificationIdsTracker[sdkKey]?.removeValue(forKey: notificationID)
+        }
+        result(self.createResponse(success: true))
+    }
+    
+    /// Removes all notification listeners from the optimizely client as requested
+    func clearAllNotificationListeners(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+
+        if let type = parameters[RequestParameterKey.notificationType] as? String, let convertedNotificationType = Utils.getNotificationType(type: type) {
+            // Remove listeners only for the provided type
+            optimizelyClient.notificationCenter?.clearNotificationListeners(type: convertedNotificationType)
+        } else {
+            // Remove all listeners if type is not provided
+            optimizelyClient.notificationCenter?.clearAllNotificationListeners()
+        }
+        
+        if let callBackIds = parameters[RequestParameterKey.callbackIds] as? [Int] {
+            if notificationIdsTracker[sdkKey] != nil {
+                for callbackId in callBackIds {
+                    notificationIdsTracker[sdkKey]?.removeValue(forKey: callbackId)
+                }
+            }
+        }
         result(self.createResponse(success: true))
     }
     
