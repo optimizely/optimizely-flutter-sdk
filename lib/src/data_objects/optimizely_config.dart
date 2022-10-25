@@ -359,8 +359,8 @@ class OptimizelyVariation {
 
   @override
   String toString() {
-    var encodeVariablesMap = json.encode(variablesMap);
-    return 'OptimizelyVariation {id="$id", key="$key", featureEnabled="$featureEnabled", variablesMap="$encodeVariablesMap"}';
+    var encodedVariablesMap = json.encode(variablesMap);
+    return 'OptimizelyVariation {id="$id", key="$key", featureEnabled="$featureEnabled", variablesMap="$encodedVariablesMap"}';
   }
 }
 
