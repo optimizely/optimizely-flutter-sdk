@@ -665,17 +665,6 @@ void main() {
       expect(response.reason, equals(Constants.removeAllForcedDecisions));
     });
     group("NotificationListeners", () {
-      test("addNotificationListener() should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        expect(sdk.addDecisionNotificationListener((_) => {}), completes);
-      });
-
-      test("removeNotificationListener() should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var cancelListener = sdk.addDecisionNotificationListener((_) => {});
-        expect(cancelListener, completes);
-      });
-
       test("should receive 1 notification due to same callback used", () async {
         var notifications = [];
         var sdk = OptimizelyFlutterSdk(testSDKKey);
