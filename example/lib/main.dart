@@ -102,7 +102,7 @@ class _MyAppState extends State<MyApp> {
     // variationKey: off
 
     // To cancel decide listener
-    // await flutterSDK.removeNotification(decideListenerId);
+    // await flutterSDK.removeNotificationListener(decideListenerId);
 
     // To add track listener
     var trackListenerID =
@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // To cancel track listener
-    //await flutterSDK.removeNotification(trackListenerID);
+    //await flutterSDK.removeNotificationListener(trackListenerID);
 
     if (!mounted) return;
   }
