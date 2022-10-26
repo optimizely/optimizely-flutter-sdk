@@ -152,15 +152,18 @@ class OptimizelyFlutterSdk {
   /// Takes [int] id which allows user to remove that specific listener.
   /// Returns [BaseResponse] A object containing success result or reason of failure.
   Future<BaseResponse> removeNotificationListener(int id) async {
-    return await OptimizelyClientWrapper.removeNotificationListener(_sdkKey, id);
+    return await OptimizelyClientWrapper.removeNotificationListener(
+        _sdkKey, id);
   }
 
   /// Allows user to clear all notification listeners of specific type.
   ///
   /// Takes [ListenerType] A listener type which allows user to remove only specific type of listeners.
   /// Returns [BaseResponse] A object containing success result or reason of failure.
-  Future<BaseResponse> clearNotificationListeners(ListenerType listenerType) async {
-    return await OptimizelyClientWrapper.clearNotificationListeners(_sdkKey, listenerType);
+  Future<BaseResponse> clearNotificationListeners(
+      ListenerType listenerType) async {
+    return await OptimizelyClientWrapper.clearNotificationListeners(
+        _sdkKey, listenerType);
   }
 
   /// Allows user to check and clear all notification listeners.

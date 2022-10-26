@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
       print("Parsed decision event ....................");
       print(notification.type);
       print(notification.userId);
-      print(notification);
+      print(notification.decisionInfo);
       print("decide notification received");
     });
 
@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
     // variationKey: off
 
     // Setting forced decision
-    userContext.setForcedDecision(
+    await userContext.setForcedDecision(
         OptimizelyDecisionContext("flag1", "flag1_experiment"),
         OptimizelyForcedDecision("variation_a"));
 
@@ -84,7 +84,7 @@ class _MyAppState extends State<MyApp> {
     // variationKey: variation_a
 
     // removing forced decision
-    userContext.removeForcedDecision(
+    await userContext.removeForcedDecision(
         OptimizelyDecisionContext("flag1", "flag1_experiment"));
 
     // Decide call
@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // To cancel track listener
-    //await flutterSDK.removeNotificationListener(trackListenerID);
+    await flutterSDK.removeNotificationListener(trackListenerID);
 
     if (!mounted) return;
   }
