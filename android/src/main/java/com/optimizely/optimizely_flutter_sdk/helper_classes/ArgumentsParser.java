@@ -31,12 +31,16 @@ public class ArgumentsParser {
         return (String) arguments.get(Constants.RequestParameterKey.SDK_KEY);
     }
 
-    public Integer getNotificaitonID() {
+    public Integer getNotificationID() {
         return (Integer) arguments.get(Constants.RequestParameterKey.NOTIFICATION_ID);
     }
 
     public String getNotificationType() {
         return (String) arguments.get(Constants.RequestParameterKey.NOTIFICATION_TYPE);
+    }
+
+    public List<Integer> getCallBackIds() {
+        return (List<Integer>) arguments.get(Constants.RequestParameterKey.CALLBACK_IDS);
     }
 
     public String getUserId() {

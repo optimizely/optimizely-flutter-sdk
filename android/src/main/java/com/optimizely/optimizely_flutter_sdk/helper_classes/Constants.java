@@ -36,6 +36,8 @@ public class Constants {
         public static final String DECIDE = "decide";
         public static final String ADD_NOTIFICATION_LISTENER = "addNotificationListener";
         public static final String REMOVE_NOTIFICATION_LISTENER = "removeNotificationListener";
+        public static final String CLEAR_ALL_NOTIFICATION_LISTENERS = "clearAllNotificationListeners";
+        public static final String CLEAR_NOTIFICATION_LISTENERS = "clearNotificationListeners";
     }
 
     public static class NotificationType {
@@ -52,6 +54,7 @@ public class Constants {
         public static final String USER_CONTEXT_ID = "userContextId";
         public static final String NOTIFICATION_ID = "id";
         public static final String NOTIFICATION_TYPE = "type";
+        public static final String CALLBACK_IDS = "callbackIds";
         public static final String NOTIFICATION_PAYLOAD = "payload";
         public static final String ATTRIBUTES = "attributes";
         public static final String DECIDE_KEYS = "keys";
