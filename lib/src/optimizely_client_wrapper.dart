@@ -69,7 +69,7 @@ class OptimizelyClientWrapper {
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
     };
 
-    // clearing notification listeners, if they are mapped to the same sdkKey. 
+    // clearing notification listeners, if they are mapped to the same sdkKey.
     activateCallbacksById.remove(sdkKey);
     decisionCallbacksById.remove(sdkKey);
     trackCallbacksById.remove(sdkKey);
@@ -162,11 +162,9 @@ class OptimizelyClientWrapper {
   }
 
   /// Remove notification listener by notification id.
-  static Future<BaseResponse> removeNotificationListener(String sdkKey, int id) async {
-    Map<String, dynamic> request = {
-      Constants.sdkKey: sdkKey,
-      Constants.id: id
-    };
+  static Future<BaseResponse> removeNotificationListener(
+      String sdkKey, int id) async {
+    Map<String, dynamic> request = {Constants.sdkKey: sdkKey, Constants.id: id};
 
     activateCallbacksById[sdkKey]?.remove(id);
     decisionCallbacksById[sdkKey]?.remove(id);
@@ -180,7 +178,8 @@ class OptimizelyClientWrapper {
   }
 
   /// Remove notification listeners by notification type.
-  static Future<BaseResponse> clearNotificationListeners(String sdkKey, ListenerType listenerType) async {
+  static Future<BaseResponse> clearNotificationListeners(
+      String sdkKey, ListenerType listenerType) async {
     var callbackIds = _clearAllCallbacks(sdkKey, listenerType);
     Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
@@ -193,7 +192,8 @@ class OptimizelyClientWrapper {
   }
 
   /// Removes all notification listeners.
-  static Future<BaseResponse> clearAllNotificationListeners(String sdkKey) async {
+  static Future<BaseResponse> clearAllNotificationListeners(
+      String sdkKey) async {
     var callbackIds = _clearAllCallbacks(sdkKey);
     Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
