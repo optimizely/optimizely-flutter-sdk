@@ -58,35 +58,35 @@ public class Utils: NSObject {
     }
     
     /// Returns callback required for LogEventListener
-    static func getLogEventCallback(id: Int) -> LogEventListener {
+    static func getLogEventCallback(id: Int, sdkKey: String) -> LogEventListener {
         
         let listener : LogEventListener = {(url, logEvent) in
             let listenerDict : [String : Any] = [
                 "url"       : url,
                 "params"    : logEvent as Any
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.logEvent)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.logEvent)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
         }
         
         return listener
     }
     
     /// Returns callback required for DatafileChangeListener
-    static func getProjectConfigUpdateCallback(id: Int) -> DatafileChangeListener {
+    static func getProjectConfigUpdateCallback(id: Int, sdkKey: String) -> DatafileChangeListener {
         
         let listener : DatafileChangeListener = { datafile in
             var listenerDict = [String : Any]()
             if let datafileMap = try? JSONSerialization.jsonObject(with: datafile, options: []) as? [String: Any] {
                 listenerDict["datafile"] = datafileMap
             }
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.projectConfigUpdate)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.projectConfigUpdate, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.projectConfigUpdate)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.projectConfigUpdate, RequestParameterKey.notificationPayload: listenerDict])
         }
         
         return listener
     }
     
     /// Returns callback required for ActivateListener
-    static func getActivateCallback(id: Int) -> ActivateListener {
+    static func getActivateCallback(id: Int, sdkKey: String) -> ActivateListener {
         let listener : ActivateListener = {(experiment, userId, attributes, variation, logEvents) in
             let listenerDict : [String : Any] = [
                 "experiment"   : experiment,
@@ -94,13 +94,13 @@ public class Utils: NSObject {
                 "attributes"   : attributes as Any,
                 "variation"    : variation
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.activate)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.activate, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.activate)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.activate, RequestParameterKey.notificationPayload: listenerDict])
         }
         return listener
     }
     
     /// Returns callback required for DecisionListener
-    static func getDecisionCallback(id: Int) -> DecisionListener {
+    static func getDecisionCallback(id: Int, sdkKey: String) -> DecisionListener {
         let listener : DecisionListener = {(type, userId, attributes, decisionInfo) in
             let listenerDict : [String : Any] = [
                 "type"        : type,
@@ -108,13 +108,13 @@ public class Utils: NSObject {
                 "attributes"  : attributes as Any,
                 "decisionInfo": decisionInfo
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.decision)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.decision)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
         }
         return listener
     }
     
     /// Returns callback required for TrackListener
-    static func getTrackCallback(id: Int) -> TrackListener {
+    static func getTrackCallback(id: Int, sdkKey: String) -> TrackListener {
         let listener : TrackListener = {(eventKey, userId, attributes, eventTags, event) in
             let listenerDict : [String : Any] = [
                 "attributes"   : attributes as Any,
@@ -123,7 +123,7 @@ public class Utils: NSObject {
                 "userId"       : userId,
                 //                "event": event as Any, This is causing codec related exceptions on flutter side, need to debug
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.track)CallbackListener", arguments: [RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
+            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.track)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
         }
         return listener
     }
@@ -166,5 +166,22 @@ public class Utils: NSObject {
          RequestParameterKey.variables: decision?.variables.toMap(),
          RequestParameterKey.reasons: decision?.reasons]
         return decisionMap
+    }
+    
+    static func getNotificationType(type: String) -> Optimizely.NotificationType? {
+        switch type {
+        case NotificationType.activate:
+            return Optimizely.NotificationType.activate
+        case NotificationType.decision:
+            return Optimizely.NotificationType.decision
+        case NotificationType.track:
+            return Optimizely.NotificationType.track
+        case NotificationType.logEvent:
+            return Optimizely.NotificationType.logEvent
+        case NotificationType.projectConfigUpdate:
+            return Optimizely.NotificationType.datafileChange
+        default:
+            return nil
+        }
     }
 }
