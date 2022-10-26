@@ -14,6 +14,8 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
+import 'dart:convert';
+
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
@@ -57,6 +59,14 @@ class Decision {
     if (json[Constants.reasons] is List<dynamic>) {
       reasons = List<String>.from(json[Constants.reasons]);
     }
+  }
+
+  @override
+  String toString() {
+    var encodedVariables = json.encode(variables);
+    var encodedUserContext = json.encode(userContext);
+    var reasonsString = reasons.join(",");
+    return 'Decision {variationKey="$variationKey", enabled="$enabled", variables="$encodedVariables", ruleKey="$ruleKey", flagKey="$flagKey", userContext="$encodedUserContext", reasons="$reasonsString"}';
   }
 }
 
