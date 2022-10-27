@@ -24,10 +24,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> runOptimizelySDK() async {
+    Set<OptimizelyDecideOption> defaultOptions = {
+      OptimizelyDecideOption.disableDecisionEvent,
+      OptimizelyDecideOption.enabledFlagsOnly
+    };
     var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
         datafilePeriodicDownloadInterval: 10 * 60,
         eventOptions: const EventOptions(
-            batchSize: 1, timeInterval: 60, maxQueueSize: 10000));
+            batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
+        defaultDecideOptions: defaultOptions);
     var response = await flutterSDK.initializeClient();
 
     setState(() {
@@ -58,8 +63,12 @@ class _MyAppState extends State<MyApp> {
       print("decide notification received");
     });
 
+    Set<OptimizelyDecideOption> options = {
+      OptimizelyDecideOption.ignoreUserProfileService,
+      OptimizelyDecideOption.includeReasons,
+    };
     // Decide call
-    var decideResponse = await userContext.decide('flag1');
+    var decideResponse = await userContext.decide('flag1', options);
     uiResponse +=
         "\nFirst decide call variationKey: ${decideResponse.decision!.variationKey}";
 
