@@ -320,10 +320,8 @@ class OptimizelyVariation {
   final Map<String, OptimizelyVariable> variablesMap;
 
   OptimizelyVariation(
-      {this.id,
-      this.key,
-      this.featureEnabled = false,
-      this.variablesMap = const {}});
+      {this.id, this.key, bool? featureEnabled, this.variablesMap = const {}})
+      : featureEnabled = featureEnabled ?? false;
 
   factory OptimizelyVariation.fromJson(Map<String, dynamic> parsedJson) {
     Map<String, OptimizelyVariable>? tempVariablesMap = {};
