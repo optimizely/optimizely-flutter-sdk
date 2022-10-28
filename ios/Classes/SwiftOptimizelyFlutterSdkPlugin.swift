@@ -93,6 +93,12 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
         let eventDispatcher = DefaultEventDispatcher(batchSize: batchSize, backingStore: .file, dataStoreName: "OPTEventQueue", timerInterval: timeInterval, maxQueueSize: maxQueueSize)
         
+        var decideOptions: [String]?
+        if let options = parameters[RequestParameterKey.decideOptions] as? [String] {
+            decideOptions = options
+        }
+        let defaultDecideOptions = Utils.getDecideOptions(options: decideOptions)
+        
         // Datafile Download Interval
         var datafilePeriodicDownloadInterval = 10 * 60 // seconds
         
@@ -113,7 +119,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
-        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, datafileHandler: datafileHandler, periodicDownloadInterval: datafilePeriodicDownloadInterval)
+        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, datafileHandler: datafileHandler, periodicDownloadInterval: datafilePeriodicDownloadInterval, defaultDecideOptions: defaultDecideOptions)
         
         optimizelyInstance.start{ [weak self] res in
             switch res {
