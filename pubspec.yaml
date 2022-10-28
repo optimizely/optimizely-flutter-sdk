@@ -1,6 +1,6 @@
 name: optimizely_flutter_sdk
 description: This repository houses the Flutter SDK for use with Optimizely Full Stack and Optimizely Rollouts.
-version: 0.1.1-beta
+version: 0.1.2-beta
 homepage: https://github.com/optimizely/optimizely-flutter-sdk
 
 environment:
