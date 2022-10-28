@@ -552,16 +552,23 @@ void main() {
         return true;
       }
 
-      Set<OptimizelyDecideOption> options = {
+      Set<OptimizelyDecideOption> defaultDecideOptions = {
         OptimizelyDecideOption.disableDecisionEvent,
-        OptimizelyDecideOption.enabledFlagsOnly,
+        OptimizelyDecideOption.enabledFlagsOnly
+      };
+      Set<OptimizelyDecideOption> options = {
         OptimizelyDecideOption.ignoreUserProfileService,
         OptimizelyDecideOption.includeReasons,
         OptimizelyDecideOption.excludeVariables,
       };
-
       test("decide() should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        Set<OptimizelyDecideOption> options = {
+          OptimizelyDecideOption.ignoreUserProfileService,
+          OptimizelyDecideOption.includeReasons,
+          OptimizelyDecideOption.excludeVariables,
+        };
+        var sdk = OptimizelyFlutterSdk(testSDKKey,
+            defaultDecideOptions: defaultDecideOptions);
         var userContext = await sdk.createUserContext(userId, attributes);
         var decideKey = "decide-key";
 
@@ -573,13 +580,14 @@ void main() {
             TestUtils.compareDecisions(
                 {response.decision!.flagKey: response.decision!}),
             equals(true));
-        expect(decideOptions.length == 5, isTrue);
+        expect(decideOptions.length == 3, isTrue);
         expect(assertDecideOptions(options, decideOptions), isTrue);
         decideOptions = [];
       });
 
       test("decideForKeys should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var sdk = OptimizelyFlutterSdk(testSDKKey,
+            defaultDecideOptions: defaultDecideOptions);
         var userContext = await sdk.createUserContext(userId, attributes);
         var decideKeys = ["decide-key-1", "decide-key-2"];
 
@@ -588,13 +596,14 @@ void main() {
         expect(response.success, isTrue);
         expect(response.decisions.length, equals(2));
         expect(TestUtils.compareDecisions(response.decisions), isTrue);
-        expect(decideOptions.length == 5, isTrue);
+        expect(decideOptions.length == 3, isTrue);
         expect(assertDecideOptions(options, decideOptions), isTrue);
         decideOptions = [];
       });
 
       test("decideAll() should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
+        var sdk = OptimizelyFlutterSdk(testSDKKey,
+            defaultDecideOptions: defaultDecideOptions);
         var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!.decideAll(options);
@@ -602,7 +611,7 @@ void main() {
         expect(response.success, isTrue);
         expect(response.decisions.length, equals(3));
         expect(TestUtils.compareDecisions(response.decisions), isTrue);
-        expect(decideOptions.length == 5, isTrue);
+        expect(decideOptions.length == 3, isTrue);
         expect(assertDecideOptions(options, decideOptions), isTrue);
         decideOptions = [];
       });
@@ -611,8 +620,16 @@ void main() {
         final convertedOptions = Utils.convertDecideOptions(
           options,
         );
-        expect(convertedOptions.length == 5, isTrue);
+        expect(convertedOptions.length == 3, isTrue);
         expect(assertDecideOptions(options, convertedOptions), isTrue);
+        final convertedDefaultDecideOptions = Utils.convertDecideOptions(
+          defaultDecideOptions,
+        );
+        expect(convertedDefaultDecideOptions.length == 2, isTrue);
+        expect(
+            assertDecideOptions(
+                defaultDecideOptions, convertedDefaultDecideOptions),
+            isTrue);
       });
     });
 

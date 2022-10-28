@@ -49,30 +49,36 @@ export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
-/// To use, create an instance of OptimizelyFlutterSdk class with a valid sdkKey, datafilePeriodicDownloadInterval (optional), eventOptions (optional) and
+/// To use, create an instance of OptimizelyFlutterSdk class with a valid sdkKey, datafilePeriodicDownloadInterval (optional), eventOptions (optional) , defaultDecideOptions (optional) and
 /// call initializeClient method.
-/// If successfull, call createUserContext to setup user context.
+/// If successful, call createUserContext to setup user context.
 /// Once done, all API's should be available.
 class OptimizelyFlutterSdk {
   final String _sdkKey;
   final EventOptions _eventOptions;
   final int _datafilePeriodicDownloadInterval;
   final Map<ClientPlatform, DatafileHostOptions> _datafileHostOptions;
-
+  final Set<OptimizelyDecideOption> _defaultDecideOptions;
   OptimizelyFlutterSdk(
     this._sdkKey, {
     EventOptions eventOptions = const EventOptions(),
     int datafilePeriodicDownloadInterval =
         10 * 60, // Default time interval in seconds
     Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
+    Set<OptimizelyDecideOption> defaultDecideOptions = const {},
   })  : _eventOptions = eventOptions,
         _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
-        _datafileHostOptions = datafileHostOptions;
+        _datafileHostOptions = datafileHostOptions,
+        _defaultDecideOptions = defaultDecideOptions;
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   Future<BaseResponse> initializeClient() async {
-    return await OptimizelyClientWrapper.initializeClient(_sdkKey,
-        _eventOptions, _datafilePeriodicDownloadInterval, _datafileHostOptions);
+    return await OptimizelyClientWrapper.initializeClient(
+        _sdkKey,
+        _eventOptions,
+        _datafilePeriodicDownloadInterval,
+        _datafileHostOptions,
+        _defaultDecideOptions);
   }
 
   /// Use the activate method to start an experiment.

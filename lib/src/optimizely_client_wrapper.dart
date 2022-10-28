@@ -58,12 +58,15 @@ class OptimizelyClientWrapper {
       String sdkKey,
       EventOptions eventOptions,
       int datafilePeriodicDownloadInterval,
-      Map<ClientPlatform, DatafileHostOptions> datafileHostOptions) async {
+      Map<ClientPlatform, DatafileHostOptions> datafileHostOptions,
+      Set<OptimizelyDecideOption> defaultDecideOptions) async {
     _channel.setMethodCallHandler(methodCallHandler);
+    final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
       Constants.datafilePeriodicDownloadInterval:
           datafilePeriodicDownloadInterval,
+      Constants.optimizelyDecideOption: convertedOptions,
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,

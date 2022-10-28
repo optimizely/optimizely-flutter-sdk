@@ -125,6 +125,8 @@ public class OptimizelyFlutterClient {
         }
         optimizelyManagerTracker.remove(sdkKey);
         notificationIdsTracker.remove(sdkKey);
+
+        List<OptimizelyDecideOption> defaultDecideOptions = argumentsParser.getDecideOptions();
         // Creating new instance
         OptimizelyManager optimizelyManager = OptimizelyManager.builder()
                 .withEventProcessor(batchProcessor)
@@ -132,6 +134,7 @@ public class OptimizelyFlutterClient {
                 .withNotificationCenter(notificationCenter)
                 .withDatafileDownloadInterval(datafilePeriodicDownloadInterval, TimeUnit.SECONDS)
                 .withErrorHandler(new RaiseExceptionErrorHandler())
+                .withDefaultDecideOptions(defaultDecideOptions)
                 .withSDKKey(sdkKey)
                 .build(context);
 
