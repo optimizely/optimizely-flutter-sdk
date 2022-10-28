@@ -25,8 +25,8 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> runOptimizelySDK() async {
     Set<OptimizelyDecideOption> defaultOptions = {
-      OptimizelyDecideOption.disableDecisionEvent,
-      OptimizelyDecideOption.enabledFlagsOnly
+      OptimizelyDecideOption.includeReasons,
+      OptimizelyDecideOption.excludeVariables
     };
     var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
         datafilePeriodicDownloadInterval: 10 * 60,
@@ -65,7 +65,6 @@ class _MyAppState extends State<MyApp> {
 
     Set<OptimizelyDecideOption> options = {
       OptimizelyDecideOption.ignoreUserProfileService,
-      OptimizelyDecideOption.includeReasons,
     };
     // Decide call
     var decideResponse = await userContext.decide('flag1', options);
