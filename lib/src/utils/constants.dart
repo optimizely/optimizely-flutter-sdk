@@ -85,7 +85,7 @@ class Constants {
   static const String decisionCallBackListener = "decisionCallbackListener";
   static const String logEventCallbackListener = "logEventCallbackListener";
   static const String configUpdateCallBackListener =
-      "projectConfigUpdateCallBackListener";
+      "projectConfigUpdateCallbackListener";
 
   // OptimizelyConfig Request params
   static const String audiences = "audiences";

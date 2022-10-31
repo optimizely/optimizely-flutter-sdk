@@ -29,6 +29,6 @@
 * addActivateNotificationListener
 * addTrackNotificationListener
 * addLogEventNotificationListener
-* addUpdateConfigNotificationListener
+* addConfigUpdateNotificationListener
 
 ### **Documentation will be available soon in final release**
