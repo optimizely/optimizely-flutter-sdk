@@ -29,7 +29,7 @@ Other Flutter platforms are not currently supported by this SDK.
 To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
 
 ```
-   optimizely_flutter_sdk: ^0.1.2-beta
+   optimizely_flutter_sdk: ^1.0.0-beta
 ```
 
 Then, import the package in your application code:
@@ -53,6 +53,7 @@ A sample code for SDK initialization:
 ```
    import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
+   // Also supports eventOptions, datafilePeriodicDownloadInterval, datafileHostOptions and defaultDecideOptions
    var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
 
    // instantiate a client
