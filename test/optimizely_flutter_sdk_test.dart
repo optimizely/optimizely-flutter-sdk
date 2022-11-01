@@ -691,7 +691,7 @@ void main() {
         };
         await sdk.addDecisionNotificationListener(callback);
         await sdk.addLogEventNotificationListener(callback);
-        await sdk.addUpdateConfigNotificationListener(callback);
+        await sdk.addConfigUpdateNotificationListener(callback);
         await sdk.addTrackNotificationListener(callback);
         await sdk.addActivateNotificationListener(callback);
         var callHandler = OptimizelyClientWrapper.methodCallHandler;
@@ -716,7 +716,7 @@ void main() {
         await sdk.addLogEventNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addTrackNotificationListener((msg) {
@@ -767,10 +767,10 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -830,7 +830,7 @@ void main() {
         await sdk1.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk1.addUpdateConfigNotificationListener((msg) {
+        await sdk1.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk1.addActivateNotificationListener((msg) {
@@ -846,7 +846,7 @@ void main() {
         await sdk2.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk2.addUpdateConfigNotificationListener((msg) {
+        await sdk2.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk2.addActivateNotificationListener((msg) {
@@ -905,7 +905,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -920,7 +920,7 @@ void main() {
           notifications.add(msg);
         });
         await sdk.removeNotificationListener(id);
-        id = await sdk.addUpdateConfigNotificationListener((msg) {
+        id = await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.removeNotificationListener(id);
@@ -974,7 +974,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -1016,7 +1016,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -1058,7 +1058,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -1100,7 +1100,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -1141,7 +1141,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -1182,7 +1182,7 @@ void main() {
         await sdk.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk.addUpdateConfigNotificationListener((msg) {
+        await sdk.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk.addActivateNotificationListener((msg) {
@@ -1245,7 +1245,7 @@ void main() {
         await sdk1.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk1.addUpdateConfigNotificationListener((msg) {
+        await sdk1.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk1.addActivateNotificationListener((msg) {
@@ -1261,7 +1261,7 @@ void main() {
         await sdk2.addTrackNotificationListener((msg) {
           notifications.add(msg);
         });
-        await sdk2.addUpdateConfigNotificationListener((msg) {
+        await sdk2.addConfigUpdateNotificationListener((msg) {
           notifications.add(msg);
         });
         await sdk2.addActivateNotificationListener((msg) {

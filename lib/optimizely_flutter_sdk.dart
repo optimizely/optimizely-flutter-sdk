@@ -226,7 +226,7 @@ class OptimizelyFlutterSdk {
   ///
   /// Takes [callback] A [MultiUseCallback] notification handler to be added.
   /// Returns [int] Id of registered listener that allows the user to remove the added notification listener.
-  Future<int> addUpdateConfigNotificationListener(
+  Future<int> addConfigUpdateNotificationListener(
       MultiUseCallback callback) async {
     return await _addConfigUpdateNotificationListener(callback);
   }

@@ -105,7 +105,7 @@ public class OptimizelyFlutterClient {
                 .build();
 
         // Datafile Download Interval
-        long datafilePeriodicDownloadInterval = 10 * 60; // seconds
+        long datafilePeriodicDownloadInterval = 15 * 60; // seconds
 
         if (argumentsParser.getDatafilePeriodicDownloadInterval() != null) {
             datafilePeriodicDownloadInterval = argumentsParser.getDatafilePeriodicDownloadInterval();
