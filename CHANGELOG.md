@@ -34,5 +34,3 @@
 	- getForcedDecision
 	- removeForcedDecision
 	- removeAllForcedDecisions
-
-### **Documentation will be available soon in final release**
