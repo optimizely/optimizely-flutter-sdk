@@ -27,8 +27,6 @@ Other Flutter platforms are not currently supported by this SDK.
 
 ### Install the SDK
 
-### Packages
-
 To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
 
 ```
@@ -37,15 +35,15 @@ To add the flutter-sdk to your project dependencies, include the following in yo
 
 Then run 
 
-```
-flutter pub get
+```bash
+   flutter pub get
 ```
 
 ## Use the Flutter SDK
 
 A sample code for SDK initialization:
 
-```
+```dart
    var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
    var response = await flutterSDK.initializeClient();
 ```
@@ -54,14 +52,12 @@ A sample code for SDK initialization:
 
 Then, import the package in your application code:
 
-```
+```dart
    import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 ```
 
 ### Feature Rollouts
-```
-   import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
-
+```dart
    // Also supports eventOptions, datafilePeriodicDownloadInterval, datafileHostOptions and defaultDecideOptions
    var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
 
@@ -81,8 +77,11 @@ Then, import the package in your application code:
 
 ### Unit Tests
 
-1. To run [unit tests](https://docs.flutter.dev/cookbook/testing/unit/introduction) using terminal, simply use the following command:
-`flutter test test/optimizely_flutter_sdk_test.dart`
+1. To run [unit tests](https://docs.flutter.dev/cookbook/testing/unit/introduction) using terminal, simply use the following command
+
+```bash
+flutter test test/optimizely_flutter_sdk_test.dart
+```
 
 ### Contributing
 
