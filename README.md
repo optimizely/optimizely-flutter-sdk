@@ -4,10 +4,8 @@
 [![Pub](https://img.shields.io/pub/v/optimizely_flutter_sdk.svg)](https://pub.dev/packages/optimizely_flutter_sdk)
 [![Coverage Status](https://coveralls.io/repos/github/optimizely/optimizely-flutter-sdk/badge.svg?branch=master)](https://coveralls.io/github/optimizely/optimizely-flutter-sdk?branch=master)
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+This project is the official release for a Flutter
+[plug-in package](https://flutter.dev/developing-packages/) to support Optimizely Feature Experimentation, Optimizely Full Stack (legacy), and Optimizely Rollouts.  It is a specialized package that includes platform-specific implementation code for Android and/or iOS.
 
 ## Getting Started
 
