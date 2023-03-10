@@ -41,27 +41,28 @@ Then run
 
 ## Use the Flutter SDK
 
-A sample code for SDK initialization:
-
-```dart
-   var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
-   var response = await flutterSDK.initializeClient();
-```
-
 ### Initialization
 
-Then, import the package in your application code:
+Import the package in your application code:
 
 ```dart
    import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 ```
 
+Instantiate the SDK, adding your SDK Key and initializing the client:
+
+```dart
+   var flutterSDK = OptimizelyFlutterSdk("your_sdk_key");
+   var response = await flutterSDK.initializeClient();
+```
+
 ### Feature Rollouts
 ```dart
-   // Also supports eventOptions, datafilePeriodicDownloadInterval, datafileHostOptions and defaultDecideOptions
-   var flutterSDK = OptimizelyFlutterSdk("my_sdk_key");
+   import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
-   // instantiate a client
+   // Also supports eventOptions, datafilePeriodicDownloadInterval, datafileHostOptions and defaultDecideOptions
+   var flutterSDK = OptimizelyFlutterSdk("your_sdk_key");
+
    var response = await flutterSDK.initializeClient();
 
    // User attributes are optional and used for targeting and results segmentation
@@ -69,7 +70,7 @@ Then, import the package in your application code:
       "state": "California",
       "likes_donuts": true
    };
-   var user = await flutterSDK.createUserContext("optimizely end user", attributes);
+   var user = await flutterSDK.createUserContext("user_id", attributes);
    var decideReponse = await user!.decide("binary_feature");
 ```
 
@@ -77,7 +78,7 @@ Then, import the package in your application code:
 
 ### Unit Tests
 
-1. To run [unit tests](https://docs.flutter.dev/cookbook/testing/unit/introduction) using terminal, simply use the following command
+To run [unit tests](https://docs.flutter.dev/cookbook/testing/unit/introduction) using terminal, simply use the following command:
 
 ```bash
 flutter test test/optimizely_flutter_sdk_test.dart
@@ -86,7 +87,6 @@ flutter test test/optimizely_flutter_sdk_test.dart
 ### Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md).
-
 
 ### Other Optimizely SDKs
 
