@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.name                = 'optimizely_flutter_sdk'
   s.version             = '0.0.1'
   s.summary             = 'Optimizely experiment framework for iOS'
-  s.homepage            = "https://docs.developers.optimizely.com/full-stack/docs"
+  s.homepage            = "https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs"
   s.license             = { :type => "Apache License, Version 2.0", :file => "../LICENSE" }
   s.author              = { "Optimizely" => "support@optimizely.com" }
   s.source              = { :path => '.' }
