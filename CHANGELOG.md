@@ -1,5 +1,11 @@
 # Optimizely Flutter SDK Changelog
-## [1.0.0-beta] - November 3rd, 2022
+## 1.0.1-beta
+March 10, 2022
+
+* We updated our README.md and other non-functional code to reflect that this SDK supports both Optimizely Feature Experimentation and Optimizely Full Stack. ([#44](https://github.com/optimizely/optimizely-flutter-sdk/pull/44)).
+
+## 1.0.0-beta
+November 3, 2022
 **Beta release of the Optimizely X Full Stack Flutter SDK.**
 
 ### New Features
