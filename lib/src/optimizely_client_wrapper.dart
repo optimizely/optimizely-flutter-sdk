@@ -198,7 +198,7 @@ class OptimizelyClientWrapper {
   /// Returns the device vuid (read only)
   static Future<GetVuidResponse> getVuid(String sdkKey) async {
     final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getVuid, {
+        await _channel.invokeMethod(Constants.getVuidMethod, {
       Constants.sdkKey: sdkKey,
     }));
     return GetVuidResponse(result);

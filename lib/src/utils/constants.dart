@@ -49,7 +49,11 @@ class Constants {
 
   // Odp Supported Method Names
   static const String sendOdpEventMethod = "sendOdpEvent";
-  static const String getVuid = "getVuid";
+  static const String getVuidMethod = "getVuid";
+  static const String getQualifiedSegmentsMethod = "getQualifiedSegments";
+  static const String setQualifiedSegmentsMethod = "setQualifiedSegments";
+  static const String isQualifiedForMethod = "isQualifiedFor";
+  static const String fetchQualifiedSegmentsMethod = "fetchQualifiedSegments";
 
   // Request parameter keys
   static const String id = "id";
@@ -62,6 +66,8 @@ class Constants {
   static const String vuid = "vuid";
   static const String experimentKey = "experimentKey";
   static const String attributes = "attributes";
+  static const String qualifiedSegments = "qualifiedSegments";
+  static const String segment = "segment";
   static const String decisionInfo = "decisionInfo";
   static const String variables = "variables";
   static const String reasons = "reasons";
@@ -75,6 +81,7 @@ class Constants {
   static const String ruleKey = "ruleKey";
   static const String enabled = "enabled";
   static const String optimizelyDecideOption = "optimizelyDecideOption";
+  static const String optimizelySegmentOption = "optimizelySegmentOption";
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";

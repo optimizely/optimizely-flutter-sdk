@@ -35,7 +35,7 @@ export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decisi
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_context.dart'
     show OptimizelyDecisionContext;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart'
-    show OptimizelyUserContext, OptimizelyDecideOption;
+    show OptimizelyUserContext, OptimizelyDecideOption, OptimizelySegmentOption;
 export 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart'
     show Decision;
 export 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart'
@@ -150,9 +150,9 @@ class OptimizelyFlutterSdk {
   /// Send an event to the ODP server.
   ///
   /// Takes [action] The event action name.
-  /// Takes [type] The event type (default = "fullstack").
-  /// Takes [identifiers] A dictionary for identifiers.
-  /// Takes [data] A dictionary for associated data. The default event data will be added to this data before sending to the ODP server.
+  /// Optional [type] The event type (default = "fullstack").
+  /// Optional [identifiers] A dictionary for identifiers.
+  /// Optional [data] A dictionary for associated data. The default event data will be added to this data before sending to the ODP server.
   /// Returns [BaseResponse] A object containing success result or reason of failure.
   Future<BaseResponse> sendOdpEvent(String action,
       {String? type,
@@ -173,7 +173,7 @@ class OptimizelyFlutterSdk {
   ///
   /// NOTE: A user context will only be created successfully when the SDK is fully configured using initializeClient.
   ///
-  /// Takes [userId] the [String] user ID to be used for bucketing.
+  /// Optional [userId] the [String] user ID to be used for bucketing.
   /// Takes [attributes] An Optional [Map] of attribute names to current user attribute values.
   /// Returns An [OptimizelyUserContext] associated with this OptimizelyClient.
   Future<OptimizelyUserContext?> createUserContext(

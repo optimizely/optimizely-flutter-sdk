@@ -1,5 +1,5 @@
 /// **************************************************************************
-/// Copyright 2022, Optimizely, Inc. and contributors                        *
+/// Copyright 2022-2023, Optimizely, Inc. and contributors                   *
 ///                                                                          *
 /// Licensed under the Apache License, Version 2.0 (the "License");          *
 /// you may not use this file except in compliance with the License.         *
@@ -21,6 +21,8 @@ import 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_attributes_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_user_id_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_qualified_segments_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/fetch_qualified_segments_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
@@ -41,6 +43,16 @@ enum OptimizelyDecideOption {
 
   /// exclude variable values from the decision result.
   excludeVariables
+}
+
+/// Options controlling audience segments.
+///
+enum OptimizelySegmentOption {
+  /// ignore odp cache (save/lookup)
+  ignoreCache,
+
+  /// resets odp cache
+  resetCache,
 }
 
 /// An object for user contexts that the SDK will use to make decisions for.
@@ -84,6 +96,62 @@ class OptimizelyUserContext {
       Constants.attributes: Utils.convertToTypedMap(attributes)
     }));
     return BaseResponse(result);
+  }
+
+  /// Returns [GetQualifiedSegmentsResponse] object containing an array of segment names that the user is qualified for.
+  Future<GetQualifiedSegmentsResponse> getQualifiedSegments() async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getQualifiedSegmentsMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+    }));
+    return GetQualifiedSegmentsResponse(result);
+  }
+
+  /// Sets qualified segments for the user context.
+  ///
+  /// Takes [qualifiedSegments] A [List] of strings specifying qualified segments for the user.
+  /// Returns [BaseResponse]
+  Future<BaseResponse> setQualifiedSegments(
+      List<String> qualifiedSegments) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.setQualifiedSegmentsMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+      Constants.qualifiedSegments: qualifiedSegments
+    }));
+    return BaseResponse(result);
+  }
+
+  /// Checks if the user is qualified for the given segment.
+  ///
+  /// Takes [segment] The segment name to check qualification for.
+  /// Returns [BaseResponse]
+  Future<BaseResponse> isQualifiedFor(String segment) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.isQualifiedForMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+      Constants.segment: segment
+    }));
+    return BaseResponse(result);
+  }
+
+  /// Fetch all qualified segments for the user context.
+  ///
+  /// The segments fetched will be saved in **qualifiedSegments** and can be accessed any time using **getQualifiedSegments**.
+  /// On failure, **qualifiedSegments** will be nil and an error will be returned.
+  /// Optional [options] A set of [OptimizelySegmentOption] for fetching qualified segments.
+  /// Returns [FetchQualifiedSegmentsResponse] On success, it returns an array of segment names that the user is qualified for. On failure, ir returns the reason of failure.
+  Future<FetchQualifiedSegmentsResponse> fetchQualifiedSegments(
+      [Set<OptimizelySegmentOption> options = const {}]) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.fetchQualifiedSegmentsMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+      Constants.optimizelySegmentOption: Utils.convertSegmentOptions(options),
+    }));
+    return FetchQualifiedSegmentsResponse(result);
   }
 
   /// Tracks an event.
