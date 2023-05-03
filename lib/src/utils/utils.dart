@@ -28,11 +28,6 @@ class Utils {
     OptimizelyDecideOption.excludeVariables: "excludeVariables",
   };
 
-  static Map<OptimizelySegmentOption, String> segmentOptions = {
-    OptimizelySegmentOption.ignoreCache: "ignoreCache",
-    OptimizelySegmentOption.resetCache: "resetCache",
-  };
-
   static Map<String, dynamic> convertToTypedMap(Map<String, dynamic> map) {
     if (map.isEmpty) {
       return map;
@@ -88,10 +83,5 @@ class Utils {
   static List<String> convertDecideOptions(
       Set<OptimizelyDecideOption> options) {
     return options.map((option) => Utils.decideOptions[option]!).toList();
-  }
-
-  static List<String> convertSegmentOptions(
-      Set<OptimizelySegmentOption> options) {
-    return options.map((option) => Utils.segmentOptions[option]!).toList();
   }
 }

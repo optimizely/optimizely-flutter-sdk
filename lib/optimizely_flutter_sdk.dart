@@ -1,5 +1,5 @@
 /// **************************************************************************
-/// Copyright 2022-2023, Optimizely, Inc. and contributors                   *
+/// Copyright 2022, Optimizely, Inc. and contributors                        *
 ///                                                                          *
 /// Licensed under the Apache License, Version 2.0 (the "License");          *
 /// you may not use this file except in compliance with the License.         *
@@ -21,8 +21,6 @@ import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/get_vuid_response.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/sdk_settings.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
@@ -35,7 +33,7 @@ export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decisi
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_decision_context.dart'
     show OptimizelyDecisionContext;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart'
-    show OptimizelyUserContext, OptimizelyDecideOption, OptimizelySegmentOption;
+    show OptimizelyUserContext, OptimizelyDecideOption;
 export 'package:optimizely_flutter_sdk/src/data_objects/decide_response.dart'
     show Decision;
 export 'package:optimizely_flutter_sdk/src/data_objects/track_listener_response.dart'
@@ -46,8 +44,6 @@ export 'package:optimizely_flutter_sdk/src/data_objects/logevent_listener_respon
     show LogEventListenerResponse;
 export 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart'
     show EventOptions;
-export 'package:optimizely_flutter_sdk/src/data_objects/sdk_settings.dart'
-    show SDKSettings;
 export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
     show DatafileHostOptions;
 
@@ -63,19 +59,17 @@ class OptimizelyFlutterSdk {
   final int _datafilePeriodicDownloadInterval;
   final Map<ClientPlatform, DatafileHostOptions> _datafileHostOptions;
   final Set<OptimizelyDecideOption> _defaultDecideOptions;
-  final SDKSettings _sdkSettings;
-  OptimizelyFlutterSdk(this._sdkKey,
-      {EventOptions eventOptions = const EventOptions(),
-      int datafilePeriodicDownloadInterval =
-          10 * 60, // Default time interval in seconds
-      Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
-      Set<OptimizelyDecideOption> defaultDecideOptions = const {},
-      SDKSettings sdkSettings = const SDKSettings()})
-      : _eventOptions = eventOptions,
+  OptimizelyFlutterSdk(
+    this._sdkKey, {
+    EventOptions eventOptions = const EventOptions(),
+    int datafilePeriodicDownloadInterval =
+        10 * 60, // Default time interval in seconds
+    Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
+    Set<OptimizelyDecideOption> defaultDecideOptions = const {},
+  })  : _eventOptions = eventOptions,
         _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
         _datafileHostOptions = datafileHostOptions,
-        _defaultDecideOptions = defaultDecideOptions,
-        _sdkSettings = sdkSettings;
+        _defaultDecideOptions = defaultDecideOptions;
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   Future<BaseResponse> initializeClient() async {
@@ -84,8 +78,7 @@ class OptimizelyFlutterSdk {
         _eventOptions,
         _datafilePeriodicDownloadInterval,
         _datafileHostOptions,
-        _defaultDecideOptions,
-        _sdkSettings);
+        _defaultDecideOptions);
   }
 
   /// Use the activate method to start an experiment.
@@ -147,40 +140,17 @@ class OptimizelyFlutterSdk {
     return await OptimizelyClientWrapper.getOptimizelyConfig(_sdkKey);
   }
 
-  /// Send an event to the ODP server.
-  ///
-  /// Takes [action] The event action name.
-  /// Optional [type] The event type (default = "fullstack").
-  /// Optional [identifiers] A dictionary for identifiers.
-  /// Optional [data] A dictionary for associated data. The default event data will be added to this data before sending to the ODP server.
-  /// Returns [BaseResponse] A object containing success result or reason of failure.
-  Future<BaseResponse> sendOdpEvent(String action,
-      {String? type,
-      Map<String, String> identifiers = const {},
-      Map<String, dynamic> data = const {}}) async {
-    return await OptimizelyClientWrapper.sendOdpEvent(_sdkKey, action,
-        type: type, identifiers: identifiers, data: data);
-  }
-
-  /// Returns the device vuid.
-  ///
-  /// Returns [GetVuidResponse] A object containing device vuid
-  Future<GetVuidResponse> getVuid() async {
-    return await OptimizelyClientWrapper.getVuid(_sdkKey);
-  }
-
   /// Creates a context of the user for which decision APIs will be called.
   ///
   /// NOTE: A user context will only be created successfully when the SDK is fully configured using initializeClient.
   ///
-  /// Optional [userId] the [String] user ID to be used for bucketing.
-  /// The device vuid will be used as an userId when userId is not provided.
+  /// Takes [userId] the [String] user ID to be used for bucketing.
   /// Takes [attributes] An Optional [Map] of attribute names to current user attribute values.
   /// Returns An [OptimizelyUserContext] associated with this OptimizelyClient.
-  Future<OptimizelyUserContext?> createUserContext(
-      {String? userId, Map<String, dynamic> attributes = const {}}) async {
-    return await OptimizelyClientWrapper.createUserContext(_sdkKey,
-        userId: userId, attributes: attributes);
+  Future<OptimizelyUserContext?> createUserContext(String userId,
+      [Map<String, dynamic> attributes = const {}]) async {
+    return await OptimizelyClientWrapper.createUserContext(
+        _sdkKey, userId, attributes);
   }
 
   /// Allows user to remove notification listener using id.

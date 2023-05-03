@@ -43,8 +43,7 @@ class _MyAppState extends State<MyApp> {
     var randomUserName = "${rng.nextInt(1000)}";
 
     // Create user context
-    var userContext =
-        await flutterSDK.createUserContext(userId: randomUserName);
+    var userContext = await flutterSDK.createUserContext(randomUserName);
 
     // Set attributes
     response = await userContext!.setAttributes({

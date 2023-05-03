@@ -1,5 +1,5 @@
 /// **************************************************************************
-/// Copyright 2022-2023, Optimizely, Inc. and contributors                   *
+/// Copyright 2022, Optimizely, Inc. and contributors                        *
 ///                                                                          *
 /// Licensed under the Apache License, Version 2.0 (the "License");          *
 /// you may not use this file except in compliance with the License.         *
@@ -35,26 +35,15 @@ void main() {
   const String ruleKey = "rule_1";
   const String variationKey = "var_1";
   const String eventKey = "event-key";
-  const String segment = "segment";
-  const String action = "action1";
-  const String type = "type1";
-  const String vuid = "vuid_123";
-  const Map<String, String> identifiers = {"abc": "123"};
-  const Map<String, dynamic> data = {"abc": 12345};
   const Map<String, dynamic> attributes = {"abc": 123};
   const Map<String, dynamic> attributes1 = {"abc": 1234};
   const Map<String, dynamic> eventTags = {"abcd": 1234};
-  const List<String> qualifiedSegments = ["1", "2", "3"];
-
   const String userContextId = "123";
   // To check if decide options properly reached the native sdk through channel
   List<String> decideOptions = [];
-  // To check if event options, datafileOptions and sdkSettings reached the native sdk through channel
+  // To check if event options and datafileOptions reached the native sdk through channel
   EventOptions eventOptions = const EventOptions();
-  // To check if segment options properly reached the native sdk through channel
-  List<String> segmentOptions = [];
   DatafileHostOptions datafileHostOptions = const DatafileHostOptions("", "");
-  SDKSettings sdkSettings = const SDKSettings();
   int datafilePeriodicDownloadInterval = 0;
 
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
@@ -90,21 +79,6 @@ void main() {
               timeInterval: methodCall.arguments[Constants.eventTimeInterval]);
           datafilePeriodicDownloadInterval =
               methodCall.arguments[Constants.datafilePeriodicDownloadInterval];
-
-          // To Check if sdkSettings were received
-          var settings = methodCall.arguments[Constants.optimizelySdkSettings];
-          if (settings is Map) {
-            sdkSettings = SDKSettings(
-              segmentsCacheSize: settings[Constants.segmentsCacheSize],
-              segmentsCacheTimeoutInSecs:
-                  settings[Constants.segmentsCacheTimeoutInSecs],
-              timeoutForSegmentFetchInSecs:
-                  settings[Constants.timeoutForSegmentFetchInSecs],
-              timeoutForOdpEventInSecs:
-                  settings[Constants.timeoutForOdpEventInSecs],
-              disableOdp: settings[Constants.disableOdp],
-            );
-          }
 
           // Resetting to default for every test
           datafileHostOptions = const DatafileHostOptions("", "");
@@ -172,13 +146,9 @@ void main() {
           };
         case Constants.createUserContextMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          if (methodCall.arguments[Constants.userId] != null) {
-            expect(methodCall.arguments[Constants.userId], equals(userId));
-          }
-          if (methodCall.arguments[Constants.attributes]["abc"] != null) {
-            expect(methodCall.arguments[Constants.attributes]["abc"],
-                equals(attributes["abc"]));
-          }
+          expect(methodCall.arguments[Constants.userId], equals(userId));
+          expect(methodCall.arguments[Constants.attributes]["abc"],
+              equals(attributes["abc"]));
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
@@ -212,60 +182,6 @@ void main() {
               equals(attributes1["abc"]));
           return {
             Constants.responseSuccess: true,
-          };
-        case Constants.getQualifiedSegmentsMethod:
-          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          expect(methodCall.arguments[Constants.userContextId],
-              equals(userContextId));
-          return {
-            Constants.responseSuccess: true,
-            Constants.responseResult: {
-              Constants.qualifiedSegments: qualifiedSegments,
-            },
-          };
-        case Constants.setQualifiedSegmentsMethod:
-          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          expect(methodCall.arguments[Constants.userContextId],
-              equals(userContextId));
-          expect(methodCall.arguments[Constants.qualifiedSegments],
-              equals(qualifiedSegments));
-          return {
-            Constants.responseSuccess: true,
-          };
-        case Constants.fetchQualifiedSegmentsMethod:
-          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          expect(methodCall.arguments[Constants.userContextId],
-              equals(userContextId));
-          segmentOptions.addAll(List<String>.from(
-              methodCall.arguments[Constants.optimizelySegmentOption]));
-          return {
-            Constants.responseSuccess: true,
-          };
-        case Constants.isQualifiedForMethod:
-          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          expect(methodCall.arguments[Constants.userContextId],
-              equals(userContextId));
-          expect(methodCall.arguments[Constants.segment], equals(segment));
-          return {
-            Constants.responseSuccess: true,
-          };
-        case Constants.sendOdpEventMethod:
-          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          expect(methodCall.arguments[Constants.userContextId], isNull);
-          expect(methodCall.arguments[Constants.action], equals(action));
-          expect(methodCall.arguments[Constants.type], equals(type));
-          expect(
-              methodCall.arguments[Constants.identifiers], equals(identifiers));
-          expect(methodCall.arguments[Constants.data], equals(data));
-          return {
-            Constants.responseSuccess: true,
-          };
-        case Constants.getVuidMethod:
-          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          expect(methodCall.arguments[Constants.userContextId], isNull);
-          return {
-            Constants.responseSuccess: true,
-            Constants.responseResult: {Constants.vuid: vuid},
           };
         case Constants.trackEventMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
@@ -395,19 +311,12 @@ void main() {
         expect(response.success, isTrue);
       });
 
-      test("with no eventOptions, datafileOptions and sdkSettings", () async {
+      test("with no eventOptions and no datafileOptions", () async {
         // default values
         const expectedEventOptions =
             EventOptions(batchSize: 10, timeInterval: 60, maxQueueSize: 10000);
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
         const expectedDatafileHostOptions = DatafileHostOptions("", "");
-        const expectedSDKSettings = SDKSettings(
-          segmentsCacheSize: 100,
-          segmentsCacheTimeoutInSecs: 600,
-          timeoutForSegmentFetchInSecs: 10,
-          timeoutForOdpEventInSecs: 10,
-          disableOdp: false,
-        );
         const expectedDatafilePeriodicDownloadInterval = 10 * 60;
         var sdk = OptimizelyFlutterSdk(testSDKKey);
         var response = await sdk.initializeClient();
@@ -424,40 +333,22 @@ void main() {
             equals(expectedDatafileHostOptions.datafileHostPrefix));
         expect(datafileHostOptions.datafileHostSuffix,
             equals(expectedDatafileHostOptions.datafileHostSuffix));
-
-        expect(sdkSettings.segmentsCacheSize,
-            equals(expectedSDKSettings.segmentsCacheSize));
-        expect(sdkSettings.segmentsCacheTimeoutInSecs,
-            equals(expectedSDKSettings.segmentsCacheTimeoutInSecs));
-        expect(sdkSettings.timeoutForSegmentFetchInSecs,
-            equals(expectedSDKSettings.timeoutForSegmentFetchInSecs));
-        expect(sdkSettings.timeoutForOdpEventInSecs,
-            equals(expectedSDKSettings.timeoutForOdpEventInSecs));
-        expect(sdkSettings.disableOdp, equals(expectedSDKSettings.disableOdp));
         debugDefaultTargetPlatformOverride = null;
       });
 
-      test("with eventOptions, datafileOptions and sdkSettings", () async {
+      test("with eventOptions and datafileOptions", () async {
         const expectedEventOptions =
             EventOptions(batchSize: 20, timeInterval: 30, maxQueueSize: 200);
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
         const expectedDatafileHostOptions = DatafileHostOptions("123", "456");
         const expectedDatafilePeriodicDownloadInterval = 40;
-        const expectedSDKSettings = SDKSettings(
-          segmentsCacheSize: 111,
-          segmentsCacheTimeoutInSecs: 222,
-          timeoutForSegmentFetchInSecs: 333,
-          timeoutForOdpEventInSecs: 444,
-          disableOdp: true,
-        );
         var sdk = OptimizelyFlutterSdk(testSDKKey,
             eventOptions: expectedEventOptions,
             datafilePeriodicDownloadInterval:
                 expectedDatafilePeriodicDownloadInterval,
             datafileHostOptions: {
               ClientPlatform.iOS: expectedDatafileHostOptions
-            },
-            sdkSettings: expectedSDKSettings);
+            });
         var response = await sdk.initializeClient();
 
         expect(response.success, isTrue);
@@ -472,16 +363,6 @@ void main() {
             equals(expectedDatafileHostOptions.datafileHostPrefix));
         expect(datafileHostOptions.datafileHostSuffix,
             equals(expectedDatafileHostOptions.datafileHostSuffix));
-
-        expect(sdkSettings.segmentsCacheSize,
-            equals(expectedSDKSettings.segmentsCacheSize));
-        expect(sdkSettings.segmentsCacheTimeoutInSecs,
-            equals(expectedSDKSettings.segmentsCacheTimeoutInSecs));
-        expect(sdkSettings.timeoutForSegmentFetchInSecs,
-            equals(expectedSDKSettings.timeoutForSegmentFetchInSecs));
-        expect(sdkSettings.timeoutForOdpEventInSecs,
-            equals(expectedSDKSettings.timeoutForOdpEventInSecs));
-        expect(sdkSettings.disableOdp, equals(expectedSDKSettings.disableOdp));
         debugDefaultTargetPlatformOverride = null;
       });
 
@@ -614,26 +495,7 @@ void main() {
     group("createUserContext()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
-        expect(userContext, isNotNull);
-      });
-
-      test("should succeed null userId", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(attributes: attributes);
-        expect(userContext, isNotNull);
-      });
-
-      test("should succeed null attributes", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId: userId);
-        expect(userContext, isNotNull);
-      });
-
-      test("should succeed null userId and attributes", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext();
+        var userContext = await sdk.createUserContext(userId, attributes);
         expect(userContext, isNotNull);
       });
     });
@@ -641,8 +503,7 @@ void main() {
     group("getUserId()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var response = await userContext!.getUserId();
 
         expect(response.success, isTrue);
@@ -652,8 +513,7 @@ void main() {
     group("getAttributes()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var response = await userContext!.getAttributes();
 
         expect(response.success, isTrue);
@@ -664,93 +524,17 @@ void main() {
     group("setAttributes()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var response = await userContext!.setAttributes(attributes1);
 
         expect(response.success, isTrue);
       });
     });
 
-    group("getQualifiedSegments()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId: userId);
-        var response = await userContext!.getQualifiedSegments();
-
-        expect(response.qualifiedSegments, qualifiedSegments);
-      });
-    });
-
-    group("setQualifiedSegments()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId: userId);
-        var response =
-            await userContext!.setQualifiedSegments(qualifiedSegments);
-
-        expect(response.success, isTrue);
-      });
-    });
-
-    group("isQualifiedFor()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId: userId);
-        var response = await userContext!.isQualifiedFor(segment);
-
-        expect(response.success, isTrue);
-      });
-    });
-
-    group("fetchQualifiedSegments()", () {
-      bool assertSegmentOptions(
-          Set<OptimizelySegmentOption> options, List<String> convertedOptions) {
-        for (var option in options) {
-          if (!convertedOptions.contains(option.name)) {
-            return false;
-          }
-        }
-        return true;
-      }
-
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext = await sdk.createUserContext(userId: userId);
-        Set<OptimizelySegmentOption> options = {
-          OptimizelySegmentOption.ignoreCache,
-          OptimizelySegmentOption.resetCache,
-        };
-        var response = await userContext!.fetchQualifiedSegments(options);
-        expect(response.success, isTrue);
-        expect(segmentOptions.length == 2, isTrue);
-        expect(assertSegmentOptions(options, segmentOptions), isTrue);
-      });
-    });
-
-    group("sendOdpEvent()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var response = await sdk.sendOdpEvent(action,
-            type: type, identifiers: identifiers, data: data);
-        expect(response.success, isTrue);
-      });
-    });
-
-    group("getVuid()", () {
-      test("should succeed", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var response = await sdk.getVuid();
-        expect(response.success, isTrue);
-        expect(response.vuid, equals(vuid));
-      });
-    });
-
     group("trackEvent()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var response = await userContext!.trackEvent(eventKey, eventTags);
 
         expect(response.success, isTrue);
@@ -785,8 +569,7 @@ void main() {
         };
         var sdk = OptimizelyFlutterSdk(testSDKKey,
             defaultDecideOptions: defaultDecideOptions);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var decideKey = "decide-key";
 
         var response = await userContext!.decide(decideKey, options);
@@ -805,8 +588,7 @@ void main() {
       test("decideForKeys should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey,
             defaultDecideOptions: defaultDecideOptions);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
         var decideKeys = ["decide-key-1", "decide-key-2"];
 
         var response = await userContext!.decideForKeys(decideKeys, options);
@@ -822,8 +604,7 @@ void main() {
       test("decideAll() should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey,
             defaultDecideOptions: defaultDecideOptions);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!.decideAll(options);
 
@@ -855,8 +636,7 @@ void main() {
     group("setForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!.setForcedDecision(
             OptimizelyDecisionContext(flagKey, ruleKey),
@@ -869,8 +649,7 @@ void main() {
     group("getForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!
             .getForcedDecision(OptimizelyDecisionContext(flagKey, ruleKey));
@@ -883,8 +662,7 @@ void main() {
     group("removeForcedDecision()", () {
       test("should succeed", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
-        var userContext =
-            await sdk.createUserContext(userId: userId, attributes: attributes);
+        var userContext = await sdk.createUserContext(userId, attributes);
 
         var response = await userContext!
             .removeForcedDecision(OptimizelyDecisionContext(flagKey, ruleKey));
@@ -896,8 +674,7 @@ void main() {
 
     test("removeAllForcedDecisions() should succeed", () async {
       var sdk = OptimizelyFlutterSdk(testSDKKey);
-      var userContext =
-          await sdk.createUserContext(userId: userId, attributes: attributes);
+      var userContext = await sdk.createUserContext(userId, attributes);
 
       var response = await userContext!.removeAllForcedDecisions();
 
