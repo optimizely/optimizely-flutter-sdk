@@ -240,9 +240,6 @@ void main() {
               methodCall.arguments[Constants.optimizelySegmentOption]));
           return {
             Constants.responseSuccess: true,
-            Constants.responseResult: {
-              Constants.qualifiedSegments: qualifiedSegments,
-            },
           };
         case Constants.isQualifiedForMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
@@ -725,7 +722,6 @@ void main() {
           OptimizelySegmentOption.resetCache,
         };
         var response = await userContext!.fetchQualifiedSegments(options);
-        expect(response.qualifiedSegments, equals(qualifiedSegments));
         expect(response.success, isTrue);
         expect(segmentOptions.length == 2, isTrue);
         expect(assertSegmentOptions(options, segmentOptions), isTrue);

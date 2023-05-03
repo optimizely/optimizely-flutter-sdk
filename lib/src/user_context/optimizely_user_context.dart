@@ -22,7 +22,6 @@ import 'package:optimizely_flutter_sdk/src/data_objects/get_attributes_response.
 import 'package:optimizely_flutter_sdk/src/data_objects/get_forced_decision_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_user_id_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_qualified_segments_response.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/fetch_qualified_segments_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
@@ -142,8 +141,8 @@ class OptimizelyUserContext {
   /// The segments fetched will be saved in **qualifiedSegments** and can be accessed any time using **getQualifiedSegments**.
   /// On failure, **qualifiedSegments** will be nil and an error will be returned.
   /// Optional [options] A set of [OptimizelySegmentOption] for fetching qualified segments.
-  /// Returns [FetchQualifiedSegmentsResponse] On success, it returns an array of segment names that the user is qualified for. On failure, ir returns the reason of failure.
-  Future<FetchQualifiedSegmentsResponse> fetchQualifiedSegments(
+  /// Returns [BaseResponse]
+  Future<BaseResponse> fetchQualifiedSegments(
       [Set<OptimizelySegmentOption> options = const {}]) async {
     final result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.fetchQualifiedSegmentsMethod, {
@@ -151,7 +150,7 @@ class OptimizelyUserContext {
       Constants.userContextId: _userContextId,
       Constants.optimizelySegmentOption: Utils.convertSegmentOptions(options),
     }));
-    return FetchQualifiedSegmentsResponse(result);
+    return BaseResponse(result);
   }
 
   /// Tracks an event.

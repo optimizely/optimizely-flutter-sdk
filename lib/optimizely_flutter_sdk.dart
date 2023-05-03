@@ -174,6 +174,7 @@ class OptimizelyFlutterSdk {
   /// NOTE: A user context will only be created successfully when the SDK is fully configured using initializeClient.
   ///
   /// Optional [userId] the [String] user ID to be used for bucketing.
+  /// The device vuid will be used as an userId when userId is not provided.
   /// Takes [attributes] An Optional [Map] of attribute names to current user attribute values.
   /// Returns An [OptimizelyUserContext] associated with this OptimizelyClient.
   Future<OptimizelyUserContext?> createUserContext(
