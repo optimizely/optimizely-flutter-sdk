@@ -92,17 +92,19 @@ void main() {
               methodCall.arguments[Constants.datafilePeriodicDownloadInterval];
 
           // To Check if sdkSettings were received
-          sdkSettings = SDKSettings(
-            segmentsCacheSize:
-                methodCall.arguments[Constants.segmentsCacheSize],
-            segmentsCacheTimeoutInSecs:
-                methodCall.arguments[Constants.segmentsCacheTimeoutInSecs],
-            timeoutForSegmentFetchInSecs:
-                methodCall.arguments[Constants.timeoutForSegmentFetchInSecs],
-            timeoutForOdpEventInSecs:
-                methodCall.arguments[Constants.timeoutForOdpEventInSecs],
-            disableOdp: methodCall.arguments[Constants.disableOdp],
-          );
+          var settings = methodCall.arguments[Constants.optimizelySdkSettings];
+          if (settings is Map) {
+            sdkSettings = SDKSettings(
+              segmentsCacheSize: settings[Constants.segmentsCacheSize],
+              segmentsCacheTimeoutInSecs:
+                  settings[Constants.segmentsCacheTimeoutInSecs],
+              timeoutForSegmentFetchInSecs:
+                  settings[Constants.timeoutForSegmentFetchInSecs],
+              timeoutForOdpEventInSecs:
+                  settings[Constants.timeoutForOdpEventInSecs],
+              disableOdp: settings[Constants.disableOdp],
+            );
+          }
 
           // Resetting to default for every test
           datafileHostOptions = const DatafileHostOptions("", "");

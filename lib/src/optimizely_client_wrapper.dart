@@ -72,8 +72,10 @@ class OptimizelyClientWrapper {
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
+    };
 
-      // Odp Request params
+    // Odp Request params
+    Map<String, dynamic> optimizelySdkSettings = {
       Constants.segmentsCacheSize: sdkSettings.segmentsCacheSize,
       Constants.segmentsCacheTimeoutInSecs:
           sdkSettings.segmentsCacheTimeoutInSecs,
@@ -82,6 +84,7 @@ class OptimizelyClientWrapper {
       Constants.timeoutForOdpEventInSecs: sdkSettings.timeoutForOdpEventInSecs,
       Constants.disableOdp: sdkSettings.disableOdp,
     };
+    requestDict[Constants.optimizelySdkSettings] = optimizelySdkSettings;
 
     // clearing notification listeners, if they are mapped to the same sdkKey.
     activateCallbacksById.remove(sdkKey);
