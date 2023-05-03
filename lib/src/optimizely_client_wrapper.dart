@@ -1,5 +1,5 @@
 /// **************************************************************************
-/// Copyright 2022, Optimizely, Inc. and contributors                        *
+/// Copyright 2022-2023, Optimizely, Inc. and contributors                   *
 ///                                                                          *
 /// Licensed under the Apache License, Version 2.0 (the "License");          *
 /// you may not use this file except in compliance with the License.         *
@@ -22,6 +22,7 @@ import 'package:optimizely_flutter_sdk/src/data_objects/activate_listener_respon
 import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/get_vuid_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
@@ -59,7 +60,8 @@ class OptimizelyClientWrapper {
       EventOptions eventOptions,
       int datafilePeriodicDownloadInterval,
       Map<ClientPlatform, DatafileHostOptions> datafileHostOptions,
-      Set<OptimizelyDecideOption> defaultDecideOptions) async {
+      Set<OptimizelyDecideOption> defaultDecideOptions,
+      SDKSettings sdkSettings) async {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     Map<String, dynamic> requestDict = {
@@ -71,6 +73,18 @@ class OptimizelyClientWrapper {
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
     };
+
+    // Odp Request params
+    Map<String, dynamic> optimizelySdkSettings = {
+      Constants.segmentsCacheSize: sdkSettings.segmentsCacheSize,
+      Constants.segmentsCacheTimeoutInSecs:
+          sdkSettings.segmentsCacheTimeoutInSecs,
+      Constants.timeoutForSegmentFetchInSecs:
+          sdkSettings.timeoutForSegmentFetchInSecs,
+      Constants.timeoutForOdpEventInSecs: sdkSettings.timeoutForOdpEventInSecs,
+      Constants.disableOdp: sdkSettings.disableOdp,
+    };
+    requestDict[Constants.optimizelySdkSettings] = optimizelySdkSettings;
 
     // clearing notification listeners, if they are mapped to the same sdkKey.
     activateCallbacksById.remove(sdkKey);
@@ -164,6 +178,35 @@ class OptimizelyClientWrapper {
     return OptimizelyConfigResponse(result);
   }
 
+  /// Send an event to the ODP server.
+  static Future<BaseResponse> sendOdpEvent(String sdkKey, String action,
+      {String? type,
+      Map<String, String> identifiers = const {},
+      Map<String, dynamic> data = const {}}) async {
+    Map<String, dynamic> request = {
+      Constants.sdkKey: sdkKey,
+      Constants.action: action,
+      Constants.identifiers: identifiers,
+      Constants.data: Utils.convertToTypedMap(data)
+    };
+    if (type != null) {
+      request[Constants.type] = type;
+    }
+
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.sendOdpEventMethod, request));
+    return BaseResponse(result);
+  }
+
+  /// Returns the device vuid (read only)
+  static Future<GetVuidResponse> getVuid(String sdkKey) async {
+    final result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.getVuidMethod, {
+      Constants.sdkKey: sdkKey,
+    }));
+    return GetVuidResponse(result);
+  }
+
   /// Remove notification listener by notification id.
   static Future<BaseResponse> removeNotificationListener(
       String sdkKey, int id) async {
@@ -217,15 +260,17 @@ class OptimizelyClientWrapper {
   /// Creates a context of the user for which decision APIs will be called.
   ///
   /// A user context will only be created successfully when the SDK is fully configured using initializeClient.
-  static Future<OptimizelyUserContext?> createUserContext(
-      String sdkKey, String userId,
-      [Map<String, dynamic> attributes = const {}]) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.createUserContextMethod, {
+  static Future<OptimizelyUserContext?> createUserContext(String sdkKey,
+      {String? userId, Map<String, dynamic> attributes = const {}}) async {
+    Map<String, dynamic> request = {
       Constants.sdkKey: sdkKey,
-      Constants.userId: userId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
-    }));
+    };
+    if (userId != null) {
+      request[Constants.userId] = userId;
+    }
+    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
+        Constants.createUserContextMethod, request));
 
     if (result[Constants.responseSuccess] == true) {
       final response =

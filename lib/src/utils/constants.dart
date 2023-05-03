@@ -1,5 +1,5 @@
 /// **************************************************************************
-/// Copyright 2022, Optimizely, Inc. and contributors                        *
+/// Copyright 2022-2023, Optimizely, Inc. and contributors                   *
 ///                                                                          *
 /// Licensed under the Apache License, Version 2.0 (the "License");          *
 /// you may not use this file except in compliance with the License.         *
@@ -46,6 +46,15 @@ class Constants {
       "clearNotificationListeners";
   static const String clearAllNotificationListenersMethod =
       "clearAllNotificationListeners";
+
+  // Odp Supported Method Names
+  static const String sendOdpEventMethod = "sendOdpEvent";
+  static const String getVuidMethod = "getVuid";
+  static const String getQualifiedSegmentsMethod = "getQualifiedSegments";
+  static const String setQualifiedSegmentsMethod = "setQualifiedSegments";
+  static const String isQualifiedForMethod = "isQualifiedFor";
+  static const String fetchQualifiedSegmentsMethod = "fetchQualifiedSegments";
+
   // Request parameter keys
   static const String id = "id";
   static const String sdkKey = "sdkKey";
@@ -54,8 +63,11 @@ class Constants {
   static const String experiment = "experiment";
   static const String variation = "variation";
   static const String userId = "userId";
+  static const String vuid = "vuid";
   static const String experimentKey = "experimentKey";
   static const String attributes = "attributes";
+  static const String qualifiedSegments = "qualifiedSegments";
+  static const String segment = "segment";
   static const String decisionInfo = "decisionInfo";
   static const String variables = "variables";
   static const String reasons = "reasons";
@@ -69,9 +81,14 @@ class Constants {
   static const String ruleKey = "ruleKey";
   static const String enabled = "enabled";
   static const String optimizelyDecideOption = "optimizelyDecideOption";
+  static const String optimizelySegmentOption = "optimizelySegmentOption";
+  static const String optimizelySdkSettings = "optimizelySdkSettings";
   static const String payload = "payload";
   static const String value = "value";
   static const String type = "type";
+  static const String action = "action";
+  static const String identifiers = "identifiers";
+  static const String data = "data";
   static const String callbackIds = "callbackIds";
   static const String eventBatchSize = "eventBatchSize";
   static const String eventTimeInterval = "eventTimeInterval";
@@ -104,6 +121,14 @@ class Constants {
   static const String revision = "revision";
   static const String variationsMap = "variationsMap";
   static const String variablesMap = "variablesMap";
+
+  // Odp Request params
+  static const String segmentsCacheSize = "segmentsCacheSize";
+  static const String segmentsCacheTimeoutInSecs = "segmentsCacheTimeoutInSecs";
+  static const String timeoutForSegmentFetchInSecs =
+      "timeoutForSegmentFetchInSecs";
+  static const String timeoutForOdpEventInSecs = "timeoutForOdpEventInSecs";
+  static const String disableOdp = "disableOdp";
 
   // Response keys
   static const String responseSuccess = "success";
