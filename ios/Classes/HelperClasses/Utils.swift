@@ -152,6 +152,24 @@ public class Utils: NSObject {
         return convertedOptions
     }
     
+    /// Converts and returns string segment options to array of OptimizelySegmentOption
+    static func getSegmentOptions(options: [String]?) -> [OptimizelySegmentOption]? {
+        guard let finalOptions = options else {
+            return nil
+        }
+        var convertedOptions = [OptimizelySegmentOption]()
+        for option in finalOptions {
+            switch option {
+            case SegmentOption.ignoreCache:
+                convertedOptions.append(OptimizelySegmentOption.ignoreCache)
+            case SegmentOption.resetCache:
+                convertedOptions.append(OptimizelySegmentOption.resetCache)
+            default: break
+            }
+        }
+        return convertedOptions
+    }
+    
     static func convertDecisionToDictionary(decision: OptimizelyDecision?) -> [String: Any?] {
         let userContext: [String: Any?] =
         [RequestParameterKey.userId : decision?.userContext.userId,
