@@ -10,5 +10,5 @@
 # Optimizely
 -keep class com.optimizely.optimizely_flutter_sdk.** {*;}
 -keep class com.fasterxml.jackson.** {*;}
-##---------------End: proguard configuration for Gson  ----------
+##---------------End: proguard configuration ----------
 
