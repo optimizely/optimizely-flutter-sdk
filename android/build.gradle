@@ -49,6 +49,9 @@ android {
         versionName version_name
         buildConfigField "String", "CLIENT_VERSION", "\"$version_name\""
         multiDexEnabled true
+
+        // these rules will be merged to app's proguard rules
+        consumerProguardFiles './proguard-rules.txt'
     }
 
     compileOptions {
@@ -61,7 +64,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
