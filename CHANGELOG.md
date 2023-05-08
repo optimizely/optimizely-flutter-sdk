@@ -1,4 +1,14 @@
 # Optimizely Flutter SDK Changelog
+
+## 1.0.1
+May 8, 20223
+
+**Official General Availability (GA) release**
+
+### Bug Fixes
+
+* Fix "no serializer found" error ([#51](https://github.com/optimizely/optimizely-flutter-sdk/pull/51)).
+
 ## 1.0.1-beta
 March 10, 2022
 
@@ -6,6 +16,7 @@ March 10, 2022
 
 ## 1.0.0-beta
 November 3, 2022
+
 **Beta release of the Optimizely X Full Stack Flutter SDK.**
 
 ### New Features
