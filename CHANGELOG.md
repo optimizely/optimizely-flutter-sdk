@@ -1,7 +1,7 @@
 # Optimizely Flutter SDK Changelog
 
 ## 1.0.1
-May 8, 20223
+May 8, 2023
 
 **Official General Availability (GA) release**
 
