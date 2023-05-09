@@ -45,7 +45,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Part of FlutterPlugin protocol to handle communication with flutter sdk
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-
+        
         switch call.method {
         case API.initialize: initialize(call, result: result)
         case API.addNotificationListener: addNotificationListener(call, result: result)
@@ -67,6 +67,14 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.removeForcedDecision: removeForcedDecision(call, result: result)
         case API.removeAllForcedDecisions: removeAllForcedDecisions(call, result: result)
         case API.close: close(call, result: result)
+            
+        // ODP
+        case API.getQualifiedSegments: getQualifiedSegments(call, result: result)
+        case API.setQualifiedSegments: setQualifiedSegments(call, result: result)
+        case API.getVuid: getVuid(call, result: result)
+        case API.isQualifiedFor: isQualifiedFor(call, result: result)
+        case API.sendOdpEvent: sendOdpEvent(call, result: result)
+        case API.fetchQualifiedSegments: fetchQualifiedSegments(call, result: result)
         default: result(FlutterMethodNotImplemented)
         }
     }
@@ -99,6 +107,31 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
         let defaultDecideOptions = Utils.getDecideOptions(options: decideOptions)
         
+        // SDK Settings Default Values
+        var segmentsCacheSize: Int = 100
+        var segmentsCacheTimeoutInSecs: Int = 600
+        var timeoutForSegmentFetchInSecs: Int = 10
+        var timeoutForOdpEventInSecs: Int = 10
+        var disableOdp: Bool = false
+        if let sdkSettings = parameters[RequestParameterKey.optimizelySdkSettings] as? Dictionary<String, Any?> {
+            if let cacheSize = sdkSettings[RequestParameterKey.segmentsCacheSize] as? Int {
+                segmentsCacheSize = cacheSize
+            }
+            if let segmentsCacheTimeout = sdkSettings[RequestParameterKey.segmentsCacheTimeoutInSecs] as? Int {
+                segmentsCacheTimeoutInSecs = segmentsCacheTimeout
+            }
+            if let timeoutForSegmentFetch = sdkSettings[RequestParameterKey.timeoutForSegmentFetchInSecs] as? Int {
+                timeoutForSegmentFetchInSecs = timeoutForSegmentFetch
+            }
+            if let timeoutForOdpEvent = sdkSettings[RequestParameterKey.timeoutForOdpEventInSecs] as? Int {
+                timeoutForOdpEventInSecs = timeoutForOdpEvent
+            }
+            if let isOdpDisabled = sdkSettings[RequestParameterKey.disableOdp] as? Bool {
+                disableOdp = isOdpDisabled
+            }
+        }
+        let optimizelySdkSettings = OptimizelySdkSettings(segmentsCacheSize: segmentsCacheSize, segmentsCacheTimeoutInSecs: segmentsCacheTimeoutInSecs, timeoutForSegmentFetchInSecs: timeoutForSegmentFetchInSecs, timeoutForOdpEventInSecs: timeoutForOdpEventInSecs, disableOdp: disableOdp)
+        
         // Datafile Download Interval
         var datafilePeriodicDownloadInterval = 10 * 60 // seconds
         
@@ -119,7 +152,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
-        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, datafileHandler: datafileHandler, periodicDownloadInterval: datafilePeriodicDownloadInterval, defaultDecideOptions: defaultDecideOptions)
+        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, datafileHandler: datafileHandler, periodicDownloadInterval: datafilePeriodicDownloadInterval, defaultDecideOptions: defaultDecideOptions, settings: optimizelySdkSettings)
         
         optimizelyInstance.start{ [weak self] res in
             switch res {
@@ -198,7 +231,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
-
+        
         if let type = parameters[RequestParameterKey.notificationType] as? String, let convertedNotificationType = Utils.getNotificationType(type: type) {
             // Remove listeners only for the provided type
             optimizelyClient.notificationCenter?.clearNotificationListeners(type: convertedNotificationType)
@@ -302,7 +335,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         let success = optimizelyClient.setForcedVariation(experimentKey: experimentKey, userId: userId, variationKey: variationKey)
         result(self.createResponse(success: success))
     }
-
+    
     /// Creates a context of the user for which decision APIs will be called.
     /// A user context will only be created successfully when the SDK is fully configured using initializeClient.
     func createUserContext(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -312,13 +345,15 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
-        guard let userId = parameters[RequestParameterKey.userId] as? String else {
-            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
-            return
-        }
         
         let userContextId = uuid
-        let userContext = optimizelyClient.createUserContext(userId: userId, attributes: Utils.getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any))
+        var userContext: OptimizelyUserContext!
+        
+        if let userId = parameters[RequestParameterKey.userId] as? String {
+            userContext = optimizelyClient.createUserContext(userId: userId, attributes: Utils.getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any))
+        } else {
+            userContext = optimizelyClient.createUserContext(attributes: Utils.getTypedMap(arguments: parameters[RequestParameterKey.attributes] as? Any))
+        }
         if userContextsTracker[sdkKey] != nil {
             userContextsTracker[sdkKey]![userContextId] = userContext
         } else {
@@ -357,6 +392,108 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             userContext.setAttribute(key: k, value: v)
         }
         result(createResponse(success: true))
+    }
+    
+    /// Returns an array of segments that the user is qualified for.
+    func getQualifiedSegments(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (_, userContext) = getParametersAndUserContext(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let qualifiedSegments = userContext.qualifiedSegments else {
+            result(createResponse(success: false, reason: ErrorMessage.qualifiedSegmentsNotFound))
+            return
+        }
+        result(createResponse(success: true, result: [RequestParameterKey.qualifiedSegments: qualifiedSegments]))
+    }
+    
+    /// Sets qualified segments for the user context.
+    func setQualifiedSegments(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (parameters, userContext) = getParametersAndUserContext(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let qualifiedSegments = parameters[RequestParameterKey.qualifiedSegments] as? [String] else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
+        }
+        userContext.qualifiedSegments = qualifiedSegments
+        result(createResponse(success: true))
+    }
+    
+    /// Returns the device vuid.
+    func getVuid(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (_, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        result(self.createResponse(success: true, result: [RequestParameterKey.vuid: optimizelyClient.vuid]))
+    }
+    
+    /// Checks if the user is qualified for the given segment.
+    func isQualifiedFor(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (parameters, userContext) = getParametersAndUserContext(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let segment = parameters[RequestParameterKey.segment] as? String else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
+        }
+        result(self.createResponse(success: userContext.isQualifiedFor(segment: segment)))
+    }
+    
+    /// Send an event to the ODP server.
+    func sendOdpEvent(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (parameters, sdkKey) = getParametersAndSdkKey(arguments: call.arguments, result: result) else {
+            return
+        }
+        guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
+            return
+        }
+        guard let action = parameters[RequestParameterKey.action] as? String else {
+            result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
+            return
+        }
+        
+        var type: String?
+        var identifiers: [String: String] = [:]
+        var data: [String: Any?] = [:]
+        
+        if let _type = parameters[RequestParameterKey.type] as? String {
+            type = _type
+        }
+        if let _identifiers = parameters[RequestParameterKey.identifiers] as? Dictionary<String, String> {
+            identifiers = _identifiers
+        }
+        if let _data = Utils.getTypedMap(arguments: parameters[RequestParameterKey.data] as? Any) {
+            data = _data
+        }
+        
+        do {
+            try optimizelyClient.sendOdpEvent(type: type, action: action, identifiers: identifiers, data: data)
+            result(self.createResponse(success: true))
+        } catch {
+            result(self.createResponse(success: false, reason: error.localizedDescription))
+        }
+    }
+    
+    /// Fetch all qualified segments for the user context.
+    func fetchQualifiedSegments(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (parameters, userContext) = getParametersAndUserContext(arguments: call.arguments, result: result) else {
+            return
+        }
+        var segmentOptions: [String]?
+        if let options = parameters[RequestParameterKey.optimizelySegmentOption] as? [String] {
+            segmentOptions = options
+        }
+        
+        let options = Utils.getSegmentOptions(options: segmentOptions)
+        do {
+            try userContext.fetchQualifiedSegments(options: options ?? [])
+            result(createResponse(success: true))
+        } catch {
+            result(self.createResponse(success: false, reason: error.localizedDescription))
+        }
     }
     
     /// Tracks an event.

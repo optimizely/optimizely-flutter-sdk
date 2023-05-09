@@ -18,9 +18,10 @@ import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class GetQualifiedSegmentsResponse extends BaseResponse {
-  List<String> qualifiedSegments = [];
+  List<String>? qualifiedSegments = [];
 
   GetQualifiedSegmentsResponse(Map<String, dynamic> json) : super(json) {
+    qualifiedSegments = null;
     if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
       var response = Map<String, dynamic>.from(json[Constants.responseResult]);
       if (response[Constants.qualifiedSegments] is List<dynamic>) {

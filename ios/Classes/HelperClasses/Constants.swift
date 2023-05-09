@@ -38,6 +38,14 @@ struct API {
     static let removeNotificationListener = "removeNotificationListener"
     static let clearNotificationListeners = "clearNotificationListeners"
     static let clearAllNotificationListeners = "clearAllNotificationListeners"
+    
+    // ODP
+    static let sendOdpEvent = "sendOdpEvent"
+    static let getVuid = "getVuid"
+    static let getQualifiedSegments = "getQualifiedSegments"
+    static let setQualifiedSegments = "setQualifiedSegments"
+    static let isQualifiedFor = "isQualifiedFor"
+    static let fetchQualifiedSegments = "fetchQualifiedSegments"
 }
 
 struct NotificationType {
@@ -54,6 +62,11 @@ struct DecideOption {
     static let ignoreUserProfileService = "ignoreUserProfileService"
     static let includeReasons = "includeReasons"
     static let excludeVariables = "excludeVariables"
+}
+
+struct SegmentOption {
+    static let ignoreCache = "ignoreCache"
+    static let resetCache = "resetCache"
 }
 
 struct RequestParameterKey {
@@ -83,6 +96,23 @@ struct RequestParameterKey {
     static let datafilePeriodicDownloadInterval = "datafilePeriodicDownloadInterval"
     static let datafileHostPrefix = "datafileHostPrefix"
     static let datafileHostSuffix = "datafileHostSuffix"
+    
+    // ODP
+    static let vuid = "vuid"
+    static let qualifiedSegments = "qualifiedSegments"
+    static let segment = "segment"
+    static let action = "action"
+    static let identifiers = "identifiers"
+    static let data = "data"
+    static let type = "type"
+    static let optimizelySegmentOption = "optimizelySegmentOption"
+    
+    static let optimizelySdkSettings = "optimizelySdkSettings"
+    static let segmentsCacheSize = "segmentsCacheSize"
+    static let segmentsCacheTimeoutInSecs = "segmentsCacheTimeoutInSecs"
+    static let timeoutForSegmentFetchInSecs = "timeoutForSegmentFetchInSecs"
+    static let timeoutForOdpEventInSecs = "timeoutForOdpEventInSecs"
+    static let disableOdp = "disableOdp"
 }
 
 struct ResponseKey {
@@ -97,6 +127,7 @@ struct ErrorMessage {
     static let optimizelyConfigNotFound = "No optimizely config found."
     static let optlyClientNotFound = "Optimizely client not found."
     static let userContextNotFound = "User context not found."
+    static let qualifiedSegmentsNotFound = "Qualified Segments not found."
 }
 
 //Sohail: There is one issue, can we make sure the types remain same, probably we will need to write unit test separately for type.
