@@ -68,7 +68,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.removeAllForcedDecisions: removeAllForcedDecisions(call, result: result)
         case API.close: close(call, result: result)
             
-            // ODP
+        // ODP
         case API.getQualifiedSegments: getQualifiedSegments(call, result: result)
         case API.setQualifiedSegments: setQualifiedSegments(call, result: result)
         case API.getVuid: getVuid(call, result: result)
@@ -394,7 +394,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         result(createResponse(success: true))
     }
     
-    /// Returns an array of segment names that the user is qualified for.
+    /// Returns an array of segments that the user is qualified for.
     func getQualifiedSegments(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let (_, userContext) = getParametersAndUserContext(arguments: call.arguments, result: result) else {
             return
