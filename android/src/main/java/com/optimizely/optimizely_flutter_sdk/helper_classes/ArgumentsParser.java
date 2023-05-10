@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2022, Optimizely, Inc. and contributors                        *
+ * Copyright 2022-2023, Optimizely, Inc. and contributors                        *
  *                                                                          *
  * Licensed under the Apache License, Version 2.0 (the "License");          *
  * you may not use this file except in compliance with the License.         *
@@ -15,6 +15,7 @@
  ***************************************************************************/
 package com.optimizely.optimizely_flutter_sdk.helper_classes;
 
+import com.optimizely.ab.odp.ODPSegmentOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 
 import java.util.List;
@@ -109,5 +110,37 @@ public class ArgumentsParser {
 
     public String getExperimentKey() {
         return (String) arguments.get(Constants.RequestParameterKey.EXPERIMENT_KEY);
+    }
+
+    public List<String> getQualifiedSegments() {
+        return (List<String>) arguments.get(Constants.RequestParameterKey.QUALIFIED_SEGMENTS);
+    }
+
+    public String getSegment() {
+        return (String) arguments.get(Constants.RequestParameterKey.SEGMENT);
+    }
+
+    public String getAction() {
+        return (String) arguments.get(Constants.RequestParameterKey.ACTION);
+    }
+
+    public String getType() {
+        return (String) arguments.get(Constants.RequestParameterKey.ODP_EVENT_TYPE);
+    }
+
+    public Map<String, String> getIdentifiers() {
+        return (Map<String, String>) arguments.get(Constants.RequestParameterKey.IDENTIFIERS);
+    }
+
+    public Map<String, Object> getData() {
+        return (Map<String, Object>) arguments.get(Constants.RequestParameterKey.DATA);
+    }
+
+    public List<ODPSegmentOption> getSegmentOptions() {
+        return Utils.getSegmentOptions((List<String>) arguments.get(Constants.RequestParameterKey.OPTIMIZELY_SEGMENT_OPTION));
+    }
+
+    public Map<String, Object> getOptimizelySdkSettings() {
+        return (Map<String, Object>) arguments.get(Constants.RequestParameterKey.OPTIMIZELY_SDK_SETTINGS);
     }
 }
