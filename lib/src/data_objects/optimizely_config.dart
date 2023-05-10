@@ -1,5 +1,5 @@
 /// **************************************************************************
-/// Copyright 2022, Optimizely, Inc. and contributors                        *
+/// Copyright 2022-2023, Optimizely, Inc. and contributors                   *
 ///                                                                          *
 /// Licensed under the Apache License, Version 2.0 (the "License");          *
 /// you may not use this file except in compliance with the License.         *
@@ -101,11 +101,17 @@ class OptimizelyConfig {
     Map<String, dynamic> dynamicFeaturesMap = {};
     featuresMap.forEach((k, v) => {dynamicFeaturesMap[k] = v.toJson()});
     var dynamicAttributes = [];
-    attributes.forEach((v) => {dynamicAttributes.add(v.toJson())});
+    for (var attribute in attributes) {
+      dynamicAttributes.add(attribute.toJson());
+    }
     var dynamicEvents = [];
-    events.forEach((v) => {dynamicEvents.add(v.toJson())});
+    for (var event in events) {
+      dynamicEvents.add(event.toJson());
+    }
     var dynamicAudiences = [];
-    audiences.forEach((v) => {dynamicAudiences.add(v.toJson())});
+    for (var audience in audiences) {
+      dynamicAudiences.add(audience.toJson());
+    }
 
     return {
       'experimentsMap': dynamicExpMap,
@@ -244,10 +250,14 @@ class OptimizelyFeature {
 
   Map<String, dynamic> toJson() {
     var dynamicDeliveryRules = [];
-    deliveryRules.forEach((v) => {dynamicDeliveryRules.add(v.toJson())});
+    for (var deliveryRule in deliveryRules) {
+      dynamicDeliveryRules.add(deliveryRule.toJson());
+    }
 
     var dynamicExperimentRules = [];
-    experimentRules.forEach((v) => {dynamicExperimentRules.add(v.toJson())});
+    for (var experimentRule in experimentRules) {
+      dynamicExperimentRules.add(experimentRule.toJson());
+    }
     return {
       'id': id,
       'key': key,
