@@ -97,9 +97,9 @@ class OptimizelyConfig {
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> dynamicExpMap = {};
-    experimentsMap.forEach((k, v) => {dynamicExpMap[k] = v.toJson()});
+    experimentsMap.forEach((k, v) => dynamicExpMap[k] = v.toJson());
     Map<String, dynamic> dynamicFeaturesMap = {};
-    featuresMap.forEach((k, v) => {dynamicFeaturesMap[k] = v.toJson()});
+    featuresMap.forEach((k, v) => dynamicFeaturesMap[k] = v.toJson());
     var dynamicAttributes = [];
     for (var attribute in attributes) {
       dynamicAttributes.add(attribute.toJson());
@@ -305,7 +305,7 @@ class OptimizelyExperiment {
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> dynamicVariationsMap = {};
-    variationsMap.forEach((k, v) => {dynamicVariationsMap[k] = v.toJson()});
+    variationsMap.forEach((k, v) => dynamicVariationsMap[k] = v.toJson());
 
     return {
       'id': id,
@@ -355,7 +355,7 @@ class OptimizelyVariation {
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> dynamicVariablesMap = {};
-    variablesMap.forEach((k, v) => {dynamicVariablesMap[k] = v.toJson()});
+    variablesMap.forEach((k, v) => dynamicVariablesMap[k] = v.toJson());
 
     return {
       'id': id,

@@ -42,14 +42,14 @@ class Decision {
       enabled = json[Constants.enabled];
     }
     if (json[Constants.userContext] is Map<dynamic, dynamic>) {
-      Map<String, dynamic> _userContext =
+      Map<String, dynamic> tmpUserContext =
           Map<String, dynamic>.from(json[Constants.userContext]);
-      if (_userContext[Constants.userId] is String) {
-        userContext[Constants.userId] = _userContext[Constants.userId];
+      if (tmpUserContext[Constants.userId] is String) {
+        userContext[Constants.userId] = tmpUserContext[Constants.userId];
       }
-      if (_userContext[Constants.attributes] is Map<dynamic, dynamic>) {
+      if (tmpUserContext[Constants.attributes] is Map<dynamic, dynamic>) {
         userContext[Constants.attributes] =
-            Map<String, dynamic>.from(_userContext[Constants.attributes]);
+            Map<String, dynamic>.from(tmpUserContext[Constants.attributes]);
       }
     }
 

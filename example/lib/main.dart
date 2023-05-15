@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+// ignore_for_file: unused_local_variable
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
