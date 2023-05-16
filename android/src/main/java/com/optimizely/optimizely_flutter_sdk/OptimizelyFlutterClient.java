@@ -437,9 +437,9 @@ public class OptimizelyFlutterClient {
         }
         List<String> qualifiedSegments = userContext.getQualifiedSegments();
         if (qualifiedSegments != null) {
-            result.success(createResponse(qualifiedSegments));
+            result.success(createResponse(Collections.singletonMap(RequestParameterKey.QUALIFIED_SEGMENTS, qualifiedSegments)));
         } else {
-            result.success(ErrorMessage.QUALIFIED_SEGMENTS_NOT_FOUND);
+            result.success(createResponse(ErrorMessage.QUALIFIED_SEGMENTS_NOT_FOUND));
         }
     }
 
@@ -466,7 +466,7 @@ public class OptimizelyFlutterClient {
         if (!isOptimizelyClientValid(sdkKey, optimizelyClient, result)) {
             return;
         }
-        result.success(createResponse(true, optimizelyClient.getVuid(), ""));
+        result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VUID, optimizelyClient.getVuid()), ""));
     }
 
     /// Checks if the user is qualified for the given segment.
@@ -493,7 +493,7 @@ public class OptimizelyFlutterClient {
             return;
         }
         String action = argumentsParser.getAction();
-        if (action == null) {
+        if (action == null || action.isEmpty()) {
             result.success(createResponse(ErrorMessage.INVALID_PARAMS));
             return;
         }
@@ -526,8 +526,10 @@ public class OptimizelyFlutterClient {
         List<ODPSegmentOption> segmentOptions = argumentsParser.getSegmentOptions();
 
         try {
-            userContext.fetchQualifiedSegments(segmentOptions);
-            result.success(createResponse());
+            userContext.fetchQualifiedSegments((fetchQualifiedResult) -> {
+                result.success(createResponse(fetchQualifiedResult));
+            },segmentOptions);
+
         } catch (Exception ex) {
             result.success(createResponse(ex.getMessage()));
         }
