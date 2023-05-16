@@ -21,7 +21,7 @@ Refer to the [Flutter SDK's developer documentation](https://docs.developers.opt
 
 See the [pubspec.yaml](https://github.com/optimizely/optimizely-flutter-sdk/blob/master/pubspec.yaml) file for Flutter version requirements.
 
-On the Android platform, the SDK requires a minimum SDK version of 14 or higher and compile SDK version of 32.
+On the Android platform, the SDK requires a minimum SDK version of 21 or higher and compile SDK version of 32.
 
 On the iOS platform, the SDK requires a minimum version of 10.0.
 
