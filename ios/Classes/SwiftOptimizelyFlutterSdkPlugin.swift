@@ -450,7 +450,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
-        guard let action = parameters[RequestParameterKey.action] as? String else {
+        guard let action = parameters[RequestParameterKey.action] as? String, action != "" else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
