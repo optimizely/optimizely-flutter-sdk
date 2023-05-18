@@ -471,10 +471,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         
         do {
             try optimizelyClient.sendOdpEvent(type: type, action: action, identifiers: identifiers, data: data)
-            result(self.createResponse(success: true))
         } catch {
-            result(self.createResponse(success: false, reason: error.localizedDescription))
+            print(error.localizedDescription)
         }
+        result(self.createResponse(success: true))
     }
     
     /// Fetch all qualified segments for the user context.
