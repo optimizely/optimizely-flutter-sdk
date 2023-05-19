@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2022, Optimizely, Inc. and contributors                        *
+ * Copyright 2022-2023, Optimizely, Inc. and contributors                        *
  *                                                                          *
  * Licensed under the Apache License, Version 2.0 (the "License");          *
  * you may not use this file except in compliance with the License.         *
@@ -117,6 +117,30 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
       }
       case APIs.REMOVE_ALL_FORCED_DECISIONS: {
         removeAllForcedDecisions(argumentsParser, result);
+        break;
+      }
+      case APIs.GET_QUALIFIED_SEGMENTS: {
+        getQualifiedSegments(argumentsParser, result);
+        break;
+      }
+      case APIs.SET_QUALIFIED_SEGMENTS: {
+        setQualifiedSegments(argumentsParser, result);
+        break;
+      }
+      case APIs.GET_VUID: {
+        getVuid(argumentsParser, result);
+        break;
+      }
+      case APIs.IS_QUALIFIED_FOR: {
+        isQualifiedFor(argumentsParser, result);
+        break;
+      }
+      case APIs.SEND_ODP_EVENT: {
+        sendODPEvent(argumentsParser, result);
+        break;
+      }
+      case APIs.FETCH_QUALIFIED_SEGMENTS: {
+        fetchQualifiedSegments(argumentsParser, result);
         break;
       }
       case APIs.CLOSE: {

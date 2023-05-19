@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2022, Optimizely, Inc. and contributors                        *
+ * Copyright 2022-2023, Optimizely, Inc. and contributors                        *
  *                                                                          *
  * Licensed under the Apache License, Version 2.0 (the "License");          *
  * you may not use this file except in compliance with the License.         *
@@ -29,6 +29,7 @@ import com.optimizely.ab.notification.ActivateNotification;
 import com.optimizely.ab.notification.DecisionNotification;
 import com.optimizely.ab.notification.TrackNotification;
 import com.optimizely.ab.notification.UpdateConfigNotification;
+import com.optimizely.ab.odp.ODPSegmentOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 
 public class Utils {
@@ -58,6 +59,26 @@ public class Utils {
                     break;
                 case Constants.DecideOption.INCLUDE_REASONS:
                     convertedOptions.add(OptimizelyDecideOption.INCLUDE_REASONS);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return convertedOptions;
+    }
+
+    public static List<ODPSegmentOption> getSegmentOptions(List<String> options) {
+        if(options == null || options.isEmpty()) {
+            return null;
+        }
+        List<ODPSegmentOption> convertedOptions = new ArrayList<>();
+        for(String option: options) {
+            switch(option) {
+                case Constants.SegmentOption.IGNORE_CACHE:
+                    convertedOptions.add(ODPSegmentOption.IGNORE_CACHE);
+                    break;
+                case Constants.SegmentOption.RESET_CACHE:
+                    convertedOptions.add(ODPSegmentOption.RESET_CACHE);
                     break;
                 default:
                     break;

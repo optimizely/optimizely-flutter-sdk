@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2022, Optimizely, Inc. and contributors                        *
+ * Copyright 2022-2023, Optimizely, Inc. and contributors                        *
  *                                                                          *
  * Licensed under the Apache License, Version 2.0 (the "License");          *
  * you may not use this file except in compliance with the License.         *
@@ -46,6 +46,7 @@ import com.optimizely.ab.notification.DecisionNotification;
 import com.optimizely.ab.notification.NotificationCenter;
 import com.optimizely.ab.notification.TrackNotification;
 import com.optimizely.ab.notification.UpdateConfigNotification;
+import com.optimizely.ab.odp.ODPSegmentOption;
 import com.optimizely.ab.optimizelyconfig.OptimizelyConfig;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecision;
@@ -53,6 +54,11 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 import com.optimizely.optimizely_flutter_sdk.helper_classes.Utils;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.DISABLE_ODP;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SEGMENTS_CACHE_SIZE;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SEGMENTS_CACHE_TIMEOUT_IN_SECONDS;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.TIMEOUT_FOR_ODP_EVENT_IN_SECONDS;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.TIMEOUT_FOR_SEGMENT_FETCH_IN_SECONDS;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.getNotificationListenerType;
 
 import java.util.Collections;
@@ -127,16 +133,48 @@ public class OptimizelyFlutterClient {
         notificationIdsTracker.remove(sdkKey);
 
         List<OptimizelyDecideOption> defaultDecideOptions = argumentsParser.getDecideOptions();
+
+        // SDK Settings Default Values
+        int segmentsCacheSize = 100;
+        int segmentsCacheTimeoutInSecs = 600;
+        int timeoutForSegmentFetchInSecs = 10;
+        int timeoutForOdpEventInSecs = 10;
+        boolean disableOdp = false;
+        Map<String, Object> sdkSettings = argumentsParser.getOptimizelySdkSettings();
+        if (sdkSettings != null) {
+            if (sdkSettings.containsKey(SEGMENTS_CACHE_SIZE)) {
+                segmentsCacheSize = (Integer) sdkSettings.get(SEGMENTS_CACHE_SIZE);
+            }
+            if (sdkSettings.containsKey(SEGMENTS_CACHE_TIMEOUT_IN_SECONDS)) {
+                segmentsCacheTimeoutInSecs = (Integer) sdkSettings.get(SEGMENTS_CACHE_TIMEOUT_IN_SECONDS);
+            }
+            if (sdkSettings.containsKey(TIMEOUT_FOR_SEGMENT_FETCH_IN_SECONDS)) {
+                timeoutForSegmentFetchInSecs = (Integer) sdkSettings.get(TIMEOUT_FOR_SEGMENT_FETCH_IN_SECONDS);
+            }
+            if (sdkSettings.containsKey(TIMEOUT_FOR_ODP_EVENT_IN_SECONDS)) {
+                timeoutForOdpEventInSecs = (Integer) sdkSettings.get(TIMEOUT_FOR_ODP_EVENT_IN_SECONDS);
+            }
+            if (sdkSettings.containsKey(DISABLE_ODP)) {
+                disableOdp = (boolean) sdkSettings.get(DISABLE_ODP);
+            }
+        }
         // Creating new instance
-        OptimizelyManager optimizelyManager = OptimizelyManager.builder()
+        OptimizelyManager.Builder optimizelyManagerBuilder = OptimizelyManager.builder()
                 .withEventProcessor(batchProcessor)
                 .withEventHandler(eventHandler)
                 .withNotificationCenter(notificationCenter)
                 .withDatafileDownloadInterval(datafilePeriodicDownloadInterval, TimeUnit.SECONDS)
                 .withErrorHandler(new RaiseExceptionErrorHandler())
                 .withDefaultDecideOptions(defaultDecideOptions)
-                .withSDKKey(sdkKey)
-                .build(context);
+                .withODPSegmentCacheSize(segmentsCacheSize)
+                .withODPSegmentCacheTimeout(segmentsCacheTimeoutInSecs, TimeUnit.SECONDS)
+                .withTimeoutForODPSegmentFetch(timeoutForSegmentFetchInSecs)
+                .withTimeoutForODPEventDispatch(timeoutForOdpEventInSecs)
+                .withSDKKey(sdkKey);
+        if (disableOdp) {
+            optimizelyManagerBuilder.withODPDisabled();
+        }
+        OptimizelyManager optimizelyManager = optimizelyManagerBuilder.build(context);
 
         optimizelyManager.initialize(context, null, (OptimizelyClient client) -> {
             if (client.isValid()) {
@@ -158,14 +196,14 @@ public class OptimizelyFlutterClient {
 
         String userId = argumentsParser.getUserId();
         Map<String, Object> attributes = argumentsParser.getAttributes();
-        if (userId == null) {
-            result.success(createResponse(ErrorMessage.INVALID_PARAMS));
-            return;
-        }
         try {
             String userContextId = Utils.getRandomUUID();
-
-            OptimizelyUserContext optlyUserContext = optimizelyClient.createUserContext(userId, attributes);
+            OptimizelyUserContext optlyUserContext;
+            if (userId != null) {
+                optlyUserContext = optimizelyClient.createUserContext(userId, attributes);
+            } else {
+                optlyUserContext = optimizelyClient.createUserContext(attributes);
+            }
             if (optlyUserContext != null) {
                 if (userContextsTracker.containsKey(sdkKey)) {
                     userContextsTracker.get(sdkKey).put(userContextId, optlyUserContext);
@@ -388,6 +426,109 @@ public class OptimizelyFlutterClient {
         userContext.removeAllForcedDecisions();
 
         result.success(createResponse());
+    }
+
+    /// Returns an array of segments that the user is qualified for.
+    protected void getQualifiedSegments(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (!isUserContextValid(sdkKey, userContext, result)) {
+            return;
+        }
+        List<String> qualifiedSegments = userContext.getQualifiedSegments();
+        if (qualifiedSegments != null) {
+            result.success(createResponse(Collections.singletonMap(RequestParameterKey.QUALIFIED_SEGMENTS, qualifiedSegments)));
+        } else {
+            result.success(createResponse(ErrorMessage.QUALIFIED_SEGMENTS_NOT_FOUND));
+        }
+    }
+
+    /// Sets qualified segments for the user context.
+    protected void setQualifiedSegments(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (!isUserContextValid(sdkKey, userContext, result)) {
+            return;
+        }
+        List<String> qualifiedSegments = argumentsParser.getQualifiedSegments();
+        if (qualifiedSegments == null) {
+            result.success(createResponse(ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+        userContext.setQualifiedSegments(qualifiedSegments);
+        result.success(createResponse());
+    }
+
+    /// Returns the device vuid.
+    protected void getVuid(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (!isOptimizelyClientValid(sdkKey, optimizelyClient, result)) {
+            return;
+        }
+        result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VUID, optimizelyClient.getVuid()), ""));
+    }
+
+    /// Checks if the user is qualified for the given segment.
+    protected void isQualifiedFor(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (!isUserContextValid(sdkKey, userContext, result)) {
+            return;
+        }
+        String segment = argumentsParser.getSegment();
+        if (segment == null) {
+            result.success(createResponse(ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        result.success(createResponse(userContext.isQualifiedFor(segment)));
+    }
+
+    /// Send an event to the ODP server.
+    protected void sendODPEvent(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyClient optimizelyClient = getOptimizelyClient(sdkKey);
+        if (!isOptimizelyClientValid(sdkKey, optimizelyClient, result)) {
+            return;
+        }
+        String action = argumentsParser.getAction();
+        if (action == null || action.isEmpty()) {
+            result.success(createResponse(ErrorMessage.INVALID_PARAMS));
+            return;
+        }
+
+        String type = argumentsParser.getType();
+        Map<String, String> identifiers = argumentsParser.getIdentifiers();
+        if (identifiers == null) {
+            identifiers = new HashMap<>();
+        }
+        Map<String, Object> data = argumentsParser.getData();
+        if (data == null) {
+            data = new HashMap<>();
+        }
+
+       optimizelyClient.sendODPEvent(type, action, identifiers, data);
+       result.success(createResponse());
+    }
+
+    /// Fetch all qualified segments for the user context.
+    protected void fetchQualifiedSegments(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (!isUserContextValid(sdkKey, userContext, result)) {
+            return;
+        }
+        List<ODPSegmentOption> segmentOptions = argumentsParser.getSegmentOptions();
+
+        try {
+            userContext.fetchQualifiedSegments((fetchQualifiedResult) -> {
+                result.success(createResponse(fetchQualifiedResult));
+            },segmentOptions);
+
+        } catch (Exception ex) {
+            result.success(createResponse(ex.getMessage()));
+        }
     }
 
     protected void close(ArgumentsParser argumentsParser, @NonNull Result result) {
