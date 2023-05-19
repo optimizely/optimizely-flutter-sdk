@@ -46,8 +46,6 @@ public class Constants {
         public static final String SET_QUALIFIED_SEGMENTS = "setQualifiedSegments";
         public static final String IS_QUALIFIED_FOR = "isQualifiedFor";
         public static final String FETCH_QUALIFIED_SEGMENTS = "fetchQualifiedSegments";
-
-
     }
 
     public static class NotificationType {
@@ -96,7 +94,6 @@ public class Constants {
         public static final String TIMEOUT_FOR_SEGMENT_FETCH_IN_SECONDS = "timeoutForSegmentFetchInSecs";
         public static final String TIMEOUT_FOR_ODP_EVENT_IN_SECONDS = "timeoutForOdpEventInSecs";
         public static final String DISABLE_ODP = "disableOdp";
-
     }
 
     public static class ErrorMessage {

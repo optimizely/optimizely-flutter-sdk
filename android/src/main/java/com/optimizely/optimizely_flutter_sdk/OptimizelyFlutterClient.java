@@ -508,12 +508,8 @@ public class OptimizelyFlutterClient {
             data = new HashMap<>();
         }
 
-        try {
-           optimizelyClient.sendODPEvent(type, action, identifiers, data);
-           result.success(createResponse());
-        } catch (Exception ex) {
-            result.success(createResponse(ex.getMessage()));
-        }
+       optimizelyClient.sendODPEvent(type, action, identifiers, data);
+       result.success(createResponse());
     }
 
     /// Fetch all qualified segments for the user context.
