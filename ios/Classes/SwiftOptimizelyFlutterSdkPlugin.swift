@@ -450,7 +450,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
-        guard let action = parameters[RequestParameterKey.action] as? String else {
+        guard let action = parameters[RequestParameterKey.action] as? String, action != "" else {
             result(createResponse(success: false, reason: ErrorMessage.invalidParameters))
             return
         }
@@ -471,10 +471,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         
         do {
             try optimizelyClient.sendOdpEvent(type: type, action: action, identifiers: identifiers, data: data)
-            result(self.createResponse(success: true))
         } catch {
-            result(self.createResponse(success: false, reason: error.localizedDescription))
+            print(error.localizedDescription)
         }
+        result(self.createResponse(success: true))
     }
     
     /// Fetch all qualified segments for the user context.
