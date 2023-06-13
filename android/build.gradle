@@ -76,7 +76,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
     //implementation group: 'org.slf4j', name: 'slf4j-android', version: '1.7.25'
-    //implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10"
     implementation "com.optimizely.ab:android-sdk:4.0.0-beta2"

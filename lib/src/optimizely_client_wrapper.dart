@@ -72,7 +72,7 @@ class OptimizelyClientWrapper {
       Constants.datafilePeriodicDownloadInterval:
           datafilePeriodicDownloadInterval,
       Constants.optimizelyDecideOption: convertedOptions,
-      Constants.defaultLogLevel: defaultLogLevel.toString(),
+      Constants.defaultLogLevel: defaultLogLevel.toString().split('.').last,   // "error", "warning", "info", "debug"
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
