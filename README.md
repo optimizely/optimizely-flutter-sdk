@@ -2,10 +2,8 @@
 [![Pub Version](https://img.shields.io/pub/v/optimizely_flutter_sdk?color=blueviolet)](https://pub.dev/packages/optimizely_flutter_sdk)
 [![Pub](https://img.shields.io/pub/v/optimizely_flutter_sdk.svg)](https://pub.dev/packages/optimizely_flutter_sdk)
 [![Apache 2.0](https://img.shields.io/github/license/nebula-plugins/gradle-extra-configurations-plugin.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-<!-- TODO: Resolve FSSDK-8990 to fix coverage & thus build, then return these 2 bades as #2 & # above
 [![Build Status](https://github.com/optimizely/optimizely-flutter-sdk/actions/workflows/flutter.yml/badge.svg?branch=master)](https://github.com/optimizely/optimizely-flutter-sdk/actions)
 [![Coverage Status](https://coveralls.io/repos/github/optimizely/optimizely-flutter-sdk/badge.svg?branch=master)](https://coveralls.io/github/optimizely/optimizely-flutter-sdk?branch=master)
--->
 
 This repository houses the Flutter SDK for use with Optimizely Feature Experimentation and Optimizely Full Stack (legacy).
 
