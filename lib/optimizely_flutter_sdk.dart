@@ -28,6 +28,8 @@ import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_respon
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 
+import 'src/data_objects/log_levels.dart';
+
 export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
     show ClientPlatform, ListenerType;
 export 'package:optimizely_flutter_sdk/src/user_context/optimizely_forced_decision.dart'
@@ -50,6 +52,8 @@ export 'package:optimizely_flutter_sdk/src/data_objects/sdk_settings.dart'
     show SDKSettings;
 export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
     show DatafileHostOptions;
+export 'package:optimizely_flutter_sdk/src/data_objects/log_levels.dart'
+    show OptimizelyLogLevel;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
@@ -63,6 +67,7 @@ class OptimizelyFlutterSdk {
   final int _datafilePeriodicDownloadInterval;
   final Map<ClientPlatform, DatafileHostOptions> _datafileHostOptions;
   final Set<OptimizelyDecideOption> _defaultDecideOptions;
+  final OptimizelyLogLevel _defaultLogLevel;
   final SDKSettings _sdkSettings;
   OptimizelyFlutterSdk(this._sdkKey,
       {EventOptions eventOptions = const EventOptions(),
@@ -70,11 +75,13 @@ class OptimizelyFlutterSdk {
           10 * 60, // Default time interval in seconds
       Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
       Set<OptimizelyDecideOption> defaultDecideOptions = const {},
+      OptimizelyLogLevel defaultLogLevel = OptimizelyLogLevel.info,
       SDKSettings sdkSettings = const SDKSettings()})
       : _eventOptions = eventOptions,
         _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
         _datafileHostOptions = datafileHostOptions,
         _defaultDecideOptions = defaultDecideOptions,
+        _defaultLogLevel = defaultLogLevel,
         _sdkSettings = sdkSettings;
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
@@ -85,6 +92,7 @@ class OptimizelyFlutterSdk {
         _datafilePeriodicDownloadInterval,
         _datafileHostOptions,
         _defaultDecideOptions,
+        _defaultLogLevel,
         _sdkSettings);
   }
 

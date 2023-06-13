@@ -31,6 +31,9 @@ import com.optimizely.ab.notification.TrackNotification;
 import com.optimizely.ab.notification.UpdateConfigNotification;
 import com.optimizely.ab.odp.ODPSegmentOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
 public class Utils {
 
@@ -104,4 +107,27 @@ public class Utils {
         }
         return listenerClass;
     }
+
+    public static Level mapLogLevel(String logLevel) {
+        Level level = Level.INFO;
+
+        if (logLevel == null || logLevel.isEmpty()) {
+            return level;
+        }
+
+        switch (logLevel) {
+            case Constants.LogLevel.ERROR: level = Level.ERROR; break;
+            case Constants.LogLevel.WARNING: level = Level.WARN; break;
+            case Constants.LogLevel.INFO: level = Level.INFO; break;
+            case Constants.LogLevel.DEBUG: level = Level.DEBUG; break;
+            default: {}
+        }
+        return level;
+    }
+
+    public static void setDefaultLogLevel(String logLevel) {
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(Utils.mapLogLevel(logLevel));
+    }
+
 }
