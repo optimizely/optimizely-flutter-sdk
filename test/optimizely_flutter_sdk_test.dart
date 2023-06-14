@@ -546,7 +546,7 @@ void main() {
       });
     });
 
-    group("log level", () {
+    group("log level configuration", () {
       test("with no defaultLogLevel, log level should be info level", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
 

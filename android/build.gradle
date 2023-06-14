@@ -76,7 +76,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
-    //"logback-android" required for programmatic control of glbal sl4j log level.
+    //"logback-android" required for programmatic control of global sl4j log level.
     // - default log configuration in /assets/logback.xml
     // - [ref] https://github.com/tony19/logback-android
     implementation 'com.github.tony19:logback-android:3.0.0'

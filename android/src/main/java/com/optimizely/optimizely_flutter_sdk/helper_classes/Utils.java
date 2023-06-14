@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import androidx.annotation.Nullable;
 
 import static com.optimizely.ab.notification.DecisionNotification.FeatureVariableDecisionNotificationBuilder.SOURCE_INFO;
 
@@ -113,13 +114,13 @@ public class Utils {
     // - "logback-android" logger (com.github.tony19:logback-android) is integrated in build.gradle.
     // - log-level control is not integrated into the native android-sdk core since this solution depends on logback logger.
 
-    public static void setDefaultLogLevel(String logLevel) {
+    public static void setDefaultLogLevel(@Nullable String logLevel) {
         Level defaultLogLevel = Utils.mapLogLevel(logLevel);
         Logger rootLogger = (Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(defaultLogLevel);
     }
 
-    public static Level mapLogLevel(String logLevel) {
+    public static Level mapLogLevel(@Nullable String logLevel) {
         Level level = Level.INFO;
 
         if (logLevel == null || logLevel.isEmpty()) {
