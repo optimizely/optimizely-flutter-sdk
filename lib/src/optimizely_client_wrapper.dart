@@ -27,7 +27,7 @@ import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_respon
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
-import 'data_objects/log_levels.dart';
+import 'data_objects/log_level.dart';
 
 enum ListenerType { activate, track, decision, logEvent, projectConfigUpdate }
 
