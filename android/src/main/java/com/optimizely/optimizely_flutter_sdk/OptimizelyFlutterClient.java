@@ -97,9 +97,7 @@ public class OptimizelyFlutterClient {
             maxQueueSize = argumentsParser.getEventMaxQueueSize();
         }
 
-        if (argumentsParser.getDefaultLogLevel() != null) {
-            Utils.setDefaultLogLevel(argumentsParser.getDefaultLogLevel());
-        }
+        Utils.setDefaultLogLevel(argumentsParser.getDefaultLogLevel());
 
         DefaultEventHandler eventHandler = DefaultEventHandler.getInstance(context);
         eventHandler.setDispatchInterval(-1L);
