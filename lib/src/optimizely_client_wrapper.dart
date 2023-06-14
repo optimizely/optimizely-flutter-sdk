@@ -67,12 +67,13 @@ class OptimizelyClientWrapper {
       SDKSettings sdkSettings) async {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
+    final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
       Constants.datafilePeriodicDownloadInterval:
           datafilePeriodicDownloadInterval,
       Constants.optimizelyDecideOption: convertedOptions,
-      Constants.defaultLogLevel: defaultLogLevel.toString().split('.').last,   // "error", "warning", "info", "debug"
+      Constants.defaultLogLevel: convertedLogLevel,
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,

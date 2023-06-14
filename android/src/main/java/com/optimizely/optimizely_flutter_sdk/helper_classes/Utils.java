@@ -109,8 +109,9 @@ public class Utils {
     }
 
     // SLF4J log level control:
-    // - logback logger (ch.qos.logback) is the only option that supports global log level control programmatically (not only via configuration file)
+    // - logback logger (ch.qos.logback) is the only option available that supports global log level control programmatically (not only via configuration file)
     // - "logback-android" logger (com.github.tony19:logback-android) is integrated in build.gradle.
+    // - log-level control is not integrated into the native android-sdk core since this solution depends on logback logger.
 
     public static void setDefaultLogLevel(String logLevel) {
         Level defaultLogLevel = Utils.mapLogLevel(logLevel);
