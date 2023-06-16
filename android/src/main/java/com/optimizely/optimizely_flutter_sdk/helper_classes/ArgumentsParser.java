@@ -72,6 +72,10 @@ public class ArgumentsParser {
         return Utils.getDecideOptions((List<String>) arguments.get(Constants.RequestParameterKey.DECIDE_OPTIONS));
     }
 
+    public String getDefaultLogLevel() {
+        return (String) arguments.get(Constants.RequestParameterKey.DEFAULT_LOG_LEVEL);
+    }
+
     public String getFlagKey() {
         return (String) arguments.get(Constants.RequestParameterKey.FLAG_KEY);
     }

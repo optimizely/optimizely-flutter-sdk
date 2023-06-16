@@ -106,7 +106,12 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             decideOptions = options
         }
         let defaultDecideOptions = Utils.getDecideOptions(options: decideOptions)
-        
+
+        var defaultLogLevel = OptimizelyLogLevel.info
+        if let logLevel = parameters[RequestParameterKey.defaultLogLevel] as? String {
+            defaultLogLevel = Utils.getDefaultLogLevel(logLevel)
+        }
+
         // SDK Settings Default Values
         var segmentsCacheSize: Int = 100
         var segmentsCacheTimeoutInSecs: Int = 600
@@ -152,7 +157,14 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
         // Creating new instance
-        let optimizelyInstance = OptimizelyClient(sdkKey:sdkKey, eventDispatcher: eventDispatcher, datafileHandler: datafileHandler, periodicDownloadInterval: datafilePeriodicDownloadInterval, defaultDecideOptions: defaultDecideOptions, settings: optimizelySdkSettings)
+        let optimizelyInstance = OptimizelyClient(
+            sdkKey:sdkKey, 
+            eventDispatcher: eventDispatcher, 
+            datafileHandler: datafileHandler, 
+            periodicDownloadInterval: datafilePeriodicDownloadInterval, 
+            defaultLogLevel: defaultLogLevel,
+            defaultDecideOptions: defaultDecideOptions, 
+            settings: optimizelySdkSettings)
         
         optimizelyInstance.start{ [weak self] res in
             switch res {

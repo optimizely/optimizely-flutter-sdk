@@ -67,6 +67,7 @@ public class Constants {
         public static final String ATTRIBUTES = "attributes";
         public static final String DECIDE_KEYS = "keys";
         public static final String DECIDE_OPTIONS = "optimizelyDecideOption";
+        public static final String DEFAULT_LOG_LEVEL = "defaultLogLevel";
         public static final String EVENT_BATCH_SIZE = "eventBatchSize";
         public static final String EVENT_TIME_INTERVAL = "eventTimeInterval";
         public static final String EVENT_MAX_QUEUE_SIZE = "eventMaxQueueSize";
@@ -152,5 +153,12 @@ public class Constants {
     public static class SegmentOption {
         public static final String IGNORE_CACHE = "ignoreCache";
         public static final String RESET_CACHE = "resetCache";
+    }
+
+    public static class LogLevel {
+        public static final String ERROR = "error";
+        public static final String WARNING = "warning";
+        public static final String INFO = "info";
+        public static final String DEBUG = "debug";
     }
 }

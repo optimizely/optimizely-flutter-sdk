@@ -56,6 +56,7 @@ void main() {
   DatafileHostOptions datafileHostOptions = const DatafileHostOptions("", "");
   SDKSettings sdkSettings = const SDKSettings();
   int datafilePeriodicDownloadInterval = 0;
+  String defaultLogLevel = "error";
 
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
   dynamic mockOptimizelyConfig;
@@ -83,6 +84,9 @@ void main() {
         case Constants.initializeMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
           expect(methodCall.arguments[Constants.userContextId], isNull);
+
+          defaultLogLevel = methodCall.arguments[Constants.defaultLogLevel];
+
           // To Check if eventOptions were received
           eventOptions = EventOptions(
               batchSize: methodCall.arguments[Constants.eventBatchSize],
@@ -539,6 +543,33 @@ void main() {
         expect(datafileHostOptions.datafileHostSuffix,
             equals(expectedDatafileHostOptions.datafileHostSuffix));
         debugDefaultTargetPlatformOverride = null;
+      });
+    });
+
+    group("log level configuration", () {
+      test("with no defaultLogLevel, log level should be info level", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+        var response = await sdk.initializeClient();
+
+        expect(response.success, isTrue);
+        expect(defaultLogLevel, equals("info"));
+      });
+
+      test("with a valid defaultLogLevel parameter", () async {
+        var sdk = OptimizelyFlutterSdk(testSDKKey, defaultLogLevel: OptimizelyLogLevel.debug);
+
+        var response = await sdk.initializeClient();
+
+        expect(response.success, isTrue);
+        expect(defaultLogLevel, equals("debug"));
+      });
+
+      test("should convert OptimizelyLogLevel to string", () async {
+        expect(Utils.convertLogLevel(OptimizelyLogLevel.error), "error");
+        expect(Utils.convertLogLevel(OptimizelyLogLevel.warning), "warning");
+        expect(Utils.convertLogLevel(OptimizelyLogLevel.info), "info");
+        expect(Utils.convertLogLevel(OptimizelyLogLevel.debug), "debug");
       });
     });
 

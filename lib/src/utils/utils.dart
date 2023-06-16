@@ -18,6 +18,7 @@ import 'dart:io' show Platform;
 
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
 
 class Utils {
   static Map<OptimizelyDecideOption, String> decideOptions = {
@@ -93,5 +94,11 @@ class Utils {
   static List<String> convertSegmentOptions(
       Set<OptimizelySegmentOption> options) {
     return options.map((option) => Utils.segmentOptions[option]!).toList();
+  }
+
+  static String convertLogLevel(OptimizelyLogLevel logLevel) {
+    // OptimizelyLogLevel.error -> "error"
+    // OptimizelyLogLevel.debug -> "debug"
+    return logLevel.toString().split('.').last;  
   }
 }

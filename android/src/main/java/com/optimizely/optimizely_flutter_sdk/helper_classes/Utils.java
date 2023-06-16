@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import androidx.annotation.Nullable;
 
 import static com.optimizely.ab.notification.DecisionNotification.FeatureVariableDecisionNotificationBuilder.SOURCE_INFO;
 
@@ -31,6 +32,9 @@ import com.optimizely.ab.notification.TrackNotification;
 import com.optimizely.ab.notification.UpdateConfigNotification;
 import com.optimizely.ab.odp.ODPSegmentOption;
 import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
 public class Utils {
 
@@ -104,4 +108,33 @@ public class Utils {
         }
         return listenerClass;
     }
+
+    // SLF4J log level control:
+    // - logback logger (ch.qos.logback) is the only option available that supports global log level control programmatically (not only via configuration file)
+    // - "logback-android" logger (com.github.tony19:logback-android) is integrated in build.gradle.
+    // - log-level control is not integrated into the native android-sdk core since this solution depends on logback logger.
+
+    public static void setDefaultLogLevel(@Nullable String logLevel) {
+        Level defaultLogLevel = Utils.mapLogLevel(logLevel);
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(defaultLogLevel);
+    }
+
+    public static Level mapLogLevel(@Nullable String logLevel) {
+        Level level = Level.INFO;
+
+        if (logLevel == null || logLevel.isEmpty()) {
+            return level;
+        }
+
+        switch (logLevel) {
+            case Constants.LogLevel.ERROR: level = Level.ERROR; break;
+            case Constants.LogLevel.WARNING: level = Level.WARN; break;
+            case Constants.LogLevel.INFO: level = Level.INFO; break;
+            case Constants.LogLevel.DEBUG: level = Level.DEBUG; break;
+            default: {}
+        }
+        return level;
+    }
+
 }
