@@ -24,7 +24,7 @@ jobs:
     - name: Upload coverage to Coveralls
       uses: coverallsapp/github-action@master
       with:
-        github-token: ${{ secrets.CI_USER_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         
   integration_android_tests:
     runs-on: ubuntu-latest

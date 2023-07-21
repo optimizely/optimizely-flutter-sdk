@@ -32,6 +32,7 @@ class _MyAppState extends State<MyApp> {
         datafilePeriodicDownloadInterval: 10 * 60,
         eventOptions: const EventOptions(
             batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
+        defaultLogLevel: OptimizelyLogLevel.debug,
         defaultDecideOptions: defaultOptions);
     var response = await flutterSDK.initializeClient();
 

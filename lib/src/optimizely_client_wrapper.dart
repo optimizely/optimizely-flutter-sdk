@@ -27,6 +27,8 @@ import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_respon
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 
+import 'data_objects/log_level.dart';
+
 enum ListenerType { activate, track, decision, logEvent, projectConfigUpdate }
 
 enum ClientPlatform { iOS, android }
@@ -61,14 +63,17 @@ class OptimizelyClientWrapper {
       int datafilePeriodicDownloadInterval,
       Map<ClientPlatform, DatafileHostOptions> datafileHostOptions,
       Set<OptimizelyDecideOption> defaultDecideOptions,
+      OptimizelyLogLevel defaultLogLevel,
       SDKSettings sdkSettings) async {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
+    final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
       Constants.datafilePeriodicDownloadInterval:
           datafilePeriodicDownloadInterval,
       Constants.optimizelyDecideOption: convertedOptions,
+      Constants.defaultLogLevel: convertedLogLevel,
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,

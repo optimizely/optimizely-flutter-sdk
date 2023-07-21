@@ -97,6 +97,8 @@ public class OptimizelyFlutterClient {
             maxQueueSize = argumentsParser.getEventMaxQueueSize();
         }
 
+        Utils.setDefaultLogLevel(argumentsParser.getDefaultLogLevel());
+
         DefaultEventHandler eventHandler = DefaultEventHandler.getInstance(context);
         eventHandler.setDispatchInterval(-1L);
         NotificationCenter notificationCenter = new NotificationCenter();

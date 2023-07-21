@@ -202,4 +202,17 @@ public class Utils: NSObject {
             return nil
         }
     }
+
+    static func getDefaultLogLevel(_ logLevel: String) -> OptimizelyLogLevel {
+        var defaultLogLevel: OptimizelyLogLevel
+        switch logLevel {
+            case "error": defaultLogLevel = OptimizelyLogLevel.error
+            case "warning": defaultLogLevel = OptimizelyLogLevel.warning
+            case "info": defaultLogLevel = OptimizelyLogLevel.info
+            case "debug": defaultLogLevel = OptimizelyLogLevel.debug
+            default: defaultLogLevel = OptimizelyLogLevel.info
+        }
+        return defaultLogLevel;
+    }
+
 }
