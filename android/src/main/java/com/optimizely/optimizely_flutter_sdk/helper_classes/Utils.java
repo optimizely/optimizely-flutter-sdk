@@ -72,7 +72,7 @@ public class Utils {
     }
 
     public static List<ODPSegmentOption> getSegmentOptions(List<String> options) {
-        if(options == null || options.isEmpty()) {
+        if(options == null) {
             return null;
         }
         List<ODPSegmentOption> convertedOptions = new ArrayList<>();
