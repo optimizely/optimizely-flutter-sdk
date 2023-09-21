@@ -1,5 +1,17 @@
 # Optimizely Flutter SDK Changelog
 
+## 1.0.2-beta
+September 21, 2023
+
+### Bug Fixes
+
+* Crash fixed, fetchQualifiedSegments without options ([#64](https://github.com/optimizely/optimizely-flutter-sdk/pull/64)).
+
+### Functionality Enhancements
+
+* Update Github Issue Templates ([#65](https://github.com/optimizely/optimizely-flutter-sdk/pull/65)).
+* Add configurable log level support ([#63](https://github.com/optimizely/optimizely-flutter-sdk/pull/63)).
+
 ## 1.0.1
 May 8, 2023
 
