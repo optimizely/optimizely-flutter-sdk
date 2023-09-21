@@ -1,7 +1,12 @@
 # Optimizely Flutter SDK Changelog
 
-## 1.0.2-beta
+## 2.0.0-beta
 September 21, 2023
+
+### New Features
+
+* Add ODP for iOS ([#52](https://github.com/optimizely/optimizely-flutter-sdk/pull/52)).
+* Add ODP for Android ([#57](https://github.com/optimizely/optimizely-flutter-sdk/pull/57)).
 
 ### Bug Fixes
 
