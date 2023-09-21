@@ -75,7 +75,7 @@ void main() {
     OptimizelyClientWrapper.configUpdateCallbacksById = {};
     OptimizelyClientWrapper.logEventCallbacksById = {};
     OptimizelyClientWrapper.nextCallbackId = 0;
-    tester = TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger;
+    tester = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
     tester?.setMockMethodCallHandler(channel, (MethodCall methodCall) async {
       // log.add(methodCall);
