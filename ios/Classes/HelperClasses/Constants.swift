@@ -114,6 +114,8 @@ struct RequestParameterKey {
     static let timeoutForSegmentFetchInSecs = "timeoutForSegmentFetchInSecs"
     static let timeoutForOdpEventInSecs = "timeoutForOdpEventInSecs"
     static let disableOdp = "disableOdp"
+    static let  sdkClientName = "sdkClientName";
+    static let sdkVersion = "sdkVersion";  
 }
 
 struct ResponseKey {

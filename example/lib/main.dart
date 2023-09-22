@@ -28,12 +28,17 @@ class _MyAppState extends State<MyApp> {
       OptimizelyDecideOption.includeReasons,
       OptimizelyDecideOption.excludeVariables
     };
+    
+    const sdkSetting = SDKSettings(sdkName: "flutter-sdk", sdkVersion: "1.0.0");
+
     var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
         datafilePeriodicDownloadInterval: 10 * 60,
         eventOptions: const EventOptions(
             batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
         defaultLogLevel: OptimizelyLogLevel.debug,
-        defaultDecideOptions: defaultOptions);
+        defaultDecideOptions: defaultOptions,
+        sdkSettings: sdkSetting
+        );
     var response = await flutterSDK.initializeClient();
 
     setState(() {

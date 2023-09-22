@@ -55,6 +55,8 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.Utils;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.DISABLE_ODP;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SDK_CLIENT_NAME;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SDK_VERSION;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SEGMENTS_CACHE_SIZE;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SEGMENTS_CACHE_TIMEOUT_IN_SECONDS;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.TIMEOUT_FOR_ODP_EVENT_IN_SECONDS;
@@ -142,6 +144,9 @@ public class OptimizelyFlutterClient {
         int timeoutForSegmentFetchInSecs = 10;
         int timeoutForOdpEventInSecs = 10;
         boolean disableOdp = false;
+        String sdkClientName = null;
+        String sdkVersion = null;
+        
         Map<String, Object> sdkSettings = argumentsParser.getOptimizelySdkSettings();
         if (sdkSettings != null) {
             if (sdkSettings.containsKey(SEGMENTS_CACHE_SIZE)) {
@@ -158,6 +163,12 @@ public class OptimizelyFlutterClient {
             }
             if (sdkSettings.containsKey(DISABLE_ODP)) {
                 disableOdp = (boolean) sdkSettings.get(DISABLE_ODP);
+            }
+            if (sdkSettings.containsKey(SDK_CLIENT_NAME)) {
+                sdkClientName = (String) sdkSettings.get(SDK_CLIENT_NAME);
+            }
+            if (sdkSettings.containsKey(SDK_VERSION)) {
+                sdkVersion = (String) sdkSettings.get(SDK_VERSION);
             }
         }
         // Creating new instance

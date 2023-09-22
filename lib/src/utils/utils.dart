@@ -19,6 +19,7 @@ import 'dart:io' show Platform;
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class Utils {
   static Map<OptimizelyDecideOption, String> decideOptions = {
@@ -100,5 +101,13 @@ class Utils {
     // OptimizelyLogLevel.error -> "error"
     // OptimizelyLogLevel.debug -> "debug"
     return logLevel.toString().split('.').last;  
+  }
+
+  // SDK name
+  static String sdkClientName = "flutter-sdk";
+  
+  static Future<String?> getSdkVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo.version;
   }
 }

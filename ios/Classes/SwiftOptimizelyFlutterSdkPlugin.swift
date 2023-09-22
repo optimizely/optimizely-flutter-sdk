@@ -118,6 +118,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         var timeoutForSegmentFetchInSecs: Int = 10
         var timeoutForOdpEventInSecs: Int = 10
         var disableOdp: Bool = false
+        var sdkClientName: String? = nil
+        var sdkVersion: String? = nil
         if let sdkSettings = parameters[RequestParameterKey.optimizelySdkSettings] as? Dictionary<String, Any?> {
             if let cacheSize = sdkSettings[RequestParameterKey.segmentsCacheSize] as? Int {
                 segmentsCacheSize = cacheSize
@@ -134,7 +136,14 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             if let isOdpDisabled = sdkSettings[RequestParameterKey.disableOdp] as? Bool {
                 disableOdp = isOdpDisabled
             }
+            if let reqSdkClientName = sdkSettings[RequestParameterKey.sdkClientName] as? String {
+                sdkClientName = reqSdkClientName
+            }
+            if let reqSdkVersion = sdkSettings[RequestParameterKey.sdkVersion] as? String {
+                sdkVersion = reqSdkVersion
+            }
         }
+        
         let optimizelySdkSettings = OptimizelySdkSettings(segmentsCacheSize: segmentsCacheSize, segmentsCacheTimeoutInSecs: segmentsCacheTimeoutInSecs, timeoutForSegmentFetchInSecs: timeoutForSegmentFetchInSecs, timeoutForOdpEventInSecs: timeoutForOdpEventInSecs, disableOdp: disableOdp)
         
         // Datafile Download Interval

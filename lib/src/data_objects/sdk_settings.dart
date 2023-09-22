@@ -25,6 +25,10 @@ class SDKSettings {
   final int timeoutForOdpEventInSecs;
   // Set this flag to true (default = false) to disable ODP features
   final bool disableOdp;
+  // 
+  final String? sdkName;
+  //
+  final String? sdkVersion;
 
   const SDKSettings({
     this.segmentsCacheSize = 100, // Default segmentsCacheSize
@@ -33,5 +37,7 @@ class SDKSettings {
         10, // Default timeoutForSegmentFetchInSecs
     this.timeoutForOdpEventInSecs = 10, // Default timeoutForOdpEventInSecs
     this.disableOdp = false, // Default disableOdp
+    this.sdkName,
+    this.sdkVersion
   });
 }

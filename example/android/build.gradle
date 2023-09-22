@@ -11,7 +11,7 @@ buildscript {
     }
 }
 ext {
-    android_sdk_version = "4.0.0-beta2"
+    android_sdk_version = "4.0.0-beta3"
 }
 allprojects {
     repositories {
@@ -28,6 +28,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

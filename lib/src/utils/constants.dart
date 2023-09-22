@@ -135,4 +135,8 @@ class Constants {
   static const String responseSuccess = "success";
   static const String responseResult = "result";
   static const String responseReason = "reason";
+
+  static const String sdkClientName = "sdkClientName";
+  static const String sdkVersion = "sdkVersion";
+  
 }

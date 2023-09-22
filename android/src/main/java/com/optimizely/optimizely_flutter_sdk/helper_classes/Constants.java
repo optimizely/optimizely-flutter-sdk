@@ -95,6 +95,8 @@ public class Constants {
         public static final String TIMEOUT_FOR_SEGMENT_FETCH_IN_SECONDS = "timeoutForSegmentFetchInSecs";
         public static final String TIMEOUT_FOR_ODP_EVENT_IN_SECONDS = "timeoutForOdpEventInSecs";
         public static final String DISABLE_ODP = "disableOdp";
+        public static final String SDK_CLIENT_NAME = "sdkClientName";
+        public static final String SDK_VERSION = "sdkVersion";
     }
 
     public static class ErrorMessage {
