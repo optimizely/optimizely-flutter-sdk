@@ -1,5 +1,23 @@
 # Optimizely Flutter SDK Changelog
 
+## 2.0.0
+January 23, 2024
+
+### New Features
+
+* Add ODP for iOS ([#52](https://github.com/optimizely/optimizely-flutter-sdk/pull/52)).
+* Add ODP for Android ([#57](https://github.com/optimizely/optimizely-flutter-sdk/pull/57)).
+
+### Bug Fixes
+
+* Crash fixed, fetchQualifiedSegments without options ([#64](https://github.com/optimizely/optimizely-flutter-sdk/pull/64)).
+* Fix proguard for logback and dart version ([#68](https://github.com/optimizely/optimizely-flutter-sdk/pull/68)).
+
+### Functionality Enhancements
+
+* Update Github Issue Templates ([#65](https://github.com/optimizely/optimizely-flutter-sdk/pull/65)).
+* Add configurable log level support ([#63](https://github.com/optimizely/optimizely-flutter-sdk/pull/63)).
+
 ## 2.0.0-beta
 September 21, 2023
 
