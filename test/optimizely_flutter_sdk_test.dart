@@ -24,6 +24,7 @@ import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 import 'dart:io';
 import 'dart:convert';
 
+import 'moc_platform_service.dart';
 import 'test_utils.dart';
 
 void main() {
@@ -1551,6 +1552,25 @@ void main() {
         expect(TestUtils.testActivateNotificationPayload(notifications, 4, 9),
             true);
       });
+    });
+  });
+
+  group("arbitary client name", () {
+    test("testClientNameForAndroid", () async {
+      final mocSercice = MocAndroidPlatformService();
+      final clinetName = Utils.getSdkClientName(mocSercice);
+      expect("flutter/android-sdk", clinetName);
+    });
+    test("testClientNameForiOS", () async {
+      final mocSercice = MociOSPlatformService();
+      final clinetName = Utils.getSdkClientName(mocSercice);
+      expect("flutter/swift-sdk", clinetName);
+    });
+
+     test("testClientNameForOther", () async {
+      final mocSercice = MocNotSupportedPlatformService();
+      final clinetName = Utils.getSdkClientName(mocSercice);
+      expect("flutter-sdk", clinetName);
     });
   });
 }
