@@ -21,7 +21,7 @@ See the [pubspec.yaml](https://github.com/optimizely/optimizely-flutter-sdk/blob
 
 On the Android platform, the SDK requires a minimum SDK version of 21 or higher and compile SDK version of 32.
 
-On the iOS platform, the SDK requires a minimum version of 11.0.
+On the iOS platform, the SDK requires a minimum version of 10.0.
 
 Other Flutter platforms are not currently supported by this SDK.
 
@@ -30,7 +30,7 @@ Other Flutter platforms are not currently supported by this SDK.
 To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
 
 ```
-   optimizely_flutter_sdk: ^2.0.0
+   optimizely_flutter_sdk: ^1.0.1
 ```
 
 Then run 
