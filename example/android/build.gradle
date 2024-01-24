@@ -11,7 +11,7 @@ buildscript {
     }
 }
 ext {
-    android_sdk_version = "4.0.0"
+    android_sdk_version = "4.0.0-beta3"
 }
 allprojects {
     repositories {
