@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:optimizely_flutter_sdk/package_info.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/activate_listener_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/activate_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
@@ -67,7 +68,7 @@ class OptimizelyClientWrapper {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
-    final sdkVersion = await Utils.getSdkVersion();
+    final sdkVersion = PackageInfo.version;
 
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
