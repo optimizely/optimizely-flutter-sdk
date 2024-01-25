@@ -14,11 +14,14 @@
 /// limitations under the License.                                           *
 ///**************************************************************************/
 
-import 'dart:io' show Platform;
-
+import 'dart:io' show Directory, FileSystemException, Platform;
+import 'dart:io' show File;
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:yaml/yaml.dart';
+
 
 
 class Utils {
@@ -103,7 +106,4 @@ class Utils {
     return logLevel.toString().split('.').last;  
   }
 
-  static Future<String> getSdkVersion() async {
-    return "test-2.0.0";
-  }
 }
