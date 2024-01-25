@@ -78,6 +78,8 @@ public class OptimizelyFlutterClient {
 
     protected void initializeOptimizely(@NonNull ArgumentsParser argumentsParser, @NonNull Result result) {
         String sdkKey = argumentsParser.getSdkKey();
+        String sdkName = Utils.sdkName;
+        String sdkVersion = argumentsParser.getSdkVersion();
         if (sdkKey == null) {
             result.success(createResponse(ErrorMessage.INVALID_PARAMS));
             return;
@@ -172,7 +174,8 @@ public class OptimizelyFlutterClient {
                 .withODPSegmentCacheTimeout(segmentsCacheTimeoutInSecs, TimeUnit.SECONDS)
                 .withTimeoutForODPSegmentFetch(timeoutForSegmentFetchInSecs)
                 .withTimeoutForODPEventDispatch(timeoutForOdpEventInSecs)
-                .withSDKKey(sdkKey);
+                .withSDKKey(sdkKey)
+                .withClientInfo(sdkName, sdkVersion);
         if (disableOdp) {
             optimizelyManagerBuilder.withODPDisabled();
         }

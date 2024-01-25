@@ -31,6 +31,10 @@ public class ArgumentsParser {
     public String getSdkKey() {
         return (String) arguments.get(Constants.RequestParameterKey.SDK_KEY);
     }
+    
+    public String getSdkVersion() {
+        return (String) arguments.get(Constants.RequestParameterKey.SDK_VERSION);
+    }
 
     public Integer getNotificationID() {
         return (Integer) arguments.get(Constants.RequestParameterKey.NOTIFICATION_ID);

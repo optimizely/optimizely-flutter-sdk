@@ -53,6 +53,7 @@ class OptimizelyClientWrapper {
   static Map<String, Map<int, LogEventNotificationCallback>>
       logEventCallbacksById = {};
   static Map<String, Map<int, MultiUseCallback>> configUpdateCallbacksById = {};
+  static String sdkVersion =  "";
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey and options.
   static Future<BaseResponse> initializeClient(
@@ -66,8 +67,11 @@ class OptimizelyClientWrapper {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
+    final sdkVersion = await Utils.getSdkVersion();
+
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
+      Constants.sdkVersion: sdkVersion,
       Constants.datafilePeriodicDownloadInterval:
           datafilePeriodicDownloadInterval,
       Constants.optimizelyDecideOption: convertedOptions,

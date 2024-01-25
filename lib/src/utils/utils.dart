@@ -19,8 +19,7 @@ import 'dart:io' show Platform;
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:optimizely_flutter_sdk/src/utils/platform_service.dart';
+
 
 class Utils {
   static Map<OptimizelyDecideOption, String> decideOptions = {
@@ -104,19 +103,7 @@ class Utils {
     return logLevel.toString().split('.').last;  
   }
 
-  static Future<String?> getSdkVersion() async {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    return packageInfo.version;
+  static Future<String> getSdkVersion() async {
+    return "test-2.0.0";
   }
-
-  static String getSdkClientName(PlatformService platformService) {
-    var clientName = "flutter-sdk";
-    if (platformService.isIOS()) { 
-      clientName = "flutter/ios-sdk";
-    } else if (platformService.isAndroid()) {
-      clientName = "flutter/android-sdk";
-    } 
-    return clientName;
-  }
-
 }
