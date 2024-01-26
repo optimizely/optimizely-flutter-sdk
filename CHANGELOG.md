@@ -47,9 +47,9 @@ For details, refer to our documentation pages:
 
 ### Functionality Enhancements
 
+* Add specific client name support to track event ([#72](https://github.com/optimizely/optimizely-flutter-sdk/pull/72)).
 * Update Github Issue Templates ([#65](https://github.com/optimizely/optimizely-flutter-sdk/pull/65)).
 * Add configurable log level support ([#63](https://github.com/optimizely/optimizely-flutter-sdk/pull/63)).
-* Add specific client name support to track event [#72](https://github.com/optimizely/optimizely-flutter-sdk/pull/72).
 
 ## 2.0.0-beta
 September 21, 2023
