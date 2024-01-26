@@ -23,7 +23,6 @@ import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
 import 'dart:io';
 import 'dart:convert';
-
 import 'test_utils.dart';
 
 void main() {
@@ -557,7 +556,8 @@ void main() {
       });
 
       test("with a valid defaultLogLevel parameter", () async {
-        var sdk = OptimizelyFlutterSdk(testSDKKey, defaultLogLevel: OptimizelyLogLevel.debug);
+        var sdk = OptimizelyFlutterSdk(testSDKKey,
+            defaultLogLevel: OptimizelyLogLevel.debug);
 
         var response = await sdk.initializeClient();
 
@@ -1552,5 +1552,77 @@ void main() {
             true);
       });
     });
+  });
+
+  group("Test client_name and client_version event parsing", () {
+    test("Test track event with swift sdk name and version", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+      TrackListenerResponse? response;
+
+      await sdk.addTrackNotificationListener((msg) {
+        response = msg;
+      });
+      var callHandler = OptimizelyClientWrapper.methodCallHandler;
+      tester?.setMockMethodCallHandler(channel, callHandler);
+      TestUtils.sendTestTrackClientNameAndVersion(
+          callHandler, 0, testSDKKey, "flutter/swift-sdk", "2.0.0");
+
+      expect(response == null, false);
+
+      expect(response!.eventTags!["client_name"], "flutter/swift-sdk");
+      
+    });
+
+    test("Test track event with android sdk name and version", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+      var responses = [];
+
+      await sdk.addTrackNotificationListener((msg) {
+        responses.add(msg);
+      });
+
+      var callHandler = OptimizelyClientWrapper.methodCallHandler;
+      tester?.setMockMethodCallHandler(channel, callHandler);
+
+      TestUtils.sendTestTrackClientNameAndVersion(
+          callHandler, 0, testSDKKey, "flutter/swift-sdk", "2.0.0");
+      TestUtils.sendTestTrackClientNameAndVersion(
+          callHandler, 0, testSDKKey, "flutter/android-sdk", "2.0.0-beta");
+
+      expect(responses.length == 2, true);
+
+      expect(responses[0]!.eventTags!["client_name"], "flutter/swift-sdk");
+      expect(responses[0]!.eventTags!["client_version"], "2.0.0");
+      expect(responses[1]!.eventTags!["client_name"], "flutter/android-sdk");
+      expect(responses[1]!.eventTags!["client_version"], "2.0.0-beta");
+      
+    });
+
+    test("Test log event with client sdk name and version", () async {
+      var sdk = OptimizelyFlutterSdk(testSDKKey);
+
+      var responses = [];
+
+      await sdk.addLogEventNotificationListener((msg) {
+        responses.add(msg);
+      });
+      var callHandler = OptimizelyClientWrapper.methodCallHandler;
+      tester?.setMockMethodCallHandler(channel, callHandler);
+      TestUtils.sendTestClientNameAndVersionLogEventNotification(
+          callHandler, 0, testSDKKey, "flutter/android-sdk", "2.0.0-beta");
+
+      TestUtils.sendTestClientNameAndVersionLogEventNotification(
+          callHandler, 0, testSDKKey, "flutter/swift-sdk", "2.0.0");
+
+      expect(responses.length == 2, true);
+      
+      expect(responses[0]!.params!["client_name"], "flutter/android-sdk");
+      expect(responses[0]!.params!["client_version"], "2.0.0-beta");
+      expect(responses[1]!.params!["client_name"], "flutter/swift-sdk");
+      expect(responses[1]!.params!["client_version"], "2.0.0");
+    });
+
   });
 }

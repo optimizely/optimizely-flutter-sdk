@@ -15,7 +15,6 @@
 ///**************************************************************************/
 
 import 'dart:io' show Platform;
-
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
@@ -101,4 +100,5 @@ class Utils {
     // OptimizelyLogLevel.debug -> "debug"
     return logLevel.toString().split('.').last;  
   }
+
 }

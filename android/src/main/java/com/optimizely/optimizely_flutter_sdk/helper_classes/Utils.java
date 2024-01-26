@@ -37,7 +37,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 
 public class Utils {
-
+    public static String sdkName = "flutter/android-sdk";
+    
     public static String getRandomUUID() {
         return UUID.randomUUID().toString();
     }

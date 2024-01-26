@@ -106,6 +106,23 @@ class TestUtils {
     }));
   }
 
+  static sendTestClientNameAndVersionLogEventNotification(
+      Function(MethodCall message) handler, int id, String sdkKey, String clientName, String sdkVersion) {
+      var payload = {
+      Constants.url: "$id",
+      Constants.params: {
+        "test": id,
+        "client_name": clientName,
+        "client_version": sdkVersion
+      }
+    };
+    handler(MethodCall(Constants.logEventCallbackListener, {
+      Constants.id: id,
+      Constants.sdkKey: sdkKey,
+      Constants.payload: payload
+    }));
+  }
+
   static sendTestTrackNotifications(
       Function(MethodCall message) handler, int id, String sdkKey) {
     var payload = {
@@ -113,6 +130,24 @@ class TestUtils {
       Constants.userId: "test",
       Constants.attributes: {"test": id},
       Constants.eventTags: {"testTag": id}
+    };
+    handler(MethodCall(Constants.trackCallBackListener, {
+      Constants.id: id,
+      Constants.sdkKey: sdkKey,
+      Constants.payload: payload
+    }));
+  }
+
+  static sendTestTrackClientNameAndVersion(Function(MethodCall message) handler, int id, String sdkKey, String clientName, String sdkVersion) {
+    var payload = {
+      Constants.eventKey: "$id",
+      Constants.userId: "test",
+      Constants.attributes: {"test": id},
+      Constants.eventTags: {
+        "testTag": id,
+        "client_name": clientName,
+        "client_version": sdkVersion
+        }
     };
     handler(MethodCall(Constants.trackCallBackListener, {
       Constants.id: id,

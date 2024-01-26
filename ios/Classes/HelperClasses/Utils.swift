@@ -18,7 +18,7 @@ import Foundation
 import Optimizely
 
 public class Utils: NSObject {
-    
+    static var sdkName = "flutter/swift-sdk"
     /// Converts and returns dart map to native map
     static func getTypedMap(arguments: Any?) -> [String: Any]? {
         guard let args = arguments as? Dictionary<String, Any?> else {
