@@ -19,8 +19,6 @@ import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
 
-
-
 class Utils {
   static Map<OptimizelyDecideOption, String> decideOptions = {
     OptimizelyDecideOption.disableDecisionEvent: "disableDecisionEvent",

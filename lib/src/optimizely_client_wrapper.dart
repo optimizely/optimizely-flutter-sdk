@@ -54,7 +54,6 @@ class OptimizelyClientWrapper {
   static Map<String, Map<int, LogEventNotificationCallback>>
       logEventCallbacksById = {};
   static Map<String, Map<int, MultiUseCallback>> configUpdateCallbacksById = {};
-  static String sdkVersion =  "";
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey and options.
   static Future<BaseResponse> initializeClient(
