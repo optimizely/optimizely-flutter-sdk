@@ -1589,14 +1589,14 @@ void main() {
       TestUtils.sendTestTrackClientNameAndVersion(
           callHandler, 0, testSDKKey, "flutter/swift-sdk", "2.0.0");
       TestUtils.sendTestTrackClientNameAndVersion(
-          callHandler, 0, testSDKKey, "flutter/android-sdk", "2.0.0-beta");
+          callHandler, 0, testSDKKey, "flutter/android-sdk", "2.0.0");
 
       expect(responses.length == 2, true);
 
       expect(responses[0]!.eventTags!["client_name"], "flutter/swift-sdk");
       expect(responses[0]!.eventTags!["client_version"], "2.0.0");
       expect(responses[1]!.eventTags!["client_name"], "flutter/android-sdk");
-      expect(responses[1]!.eventTags!["client_version"], "2.0.0-beta");
+      expect(responses[1]!.eventTags!["client_version"], "2.0.0");
       
     });
 
@@ -1611,7 +1611,7 @@ void main() {
       var callHandler = OptimizelyClientWrapper.methodCallHandler;
       tester?.setMockMethodCallHandler(channel, callHandler);
       TestUtils.sendTestClientNameAndVersionLogEventNotification(
-          callHandler, 0, testSDKKey, "flutter/android-sdk", "2.0.0-beta");
+          callHandler, 0, testSDKKey, "flutter/android-sdk", "2.0.0");
 
       TestUtils.sendTestClientNameAndVersionLogEventNotification(
           callHandler, 0, testSDKKey, "flutter/swift-sdk", "2.0.0");
@@ -1619,7 +1619,7 @@ void main() {
       expect(responses.length == 2, true);
       
       expect(responses[0]!.params!["client_name"], "flutter/android-sdk");
-      expect(responses[0]!.params!["client_version"], "2.0.0-beta");
+      expect(responses[0]!.params!["client_version"], "2.0.0");
       expect(responses[1]!.params!["client_name"], "flutter/swift-sdk");
       expect(responses[1]!.params!["client_version"], "2.0.0");
     });
