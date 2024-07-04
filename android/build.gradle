@@ -1,24 +1,33 @@
 group 'com.optimizely.optimizely_flutter_sdk'
 version '1.0'
 
-buildscript {
-
-    def version_name = System.getenv('TRAVIS_TAG')
-    if (version_name != null) {
-        rootProject.ext.version_name = version_name
-    } else {
-        rootProject.ext.version_name = 'debugVersion'
-    }
-
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
-    }
+def version_name = System.getenv('TRAVIS_TAG')
+if (version_name != null) {
+    rootProject.ext.version_name = version_name
+} else {
+    rootProject.ext.version_name = 'debugVersion'
 }
+
+
+// buildscript {
+
+//     def version_name = System.getenv('TRAVIS_TAG')
+//     if (version_name != null) {
+//         rootProject.ext.version_name = version_name
+//     } else {
+//         rootProject.ext.version_name = 'debugVersion'
+//     }
+
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+
+//     dependencies {
+//         classpath 'com.android.tools.build:gradle:7.2.1'
+//     }
+// }
+
 configurations {
     all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }
@@ -29,7 +38,9 @@ rootProject.allprojects {
     }
 }
 
-apply plugin: 'com.android.library'
+plugins {
+    id "com.android.library"
+}
 
 ext {
     compile_sdk_version = 32
