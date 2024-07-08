@@ -1,3 +1,7 @@
+plugins {
+    id "com.android.library"
+}
+
 group 'com.optimizely.optimizely_flutter_sdk'
 version '1.0'
 
@@ -38,9 +42,6 @@ rootProject.allprojects {
     }
 }
 
-plugins {
-    id "com.android.library"
-}
 
 ext {
     compile_sdk_version = 32
