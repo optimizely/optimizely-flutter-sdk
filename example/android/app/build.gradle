@@ -41,7 +41,6 @@ android {
         targetSdkVersion 32
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        // manifestPlaceholders = [applicationName: "android.app.Application"]
     }
 
     buildTypes {
