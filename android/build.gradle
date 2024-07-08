@@ -12,26 +12,6 @@ if (version_name != null) {
     rootProject.ext.version_name = 'debugVersion'
 }
 
-
-// buildscript {
-
-//     def version_name = System.getenv('TRAVIS_TAG')
-//     if (version_name != null) {
-//         rootProject.ext.version_name = version_name
-//     } else {
-//         rootProject.ext.version_name = 'debugVersion'
-//     }
-
-//     repositories {
-//         google()
-//         mavenCentral()
-//     }
-
-//     dependencies {
-//         classpath 'com.android.tools.build:gradle:7.2.1'
-//     }
-// }
-
 configurations {
     all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }
@@ -82,7 +62,6 @@ android {
     }
 
 }
-
 
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.0'
