@@ -33,6 +33,7 @@ class OptimizelyConfig {
     if (optimizelyConfig[Constants.experimentsMap] is Map<dynamic, dynamic>) {
       final experimentsMapDynamic =
           Map<String, dynamic>.from(optimizelyConfig[Constants.experimentsMap]);
+      // ignore: unnecessary_set_literal
       experimentsMapDynamic.forEach((k, v) => {
             if (v is Map<dynamic, dynamic>)
               {
@@ -45,6 +46,7 @@ class OptimizelyConfig {
     if (optimizelyConfig[Constants.featuresMap] is Map<dynamic, dynamic>) {
       final featuresMapDynamic =
           Map<String, dynamic>.from(optimizelyConfig[Constants.featuresMap]);
+      // ignore: unnecessary_set_literal
       featuresMapDynamic.forEach((k, v) => {
             if (v is Map<dynamic, dynamic>)
               {
@@ -288,6 +290,7 @@ class OptimizelyExperiment {
     if (parsedJson[Constants.variationsMap] is Map<dynamic, dynamic>) {
       final variationsMapDynamic =
           Map<String, dynamic>.from(parsedJson[Constants.variationsMap]);
+      // ignore: unnecessary_set_literal
       variationsMapDynamic.forEach((k, v) => {
             if (v is Map<dynamic, dynamic>)
               {
@@ -338,6 +341,7 @@ class OptimizelyVariation {
     if (parsedJson[Constants.variablesMap] is Map<dynamic, dynamic>) {
       final variablesMapDynamic =
           Map<String, dynamic>.from(parsedJson[Constants.variablesMap]);
+      // ignore: unnecessary_set_literal
       variablesMapDynamic.forEach((k, v) => {
             if (v is Map<dynamic, dynamic>)
               {

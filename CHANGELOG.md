@@ -1,5 +1,12 @@
 # Optimizely Flutter SDK Changelog
 
+## 2.0.1
+July 25, 2024
+
+### Bug Fixes
+
+* Migration of flutter's gradle plugins ([#74](https://github.com/optimizely/optimizely-flutter-sdk/pull/74)).
+
 ## 2.0.0
 January 23, 2024
 

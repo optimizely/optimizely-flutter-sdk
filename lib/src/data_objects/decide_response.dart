@@ -77,6 +77,7 @@ class BaseDecideResponse extends BaseResponse {
     if (json[Constants.responseResult] is Map<dynamic, dynamic>) {
       final decisionsMap =
           Map<String, dynamic>.from(json[Constants.responseResult]);
+      // ignore: unnecessary_set_literal
       decisionsMap.forEach((k, v) => {
             if (v is Map<dynamic, dynamic>)
               {_decisions[k] = Decision(Map<String, dynamic>.from(v))}

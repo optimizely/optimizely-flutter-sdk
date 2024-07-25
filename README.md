@@ -30,7 +30,7 @@ Other Flutter platforms are not currently supported by this SDK.
 To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
 
 ```
-   optimizely_flutter_sdk: ^2.0.0
+   optimizely_flutter_sdk: ^2.0.1
 ```
 
 Then run 

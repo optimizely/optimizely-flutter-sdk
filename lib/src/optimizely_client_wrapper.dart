@@ -67,7 +67,7 @@ class OptimizelyClientWrapper {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
-    final sdkVersion = PackageInfo.version;
+    const sdkVersion = PackageInfo.version;
 
     Map<String, dynamic> requestDict = {
       Constants.sdkKey: sdkKey,
