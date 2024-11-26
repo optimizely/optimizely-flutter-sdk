@@ -118,6 +118,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         var timeoutForSegmentFetchInSecs: Int = 10
         var timeoutForOdpEventInSecs: Int = 10
         var disableOdp: Bool = false
+        var enableVuid: Bool = false
         var sdkVersion = parameters[RequestParameterKey.sdkVersion] as? String
         var sdkName = Utils.sdkName
         
@@ -137,8 +138,11 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             if let isOdpDisabled = sdkSettings[RequestParameterKey.disableOdp] as? Bool {
                 disableOdp = isOdpDisabled
             }
+            if let isEnableVuid = sdkSettings[RequestParameterKey.enableVuid] as? Bool {
+                enableVuid = isEnableVuid
+            }
         }
-        let optimizelySdkSettings = OptimizelySdkSettings(segmentsCacheSize: segmentsCacheSize, segmentsCacheTimeoutInSecs: segmentsCacheTimeoutInSecs, timeoutForSegmentFetchInSecs: timeoutForSegmentFetchInSecs, timeoutForOdpEventInSecs: timeoutForOdpEventInSecs, disableOdp: disableOdp, sdkName: sdkName, sdkVersion: sdkVersion)
+        let optimizelySdkSettings = OptimizelySdkSettings(segmentsCacheSize: segmentsCacheSize, segmentsCacheTimeoutInSecs: segmentsCacheTimeoutInSecs, timeoutForSegmentFetchInSecs: timeoutForSegmentFetchInSecs, timeoutForOdpEventInSecs: timeoutForOdpEventInSecs, disableOdp: disableOdp, enableVuid: enableVuid, sdkName: sdkName, sdkVersion: sdkVersion)
         
         // Datafile Download Interval
         var datafilePeriodicDownloadInterval = 10 * 60 // seconds

@@ -90,6 +90,7 @@ class OptimizelyClientWrapper {
           sdkSettings.timeoutForSegmentFetchInSecs,
       Constants.timeoutForOdpEventInSecs: sdkSettings.timeoutForOdpEventInSecs,
       Constants.disableOdp: sdkSettings.disableOdp,
+      Constants.enableVuid: sdkSettings.enableVuid,
     };
     requestDict[Constants.optimizelySdkSettings] = optimizelySdkSettings;
 
