@@ -378,7 +378,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         } else {
             userContextsTracker[sdkKey] = [userContextId: userContext]
         }
-        result(self.createResponse(success: true, result: [RequestParameterKey.userContextId: userContextId]))
+        result(self.createResponse(success: userContext != nil, result: [RequestParameterKey.userContextId: userContextId]))
     }
     
     /// Returns userId for the user context.
