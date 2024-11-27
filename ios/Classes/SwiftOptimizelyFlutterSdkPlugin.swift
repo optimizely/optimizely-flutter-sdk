@@ -446,7 +446,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
-        result(self.createResponse(success: true, result: [RequestParameterKey.vuid: optimizelyClient.vuid]))
+        result(self.createResponse(success: optimizelyClient.vuid != nil, result: [RequestParameterKey.vuid: optimizelyClient.vuid]))
     }
     
     /// Checks if the user is qualified for the given segment.

@@ -479,7 +479,7 @@ public class OptimizelyFlutterClient {
         if (!isOptimizelyClientValid(sdkKey, optimizelyClient, result)) {
             return;
         }
-        result.success(createResponse(true, Collections.singletonMap(RequestParameterKey.VUID, optimizelyClient.getVuid()), ""));
+        result.success(createResponse(optimizelyClient.getVuid() != null, Collections.singletonMap(RequestParameterKey.VUID, optimizelyClient.getVuid()), ""));
     }
 
     /// Checks if the user is qualified for the given segment.
