@@ -55,6 +55,7 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.Utils;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.DISABLE_ODP;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.ENABLE_VUID;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SEGMENTS_CACHE_SIZE;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SEGMENTS_CACHE_TIMEOUT_IN_SECONDS;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.TIMEOUT_FOR_ODP_EVENT_IN_SECONDS;
@@ -144,6 +145,7 @@ public class OptimizelyFlutterClient {
         int timeoutForSegmentFetchInSecs = 10;
         int timeoutForOdpEventInSecs = 10;
         boolean disableOdp = false;
+        boolean enableVuid = false;
         Map<String, Object> sdkSettings = argumentsParser.getOptimizelySdkSettings();
         if (sdkSettings != null) {
             if (sdkSettings.containsKey(SEGMENTS_CACHE_SIZE)) {
@@ -160,6 +162,9 @@ public class OptimizelyFlutterClient {
             }
             if (sdkSettings.containsKey(DISABLE_ODP)) {
                 disableOdp = (boolean) sdkSettings.get(DISABLE_ODP);
+            }
+            if (sdkSettings.containsKey(ENABLE_VUID)) {
+                enableVuid = (boolean) sdkSettings.get(ENABLE_VUID);
             }
         }
         // Creating new instance
@@ -178,6 +183,9 @@ public class OptimizelyFlutterClient {
                 .withClientInfo(sdkName, sdkVersion);
         if (disableOdp) {
             optimizelyManagerBuilder.withODPDisabled();
+        }
+        if (enableVuid) {
+            optimizelyManagerBuilder.withVuidEnabled();
         }
         OptimizelyManager optimizelyManager = optimizelyManagerBuilder.build(context);
 
