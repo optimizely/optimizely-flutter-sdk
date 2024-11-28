@@ -3,5 +3,5 @@
 
 class PackageInfo {
   static const String name = 'optimizely_flutter_sdk';
-  static const String version = '2.0.1';
+  static const String version = '3.0.0';
 }

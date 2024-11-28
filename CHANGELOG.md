@@ -1,5 +1,16 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.0.0
+November 28th, 2024
+
+### Breaking Changes
+* VUID configuration is now independent of ODP ([#78](https://github.com/optimizely/optimizely-flutter-sdk/pull/78))
+* When VUID is disabled:
+    * `vuid` is not generated or saved.
+    * `client-initialized` event will not auto fired on SDK init.
+    * `vuid` is not included in the odp events as a default attribute.
+    * `createUserContext()` will be rejected if `userId` is not provided.
+
 ## 2.0.1
 July 25, 2024
 
