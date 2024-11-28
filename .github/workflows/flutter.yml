@@ -78,7 +78,7 @@ jobs:
       env:
         SDK: android
         BUILD_NUMBER: ${{ github.run_id }}
-        TESTAPP_BRANCH: master
+        TESTAPP_BRANCH: vuid-optln
         GITHUB_TOKEN: ${{ secrets.CI_USER_TOKEN }}
         EVENT_TYPE: ${{ github.event_name }}
         REPO_SLUG: 'optimizely/optimizely-flutter-testapp'
@@ -120,7 +120,7 @@ jobs:
       env:
         SDK: ios
         BUILD_NUMBER: ${{ github.run_id }}
-        TESTAPP_BRANCH: master
+        TESTAPP_BRANCH: vuid-optln
         GITHUB_TOKEN: ${{ secrets.CI_USER_TOKEN }}
         EVENT_TYPE: ${{ github.event_name }}
         REPO_SLUG: 'optimizely/optimizely-flutter-testapp'
