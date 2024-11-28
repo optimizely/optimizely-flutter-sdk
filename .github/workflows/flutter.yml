@@ -5,16 +5,16 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  workflow_dispatch:
-    inputs:
-      sdk_branch:
-        description: "Specify the SDK branch"
-        required: false
-        default: "master"
-      testapp_branch:
-        description: "Specify the test app branch"
-        required: false
-        default: "master"
+  # workflow_dispatch:
+  #   inputs:
+  #     sdk_branch:
+  #       description: "Specify the SDK branch"
+  #       required: false
+  #       default: "master"
+  #     testapp_branch:
+  #       description: "Specify the test app branch"
+  #       required: false
+  #       default: "master"
 
 jobs:
   unit_test_coverage:
