@@ -18,7 +18,7 @@ import 'package:optimizely_flutter_sdk/src/data_objects/base_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 
 class GetVuidResponse extends BaseResponse {
-  String vuid = "";
+  String? vuid;
 
   GetVuidResponse(Map<String, dynamic> json) : super(json) {
     if (json[Constants.responseResult] is Map<dynamic, dynamic>) {

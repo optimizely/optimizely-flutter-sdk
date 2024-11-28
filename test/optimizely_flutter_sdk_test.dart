@@ -56,7 +56,6 @@ void main() {
   SDKSettings sdkSettings = const SDKSettings();
   int datafilePeriodicDownloadInterval = 0;
   String defaultLogLevel = "error";
-
   const MethodChannel channel = MethodChannel("optimizely_flutter_sdk");
   dynamic mockOptimizelyConfig;
 
@@ -106,6 +105,7 @@ void main() {
               timeoutForOdpEventInSecs:
                   settings[Constants.timeoutForOdpEventInSecs],
               disableOdp: settings[Constants.disableOdp],
+              enableVuid: settings[Constants.enableVuid],
             );
           }
 
@@ -175,9 +175,19 @@ void main() {
           };
         case Constants.createUserContextMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
-          if (methodCall.arguments[Constants.userId] != null) {
+          var resultUserId = userContextId;
+          if (methodCall.arguments[Constants.userId] == null) {
+            if (sdkSettings.enableVuid) {
+              resultUserId = vuid;
+            } else {
+              return {
+                Constants.responseSuccess: false,
+              };
+            }
+          } else if (methodCall.arguments[Constants.userId] != null) {
             expect(methodCall.arguments[Constants.userId], equals(userId));
           }
+
           if (methodCall.arguments[Constants.attributes]["abc"] != null) {
             expect(methodCall.arguments[Constants.attributes]["abc"],
                 equals(attributes["abc"]));
@@ -185,7 +195,7 @@ void main() {
           expect(methodCall.arguments[Constants.userContextId], isNull);
           return {
             Constants.responseSuccess: true,
-            Constants.responseResult: {Constants.userContextId: userContextId},
+            Constants.responseResult: {Constants.userContextId: resultUserId},
           };
         case Constants.getUserIdMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
@@ -266,6 +276,8 @@ void main() {
         case Constants.getVuidMethod:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
           expect(methodCall.arguments[Constants.userContextId], isNull);
+          expect(methodCall.arguments[Constants.vuid], isNull);
+          var vuid = sdkSettings.enableVuid ? "vuid_123" : null;
           return {
             Constants.responseSuccess: true,
             Constants.responseResult: {Constants.vuid: vuid},
@@ -376,6 +388,7 @@ void main() {
 
   tearDown(() {
     tester?.setMockMethodCallHandler(channel, null);
+    sdkSettings = const SDKSettings();
   });
 
   group("Integration: OptimizelyFlutterSdk MethodChannel", () {
@@ -650,8 +663,17 @@ void main() {
         expect(userContext, isNotNull);
       });
 
-      test("should succeed null userId", () async {
+      test("should fail when disable vuid and userId null", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
+        sdk.initializeClient();
+        var userContext = await sdk.createUserContext(attributes: attributes);
+        expect(userContext, isNull);
+      });
+
+      test("should succed when enable vuid and userId null", () async {
+        const settings = SDKSettings(enableVuid: true);
+        var sdk = OptimizelyFlutterSdk(testSDKKey, sdkSettings: settings);
+        sdk.initializeClient();
         var userContext = await sdk.createUserContext(attributes: attributes);
         expect(userContext, isNotNull);
       });
@@ -662,10 +684,11 @@ void main() {
         expect(userContext, isNotNull);
       });
 
-      test("should succeed null userId and attributes", () async {
+      test("should not succeed null userId and attributes", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
+        sdk.initializeClient();
         var userContext = await sdk.createUserContext();
-        expect(userContext, isNotNull);
+        expect(userContext, isNull);
       });
     });
 
@@ -769,11 +792,20 @@ void main() {
     });
 
     group("getVuid()", () {
-      test("should succeed", () async {
+      test("by default should return null vuid", () async {
         var sdk = OptimizelyFlutterSdk(testSDKKey);
+        sdk.initializeClient();
         var response = await sdk.getVuid();
         expect(response.success, isTrue);
-        expect(response.vuid, equals(vuid));
+        expect(response.vuid, isNull);
+      });
+      test("should return vuid when enableVuid true", () async {
+        const settings = SDKSettings(enableVuid: true);
+        var sdk = OptimizelyFlutterSdk(testSDKKey, sdkSettings: settings);
+        sdk.initializeClient();
+        var response = await sdk.getVuid();
+        expect(response.success, isTrue);
+        expect(response.vuid, "vuid_123");
       });
     });
 

@@ -118,6 +118,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         var timeoutForSegmentFetchInSecs: Int = 10
         var timeoutForOdpEventInSecs: Int = 10
         var disableOdp: Bool = false
+        var enableVuid: Bool = false
         var sdkVersion = parameters[RequestParameterKey.sdkVersion] as? String
         var sdkName = Utils.sdkName
         
@@ -137,8 +138,11 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             if let isOdpDisabled = sdkSettings[RequestParameterKey.disableOdp] as? Bool {
                 disableOdp = isOdpDisabled
             }
+            if let isEnableVuid = sdkSettings[RequestParameterKey.enableVuid] as? Bool {
+                enableVuid = isEnableVuid
+            }
         }
-        let optimizelySdkSettings = OptimizelySdkSettings(segmentsCacheSize: segmentsCacheSize, segmentsCacheTimeoutInSecs: segmentsCacheTimeoutInSecs, timeoutForSegmentFetchInSecs: timeoutForSegmentFetchInSecs, timeoutForOdpEventInSecs: timeoutForOdpEventInSecs, disableOdp: disableOdp, sdkName: sdkName, sdkVersion: sdkVersion)
+        let optimizelySdkSettings = OptimizelySdkSettings(segmentsCacheSize: segmentsCacheSize, segmentsCacheTimeoutInSecs: segmentsCacheTimeoutInSecs, timeoutForSegmentFetchInSecs: timeoutForSegmentFetchInSecs, timeoutForOdpEventInSecs: timeoutForOdpEventInSecs, disableOdp: disableOdp, enableVuid: enableVuid, sdkName: sdkName, sdkVersion: sdkVersion)
         
         // Datafile Download Interval
         var datafilePeriodicDownloadInterval = 10 * 60 // seconds
@@ -374,7 +378,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         } else {
             userContextsTracker[sdkKey] = [userContextId: userContext]
         }
-        result(self.createResponse(success: true, result: [RequestParameterKey.userContextId: userContextId]))
+        result(self.createResponse(success: userContext != nil, result: [RequestParameterKey.userContextId: userContextId]))
     }
     
     /// Returns userId for the user context.
@@ -442,7 +446,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         guard let optimizelyClient = getOptimizelyClient(sdkKey: sdkKey, result: result) else {
             return
         }
-        result(self.createResponse(success: true, result: [RequestParameterKey.vuid: optimizelyClient.vuid]))
+        result(self.createResponse(success: optimizelyClient.vuid != nil, result: [RequestParameterKey.vuid: optimizelyClient.vuid]))
     }
     
     /// Checks if the user is qualified for the given segment.

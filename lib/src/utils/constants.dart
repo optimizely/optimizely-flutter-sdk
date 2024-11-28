@@ -131,6 +131,7 @@ class Constants {
       "timeoutForSegmentFetchInSecs";
   static const String timeoutForOdpEventInSecs = "timeoutForOdpEventInSecs";
   static const String disableOdp = "disableOdp";
+  static const String enableVuid = "enableVuid";
 
   // Response keys
   static const String responseSuccess = "success";
