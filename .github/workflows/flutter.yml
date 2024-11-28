@@ -47,38 +47,38 @@ jobs:
         path: 'home/runner/travisci-tools'
         ref: 'master'
     # Set SDK Branch based on input or PR/Push
-    - name: Set SDK Branch and Test App Branch
+    # - name: Set SDK Branch and Test App Branch
+    #   run: |
+    #     # If manually triggered
+    #     if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+    #       echo "SDK_BRANCH=${{ github.event.inputs.sdk_branch || 'master' }}" >> $GITHUB_ENV
+    #       echo "TESTAPP_BRANCH=${{ github.event.inputs.testapp_branch || 'master' }}" >> $GITHUB_ENV
+    #     # If triggered by PR
+    #     elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+    #       echo "SDK_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+    #     # If triggered by push
+    #     else
+    #       echo "SDK_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+    #       echo "TRAVIS_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+    #     fi
+    - name: set SDK Branch if PR
+      env:
+        HEAD_REF: ${{ github.head_ref }}
+      if: ${{ github.event_name == 'pull_request' }}
       run: |
-        # If manually triggered
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "SDK_BRANCH=${{ github.event.inputs.sdk_branch || 'master' }}" >> $GITHUB_ENV
-          echo "TESTAPP_BRANCH=${{ github.event.inputs.testapp_branch || 'master' }}" >> $GITHUB_ENV
-        # If triggered by PR
-        elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-          echo "SDK_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-        # If triggered by push
-        else
-          echo "SDK_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-          echo "TRAVIS_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-        fi
-    # - name: set SDK Branch if PR
-    #   env:
-    #     HEAD_REF: ${{ github.head_ref }}
-    #   if: ${{ github.event_name == 'pull_request' }}
-    #   run: |
-    #     echo "SDK_BRANCH=$HEAD_REF" >> $GITHUB_ENV
-    # - name: set SDK Branch if not pull request
-    #   env:
-    #     REF_NAME: ${{ github.ref_name }}
-    #   if: ${{ github.event_name != 'pull_request' }}
-    #   run: |
-    #     echo "SDK_BRANCH=$REF_NAME" >> $GITHUB_ENV
-    #     echo "TRAVIS_BRANCH=$REF_NAME" >> $GITHUB_ENV
+        echo "SDK_BRANCH=$HEAD_REF" >> $GITHUB_ENV
+    - name: set SDK Branch if not pull request
+      env:
+        REF_NAME: ${{ github.ref_name }}
+      if: ${{ github.event_name != 'pull_request' }}
+      run: |
+        echo "SDK_BRANCH=$REF_NAME" >> $GITHUB_ENV
+        echo "TRAVIS_BRANCH=$REF_NAME" >> $GITHUB_ENV
     - name: Trigger build
       env:
         SDK: android
         BUILD_NUMBER: ${{ github.run_id }}
-        TESTAPP_BRANCH: vuid-optln
+        TESTAPP_BRANCH: master
         GITHUB_TOKEN: ${{ secrets.CI_USER_TOKEN }}
         EVENT_TYPE: ${{ github.event_name }}
         REPO_SLUG: 'optimizely/optimizely-flutter-testapp'
@@ -120,7 +120,7 @@ jobs:
       env:
         SDK: ios
         BUILD_NUMBER: ${{ github.run_id }}
-        TESTAPP_BRANCH: vuid-optln
+        TESTAPP_BRANCH: master
         GITHUB_TOKEN: ${{ secrets.CI_USER_TOKEN }}
         EVENT_TYPE: ${{ github.event_name }}
         REPO_SLUG: 'optimizely/optimizely-flutter-testapp'
