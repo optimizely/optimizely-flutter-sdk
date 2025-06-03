@@ -89,7 +89,14 @@ class TestUtils {
     handler(MethodCall(Constants.decisionCallBackListener, {
       Constants.id: id,
       Constants.sdkKey: sdkKey,
-      Constants.payload: {Constants.type: "$id", Constants.userId: "test"}
+      Constants.payload: <String, Object>{
+        Constants.type: "$id", 
+        Constants.userId: "test", 
+        Constants.decisionInfo: const {
+          Constants.experimentId: "experiment_12345",
+          Constants.variationId: "variation_12345",
+        },
+      }
     }));
   }
 
@@ -129,7 +136,15 @@ class TestUtils {
       Constants.eventKey: "$id",
       Constants.userId: "test",
       Constants.attributes: {"test": id},
-      Constants.eventTags: {"testTag": id}
+      Constants.eventTags: {
+        "testTag": id,
+        "nestedTag": {
+          "string_key": "stringValue",
+          "int_key": 123,
+          "double_key": 123.456,
+          "bool_key": true
+        } 
+      }
     };
     handler(MethodCall(Constants.trackCallBackListener, {
       Constants.id: id,
@@ -145,6 +160,12 @@ class TestUtils {
       Constants.attributes: {"test": id},
       Constants.eventTags: {
         "testTag": id,
+        "nestedTag": {
+          "string_key": "stringValue",
+          "int_key": 123,
+          "double_key": 123.456,
+          "bool_key": true
+        }, 
         "client_name": clientName,
         "client_version": sdkVersion
         }
@@ -179,7 +200,11 @@ class TestUtils {
   static bool testDecisionNotificationPayload(
       List notifications, int id, int actualID) {
     if (notifications[id].type != "$actualID" ||
-        notifications[id].userId != "test") {
+        notifications[id].userId != "test" ||
+        notifications[id].decisionInfo[Constants.experimentId] !=
+            "experiment_12345" ||
+        notifications[id].decisionInfo[Constants.variationId] !=
+            "variation_12345") {
       return false;
     }
     return true;
