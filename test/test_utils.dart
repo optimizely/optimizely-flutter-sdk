@@ -136,7 +136,15 @@ class TestUtils {
       Constants.eventKey: "$id",
       Constants.userId: "test",
       Constants.attributes: {"test": id},
-      Constants.eventTags: {"testTag": id}
+      Constants.eventTags: {
+        "testTag": id,
+        "nestedTag": {
+          "string_key": "stringValue",
+          "int_key": 123,
+          "double_key": 123.456,
+          "bool_key": true
+        } 
+      }
     };
     handler(MethodCall(Constants.trackCallBackListener, {
       Constants.id: id,
@@ -152,6 +160,12 @@ class TestUtils {
       Constants.attributes: {"test": id},
       Constants.eventTags: {
         "testTag": id,
+        "nestedTag": {
+          "string_key": "stringValue",
+          "int_key": 123,
+          "double_key": 123.456,
+          "bool_key": true
+        }, 
         "client_name": clientName,
         "client_version": sdkVersion
         }

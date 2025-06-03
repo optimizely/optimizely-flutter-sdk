@@ -371,7 +371,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 
@@ -417,7 +416,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 
@@ -440,7 +438,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 
@@ -464,7 +461,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 
