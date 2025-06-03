@@ -89,7 +89,14 @@ class TestUtils {
     handler(MethodCall(Constants.decisionCallBackListener, {
       Constants.id: id,
       Constants.sdkKey: sdkKey,
-      Constants.payload: {Constants.type: "$id", Constants.userId: "test"}
+      Constants.payload: <String, Object>{
+        Constants.type: "$id", 
+        Constants.userId: "test", 
+        Constants.decisionInfo: const {
+          Constants.experimentId: "experiment_12345",
+          Constants.variationId: "variation_12345",
+        },
+      }
     }));
   }
 
@@ -179,7 +186,11 @@ class TestUtils {
   static bool testDecisionNotificationPayload(
       List notifications, int id, int actualID) {
     if (notifications[id].type != "$actualID" ||
-        notifications[id].userId != "test") {
+        notifications[id].userId != "test" ||
+        notifications[id].decisionInfo[Constants.experimentId] !=
+            "experiment_12345" ||
+        notifications[id].decisionInfo[Constants.variationId] !=
+            "variation_12345") {
       return false;
     }
     return true;

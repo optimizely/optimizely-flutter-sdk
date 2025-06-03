@@ -62,7 +62,9 @@ class Constants {
   static const String userContextId = "userContextId";
   static const String userContext = "userContext";
   static const String experiment = "experiment";
+  static const String experimentId = "experimentId";
   static const String variation = "variation";
+  static const String variationId = "variationId";
   static const String userId = "userId";
   static const String vuid = "vuid";
   static const String experimentKey = "experimentKey";
