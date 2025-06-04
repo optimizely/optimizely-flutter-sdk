@@ -5,7 +5,7 @@ Jun 4th, 2025
 
 ### Functionality Enhancements
 
-* Add experiment id and variation id added into decision notification payload ([#80](https://github.com/optimizely/optimizely-flutter-sdk/pull/80)).
+* Add experiment id and variation id added into decision notification payload ([#80](https://github.com/optimizely/optimizely-flutter-sdk/pull/80))
 
 ## 3.0.0
 November 28th, 2024
