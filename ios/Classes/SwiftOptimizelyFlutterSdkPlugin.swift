@@ -36,8 +36,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         return UUID().uuidString
     }
     
+    static var registrar: FlutterPluginRegistrar?
     /// Registers optimizely_flutter_sdk channel to communicate with the flutter sdk to receive requests and send responses
     public static func register(with registrar: FlutterPluginRegistrar) {
+        self.registrar = registrar
         channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftOptimizelyFlutterSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
@@ -163,9 +165,16 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         notificationIdsTracker.removeValue(forKey: sdkKey)
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
+        // Check if custom logger is requested
+        var logger: OPTLogger?
+        if let useCustomLogger = parameters[RequestParameterKey.customLogger] as? Bool, useCustomLogger {
+            logger = FlutterOptimizelyLogger()
+        }
+
         // Creating new instance
         let optimizelyInstance = OptimizelyClient(
             sdkKey:sdkKey, 
+            logger:logger,
             eventDispatcher: eventDispatcher, 
             datafileHandler: datafileHandler, 
             periodicDownloadInterval: datafilePeriodicDownloadInterval, 

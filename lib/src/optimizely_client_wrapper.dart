@@ -27,6 +27,8 @@ import 'package:optimizely_flutter_sdk/src/data_objects/get_vuid_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
+import 'package:optimizely_flutter_sdk/src/logger/OptimizelyLogger.dart';
+import 'package:optimizely_flutter_sdk/src/logger/LoggerBridge.dart';
 
 enum ListenerType { activate, track, decision, logEvent, projectConfigUpdate }
 
@@ -63,8 +65,13 @@ class OptimizelyClientWrapper {
       Map<ClientPlatform, DatafileHostOptions> datafileHostOptions,
       Set<OptimizelyDecideOption> defaultDecideOptions,
       OptimizelyLogLevel defaultLogLevel,
-      SDKSettings sdkSettings) async {
+      SDKSettings sdkSettings,
+      OptimizelyLogger? logger) async {
     _channel.setMethodCallHandler(methodCallHandler);
+    // Initialize logger bridge if custom logger is provided
+    if (logger != null) {
+      LoggerBridge.initialize();
+    }
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
     const sdkVersion = PackageInfo.version;
@@ -79,6 +86,7 @@ class OptimizelyClientWrapper {
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
+      Constants.customLogger: logger != null,
     };
 
     // Odp Request params
