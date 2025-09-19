@@ -68,10 +68,6 @@ class OptimizelyClientWrapper {
       SDKSettings sdkSettings,
       OptimizelyLogger? logger) async {
     _channel.setMethodCallHandler(methodCallHandler);
-    // Initialize logger bridge if custom logger is provided
-    if (logger != null) {
-      LoggerBridge.initialize();
-    }
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
     const sdkVersion = PackageInfo.version;

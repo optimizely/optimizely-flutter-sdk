@@ -80,6 +80,10 @@ public class ArgumentsParser {
         return (String) arguments.get(Constants.RequestParameterKey.DEFAULT_LOG_LEVEL);
     }
 
+    public Boolean getCustomLogger() {
+        return (Boolean) arguments.get(Constants.RequestParameterKey.CUSTOM_LOGGER);
+    }
+
     public String getFlagKey() {
         return (String) arguments.get(Constants.RequestParameterKey.FLAG_KEY);
     }

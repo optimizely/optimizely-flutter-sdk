@@ -25,7 +25,7 @@ import com.optimizely.ab.OptimizelyForcedDecision;
 import com.optimizely.ab.UnknownEventTypeException;
 import com.optimizely.ab.android.event_handler.DefaultEventHandler;
 import com.optimizely.ab.android.sdk.OptimizelyClient;
-
+import org.slf4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -187,6 +187,15 @@ public class OptimizelyFlutterClient {
         if (enableVuid) {
             optimizelyManagerBuilder.withVuidEnabled();
         }
+
+        // Check if custom logger is requested
+        Boolean useCustomLogger = argumentsParser.getCustomLogger();
+        Logger customLogger = null;
+        if (useCustomLogger != null && useCustomLogger) {
+            customLogger = new FlutterOptimizelyLogger("OptimizelySDK");
+            optimizelyManagerBuilder.withLogger(customLogger);
+        }
+
         OptimizelyManager optimizelyManager = optimizelyManagerBuilder.build(context);
 
         optimizelyManager.initialize(context, null, (OptimizelyClient client) -> {

@@ -70,12 +70,11 @@ class OptimizelyFlutterSdk {
   final Set<OptimizelyDecideOption> _defaultDecideOptions;
   final OptimizelyLogLevel _defaultLogLevel;
   final SDKSettings _sdkSettings;
-  final OptimizelyLogger? _logger; // Add logger field
   static OptimizelyLogger? _customLogger;
   /// Set a custom logger for the SDK
   static void setLogger(OptimizelyLogger logger) {
     _customLogger = logger;
-    LoggerBridge.initialize();
+    LoggerBridge.initialize(logger);
   }
   /// Get the current logger
   static OptimizelyLogger? get logger {
@@ -94,11 +93,12 @@ class OptimizelyFlutterSdk {
       _datafileHostOptions = datafileHostOptions,
       _defaultDecideOptions = defaultDecideOptions,
       _defaultLogLevel = defaultLogLevel,
-      _sdkSettings = sdkSettings,
-      _logger = logger {
+      _sdkSettings = sdkSettings {
       // Set the logger if provided
       if (logger != null) {
         setLogger(logger);
+      } else {
+        print("Logger not provided.");
       }
   }
 
@@ -112,7 +112,7 @@ class OptimizelyFlutterSdk {
         _defaultDecideOptions,
         _defaultLogLevel,
         _sdkSettings,
-        _logger
+        _customLogger
     );
   }
 

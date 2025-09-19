@@ -1,26 +1,78 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
-
+import 'package:optimizely_flutter_sdk/src/logger/OptimizelyLogger.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
 class LoggerBridge {
   static const MethodChannel _loggerChannel =
       MethodChannel('optimizely_flutter_sdk_logger');
+  static OptimizelyLogger? _customLogger;
 
-  static void initialize() {
+  /// Initialize the logger bridge to receive calls from native
+  static void initialize(OptimizelyLogger? logger) {
+    print('[LoggerBridge] Initializing with logger: ${logger != null}');
+    _customLogger = logger;
     _loggerChannel.setMethodCallHandler(_handleMethodCall);
   }
 
+  /// Handle incoming method calls from native Swift/Java code
   static Future<void> _handleMethodCall(MethodCall call) async {
-    switch (call.method) {
-      case 'log':
-        final args = call.arguments as Map<String, dynamic>;
-        final level = OptimizelyLogLevel.values[args['level'] as int];
-        final message = args['message'] as String;
+    print('[LoggerBridge] Received method call: ${call.method}');
+    try {
+      switch (call.method) {
+        case 'log':
+          await _handleLogCall(call);
+          break;
+        default:
+          print('[LoggerBridge] Unknown method call: ${call.method}');
+      }
+    } catch (e) {
+      print('[LoggerBridge] Error handling method call: $e');
+    }
+  }
 
-        OptimizelyFlutterSdk.logger?.log(level, message);
-        break;
+  /// Process the log call from Swift/Java
+  static Future<void> _handleLogCall(MethodCall call) async {
+    try {
+      // Simple fix - just convert the map safely
+      final args = Map<String, dynamic>.from(call.arguments ?? {});
+
+      final levelRawValue = args['level'] as int?;
+      final message = args['message'] as String?;
+
+      if (levelRawValue == null || message == null) {
+        print('[LoggerBridge] Warning: Missing level or message in log call');
+        return;
+      }
+
+      final level = _convertLogLevel(levelRawValue);
+
+      print('[LoggerBridge] Processing log: level=$levelRawValue, message=$message');
+
+      if (_customLogger != null) {
+        _customLogger!.log(level, message);
+      } else {
+        print('[Optimizely ${level.name.toUpperCase()}] $message');
+      }
+    } catch (e) {
+      print('[LoggerBridge] Error processing log call: $e');
+    }
+  }
+
+  /// Convert native log level to Flutter enum
+  static OptimizelyLogLevel _convertLogLevel(int rawValue) {
+    switch (rawValue) {
+      case 1:
+        return OptimizelyLogLevel.error;
+      case 2:
+        return OptimizelyLogLevel.warning;
+      case 3:
+        return OptimizelyLogLevel.info;
+      case 4:
+        return OptimizelyLogLevel.debug;
+      default:
+        return OptimizelyLogLevel.info;
     }
   }
 }
