@@ -9,8 +9,6 @@ abstract class OptimizelyLogger {
   void log(OptimizelyLogLevel level, String message);
 }
 
-// enum OptimizelyLogLevel { error, warning, info, debug }
-
 class DefaultOptimizelyLogger implements OptimizelyLogger {
   @override
   OptimizelyLogLevel logLevel = OptimizelyLogLevel.info;

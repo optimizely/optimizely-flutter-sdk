@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
-import 'package:optimizely_flutter_sdk/src/logger/OptimizelyLogger.dart';
+import 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
 class LoggerBridge {
@@ -35,7 +35,6 @@ class LoggerBridge {
   /// Process the log call from Swift/Java
   static Future<void> _handleLogCall(MethodCall call) async {
     try {
-      // Simple fix - just convert the map safely
       final args = Map<String, dynamic>.from(call.arguments ?? {});
 
       final levelRawValue = args['level'] as int?;

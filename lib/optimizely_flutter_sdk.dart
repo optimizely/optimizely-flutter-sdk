@@ -28,8 +28,8 @@ import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_respon
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
-import 'package:optimizely_flutter_sdk/src/logger/OptimizelyLogger.dart';
-import 'package:optimizely_flutter_sdk/src/logger/LoggerBridge.dart';
+import 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart';
+import 'package:optimizely_flutter_sdk/src/logger/logger_bridge.dart';
 
 export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
     show ClientPlatform, ListenerType;
@@ -55,6 +55,8 @@ export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
     show DatafileHostOptions;
 export 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart'
     show OptimizelyLogLevel;
+export 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart'
+    show OptimizelyLogger;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///

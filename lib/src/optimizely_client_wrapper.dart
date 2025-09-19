@@ -27,8 +27,8 @@ import 'package:optimizely_flutter_sdk/src/data_objects/get_vuid_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/utils/constants.dart';
 import 'package:optimizely_flutter_sdk/src/utils/utils.dart';
-import 'package:optimizely_flutter_sdk/src/logger/OptimizelyLogger.dart';
-import 'package:optimizely_flutter_sdk/src/logger/LoggerBridge.dart';
+import 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart';
+import 'package:optimizely_flutter_sdk/src/logger/logger_bridge.dart';
 
 enum ListenerType { activate, track, decision, logEvent, projectConfigUpdate }
 
