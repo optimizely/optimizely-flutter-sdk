@@ -1,4 +1,5 @@
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:flutter/foundation.dart';
 
 class CustomLogger implements OptimizelyLogger {
   @override
@@ -6,6 +7,8 @@ class CustomLogger implements OptimizelyLogger {
 
   @override
   void log(OptimizelyLogLevel level, String message) {
-    print('[Flutter LOGGER] ${level.name}: $message');
+    if (kDebugMode) {
+      print('[Flutter LOGGER] ${level.name}: $message');
+    }
   }
 }

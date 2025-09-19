@@ -168,7 +168,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         // Check if custom logger is requested
         var logger: OPTLogger?
         if let useCustomLogger = parameters[RequestParameterKey.customLogger] as? Bool, useCustomLogger {
-            logger = FlutterOptimizelyLogger()
+            logger = OptimizelyFlutterLogger()
         }
 
         // Creating new instance

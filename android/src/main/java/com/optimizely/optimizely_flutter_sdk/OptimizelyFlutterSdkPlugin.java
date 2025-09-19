@@ -157,12 +157,9 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     channel = new MethodChannel(binding.getBinaryMessenger(), "optimizely_flutter_sdk");
     channel.setMethodCallHandler(this);
-
-    // Logger channel for custom logging
-    loggerChannel = new MethodChannel(binding.getBinaryMessenger(), FlutterOptimizelyLogger.LOGGER_CHANNEL);
-
-    // Set the logger channel in your logger class
-      FlutterOptimizelyLogger.setChannel(loggerChannel);
+    
+    loggerChannel = new MethodChannel(binding.getBinaryMessenger(), OptimizelyFlutterLogger.LOGGER_CHANNEL);
+    OptimizelyFlutterLogger.setChannel(loggerChannel);
 
     context = binding.getApplicationContext();
   }
@@ -170,8 +167,8 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
-    loggerChannel.setMethodCallHandler(null); // Clean up logger channel
-    FlutterOptimizelyLogger.setChannel(null);
+    loggerChannel.setMethodCallHandler(null); 
+    OptimizelyFlutterLogger.setChannel(null);
   }
 
   @Override

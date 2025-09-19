@@ -1,7 +1,7 @@
 import Flutter
 import Optimizely
 
-public class FlutterOptimizelyLogger: NSObject, OPTLogger {
+public class OptimizelyFlutterLogger: NSObject, OPTLogger {
     public static var logLevel: OptimizelyLogLevel = .info
     
     private static let loggerChannel = FlutterMethodChannel(

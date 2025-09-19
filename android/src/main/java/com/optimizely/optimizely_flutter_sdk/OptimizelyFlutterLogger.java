@@ -23,12 +23,12 @@ import org.slf4j.Marker;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FlutterOptimizelyLogger implements Logger { 
+public class OptimizelyFlutterLogger implements Logger { 
     static final String LOGGER_CHANNEL = "optimizely_flutter_sdk_logger";
     private static MethodChannel loggerChannel;
     private final String tag;
 
-    public FlutterOptimizelyLogger(String name) {
+    public OptimizelyFlutterLogger(String name) {
         tag = name;
     }
 

@@ -192,7 +192,7 @@ public class OptimizelyFlutterClient {
         Boolean useCustomLogger = argumentsParser.getCustomLogger();
         Logger customLogger = null;
         if (useCustomLogger != null && useCustomLogger) {
-            customLogger = new FlutterOptimizelyLogger("OptimizelySDK");
+            customLogger = new OptimizelyFlutterLogger("OptimizelySDK");
             optimizelyManagerBuilder.withLogger(customLogger);
         }
 
