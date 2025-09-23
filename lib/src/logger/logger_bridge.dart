@@ -52,7 +52,7 @@ class LoggerBridge {
       if (_customLogger != null) {
         _customLogger!.log(level, message);
       } else {
-        print('[Optimizely ${level.name.toUpperCase()}] $message');
+        print('[Optimizely ${level.name}] $message');
       }
     } catch (e) {
       print('[LoggerBridge] Error processing log call: $e');

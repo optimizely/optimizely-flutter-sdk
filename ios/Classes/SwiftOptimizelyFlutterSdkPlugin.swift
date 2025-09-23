@@ -112,6 +112,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         var defaultLogLevel = OptimizelyLogLevel.info
         if let logLevel = parameters[RequestParameterKey.defaultLogLevel] as? String {
             defaultLogLevel = Utils.getDefaultLogLevel(logLevel)
+            OptimizelyFlutterLogger.logLevel = defaultLogLevel
         }
 
         // SDK Settings Default Values

@@ -3,9 +3,6 @@ import 'package:flutter/foundation.dart';
 
 class CustomLogger implements OptimizelyLogger {
   @override
-  OptimizelyLogLevel logLevel = OptimizelyLogLevel.debug;
-
-  @override
   void log(OptimizelyLogLevel level, String message) {
     if (kDebugMode) {
       print('[Flutter LOGGER] ${level.name}: $message');

@@ -4,22 +4,43 @@ import Optimizely
 public class OptimizelyFlutterLogger: NSObject, OPTLogger {
     public static var logLevel: OptimizelyLogLevel = .info
     
-    private static let loggerChannel = FlutterMethodChannel(
-        name: "optimizely_flutter_sdk_logger",
-        binaryMessenger: SwiftOptimizelyFlutterSdkPlugin.registrar?.messenger() ?? FlutterEngine().binaryMessenger
-    )
+    private static var loggerChannel: FlutterMethodChannel?
     
     public required override init() {
         super.init()
     }
     
+    public static func setChannel(_ channel: FlutterMethodChannel) {
+        loggerChannel = channel
+    }
+    
     public func log(level: OptimizelyLogLevel, message: String) {
-        // Ensure we're on the main thread when calling Flutter
-        DispatchQueue.main.async {
-            Self.loggerChannel.invokeMethod("log", arguments: [
+        // Early return if level check fails
+        guard level.rawValue <= OptimizelyFlutterLogger.logLevel.rawValue else { 
+            return 
+        }
+        
+        // Ensure we have a valid channel
+        guard let channel = Self.loggerChannel else {
+            print("[OptimizelyFlutterLogger] ERROR: No logger channel available!")
+            return
+        }
+        
+        // Ensure logging happens on main thread as FlutterMethodChannel requires it
+        if Thread.isMainThread {
+            // Already on main thread
+            channel.invokeMethod("log", arguments: [
                 "level": level.rawValue,
                 "message": message
             ])
+        } else {
+            // Switch to main thread
+            DispatchQueue.main.sync {
+                channel.invokeMethod("log", arguments: [
+                    "level": level.rawValue,
+                    "message": message
+                ])
+            }
         }
     }
 }
