@@ -65,7 +65,10 @@ public class Utils: NSObject {
                 "url"       : url,
                 "params"    : logEvent as Any
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.logEvent)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
+            // Dispatch to main thread for Flutter method channel call. Platform channel messages must be sent on the platform thread to avoid data loss or crashes.
+            DispatchQueue.main.async {
+                SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.logEvent)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.logEvent, RequestParameterKey.notificationPayload: listenerDict])
+            }
         }
         
         return listener
@@ -94,7 +97,10 @@ public class Utils: NSObject {
                 "attributes"   : attributes as Any,
                 "variation"    : variation
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.activate)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.activate, RequestParameterKey.notificationPayload: listenerDict])
+            // Dispatch to main thread for Flutter method channel call
+            DispatchQueue.main.async {
+                SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.activate)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.activate, RequestParameterKey.notificationPayload: listenerDict])
+            }
         }
         return listener
     }
@@ -108,7 +114,10 @@ public class Utils: NSObject {
                 "attributes"  : attributes as Any,
                 "decisionInfo": decisionInfo
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.decision)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
+            // Dispatch to main thread for Flutter method channel call
+            DispatchQueue.main.async {
+                SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.decision)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.decision, RequestParameterKey.notificationPayload: listenerDict])
+            }
         }
         return listener
     }
@@ -123,7 +132,9 @@ public class Utils: NSObject {
                 "userId"       : userId,
                 //                "event": event as Any, This is causing codec related exceptions on flutter side, need to debug
             ]
-            SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.track)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
+            DispatchQueue.main.async {
+                SwiftOptimizelyFlutterSdkPlugin.channel.invokeMethod("\(NotificationType.track)CallbackListener", arguments: [RequestParameterKey.sdkKey: sdkKey, RequestParameterKey.notificationId: id, RequestParameterKey.notificationType: NotificationType.track, RequestParameterKey.notificationPayload: listenerDict])
+            }
         }
         return listener
     }
