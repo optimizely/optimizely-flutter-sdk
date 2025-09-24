@@ -43,6 +43,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftOptimizelyFlutterSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
+
+        // Separate logger channel for outgoing log calls
+        let loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL, binaryMessenger: registrar.messenger())
+        OptimizelyFlutterLogger.setChannel(loggerChannel)
     }
     
     /// Part of FlutterPlugin protocol to handle communication with flutter sdk
