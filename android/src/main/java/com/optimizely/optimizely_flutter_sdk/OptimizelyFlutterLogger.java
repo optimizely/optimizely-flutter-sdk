@@ -352,7 +352,7 @@ public class OptimizelyFlutterLogger implements Logger {
             return;
         }
 
-        // Ensure we're on the main thread when calling Flutter (similar to Swift's DispatchQueue.main.async)
+        // Ensure we're on the main thread when calling Flutter
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(() -> {
             Map<String, Object> arguments = new HashMap<>();
