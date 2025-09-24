@@ -4,13 +4,6 @@ import 'dart:math';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk_example/custom_logger.dart';
 
-/**
- * Logger TODO:
- * Check thread safety
- * Android logger fix
- * Add unit test
- */
-
 void main() {
   runApp(const MyApp());
 }
@@ -45,7 +38,7 @@ class _MyAppState extends State<MyApp> {
         defaultLogLevel: OptimizelyLogLevel.debug,
         defaultDecideOptions: defaultOptions,
         logger: customLogger,
-        );
+      );
     var response = await flutterSDK.initializeClient();
 
     setState(() {

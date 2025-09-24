@@ -100,7 +100,7 @@ class OptimizelyFlutterSdk {
       if (logger != null) {
         setLogger(logger);
       } else {
-        print("Logger not provided.");
+        AppLogger.warning("Logger not provided.");
       }
   }
 

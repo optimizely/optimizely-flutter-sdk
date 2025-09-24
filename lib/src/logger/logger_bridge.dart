@@ -11,24 +11,24 @@ class LoggerBridge {
 
   /// Initialize the logger bridge to receive calls from native
   static void initialize(OptimizelyLogger? logger) {
-    print('[LoggerBridge] Initializing with logger: ${logger != null}');
+    AppLogger.info('[LoggerBridge] Initializing with logger: ${logger != null}');
     _customLogger = logger;
     _loggerChannel.setMethodCallHandler(_handleMethodCall);
   }
 
   /// Handle incoming method calls from native Swift/Java code
   static Future<void> _handleMethodCall(MethodCall call) async {
-    print('[LoggerBridge] Received method call: ${call.method}');
+    AppLogger.info('[LoggerBridge] Received method call: ${call.method}');
     try {
       switch (call.method) {
         case 'log':
           await _handleLogCall(call);
           break;
         default:
-          print('[LoggerBridge] Unknown method call: ${call.method}');
+          AppLogger.warning('[LoggerBridge] Unknown method call: ${call.method}');
       }
     } catch (e) {
-      print('[LoggerBridge] Error handling method call: $e');
+      AppLogger.error('[LoggerBridge] Error handling method call: $e');
     }
   }
 
@@ -41,21 +41,21 @@ class LoggerBridge {
       final message = args['message'] as String?;
 
       if (levelRawValue == null || message == null) {
-        print('[LoggerBridge] Warning: Missing level or message in log call');
+        AppLogger.error('[LoggerBridge] Warning: Missing level or message in log call');
         return;
       }
 
       final level = _convertLogLevel(levelRawValue);
 
-      print('[LoggerBridge] Processing log: level=$levelRawValue, message=$message');
+      AppLogger.info('[LoggerBridge] Processing log: level=$levelRawValue, message=$message');
 
       if (_customLogger != null) {
         _customLogger!.log(level, message);
       } else {
-        print('[Optimizely ${level.name}] $message');
+        AppLogger.info('[Optimizely ${level.name}] $message');
       }
     } catch (e) {
-      print('[LoggerBridge] Error processing log call: $e');
+      AppLogger.error('[LoggerBridge] Error processing log call: $e');
     }
   }
 
