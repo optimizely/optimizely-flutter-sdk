@@ -74,4 +74,29 @@ class LoggerBridge {
         return OptimizelyLogLevel.info;
     }
   }
+  
+  /// Expose convertLogLevel 
+  static OptimizelyLogLevel convertLogLevel(int rawValue) {
+    return _convertLogLevel(rawValue);
+  }
+
+  /// Check if a custom logger is set
+  static bool hasLogger() {
+    return _customLogger != null;
+  }
+
+  /// Get the current logger
+  static OptimizelyLogger? getCurrentLogger() {
+    return _customLogger;
+  }
+
+  /// Reset logger state
+  static void reset() {
+    _customLogger = null;
+  }
+
+  /// Simulate method calls
+  static Future<void> handleMethodCallForTesting(MethodCall call) async {
+    await _handleMethodCall(call);
+  }
 }
