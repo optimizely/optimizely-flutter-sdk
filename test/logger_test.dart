@@ -244,7 +244,47 @@ void main() {
         }, returnsNormally);
       });
     });
+    group("Global Logging Functions", () {
+      test("should call global logging functions without error", () {
+        expect(() {
+          logError("Global error message");
+          logWarning("Global warning message");  
+          logInfo("Global info message");
+          logDebug("Global debug message");
+        }, returnsNormally);
+      });
 
+      test("should handle empty messages in global functions", () {
+        expect(() {
+          logError("");
+          logWarning("");
+          logInfo("");
+          logDebug("");
+        }, returnsNormally);
+      });
+
+      test("should handle special characters in global functions", () {
+        var specialMessage = "Special: 🚀 \n\t 世界";
+        
+        expect(() {
+          logError(specialMessage);
+          logWarning(specialMessage);
+          logInfo(specialMessage);
+          logDebug(specialMessage);
+        }, returnsNormally);
+      });
+
+      test("should handle rapid calls to global functions", () {
+        expect(() {
+          for (int i = 0; i < 25; i++) {
+            logError("Rapid error $i");
+            logWarning("Rapid warning $i");
+            logInfo("Rapid info $i");
+            logDebug("Rapid debug $i");
+          }
+        }, returnsNormally);
+      });
+    });
     group("Concurrent Access", () {
       test("should handle multiple concurrent log calls", () async {
         var testLogger = TestLogger();
