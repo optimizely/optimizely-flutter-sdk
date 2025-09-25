@@ -43,7 +43,7 @@ void main() {
       LoggerBridge.initialize(testLogger);
       
       // Simulate native log call by directly invoking the method handler
-      final methodCall = MethodCall('log', {
+      final methodCall = const MethodCall('log', {
         'level': 3, // INFO
         'message': 'Test log message from native'
       });
@@ -85,7 +85,7 @@ void main() {
         var testLogger = TestLogger();
         LoggerBridge.initialize(testLogger);
         
-        final methodCall = MethodCall('log', null);
+        final methodCall = const MethodCall('log', null);
         await LoggerBridge.handleMethodCallForTesting(methodCall);
         
         expect(testLogger.logs.isEmpty, isTrue);
@@ -95,7 +95,7 @@ void main() {
         var testLogger = TestLogger();
         LoggerBridge.initialize(testLogger);
         
-        final methodCall = MethodCall('log', {});
+        final methodCall = const MethodCall('log', {});
         await LoggerBridge.handleMethodCallForTesting(methodCall);
         
         expect(testLogger.logs.isEmpty, isTrue);
@@ -105,7 +105,7 @@ void main() {
         var testLogger = TestLogger();
         LoggerBridge.initialize(testLogger);
         
-        final methodCall = MethodCall('log', {
+        final methodCall = const MethodCall('log', {
           'message': 'Test message without level'
         });
         await LoggerBridge.handleMethodCallForTesting(methodCall);
@@ -117,7 +117,7 @@ void main() {
         var testLogger = TestLogger();
         LoggerBridge.initialize(testLogger);
         
-        final methodCall = MethodCall('log', {
+        final methodCall = const MethodCall('log', {
           'level': 3
         });
         await LoggerBridge.handleMethodCallForTesting(methodCall);
@@ -130,7 +130,7 @@ void main() {
         LoggerBridge.initialize(testLogger);
         
         // Test with string level
-        var methodCall = MethodCall('log', {
+        var methodCall = const MethodCall('log', {
           'level': 'invalid',
           'message': 'Test message'
         });
@@ -139,7 +139,7 @@ void main() {
         expect(testLogger.logs.isEmpty, isTrue);
         
         // Test with null level
-        methodCall = MethodCall('log', {
+        methodCall = const MethodCall('log', {
           'level': null,
           'message': 'Test message'
         });
@@ -154,7 +154,7 @@ void main() {
         var testLogger = TestLogger();
         LoggerBridge.initialize(testLogger);
         
-        final methodCall = MethodCall('unknownMethod', {
+        final methodCall = const MethodCall('unknownMethod', {
           'level': 3,
           'message': 'Test message'
         });
@@ -368,14 +368,14 @@ void main() {
         
         // Perform various operations
         await LoggerBridge.handleMethodCallForTesting(
-          MethodCall('log', {'level': 1, 'message': 'First message'})
+          const MethodCall('log', {'level': 1, 'message': 'First message'})
         );
         
         expect(LoggerBridge.hasLogger(), isTrue);
         expect(testLogger.logs.length, equals(1));
         
         await LoggerBridge.handleMethodCallForTesting(
-          MethodCall('log', {'level': 2, 'message': 'Second message'})
+          const MethodCall('log', {'level': 2, 'message': 'Second message'})
         );
         
         expect(LoggerBridge.hasLogger(), isTrue);
@@ -394,7 +394,7 @@ void main() {
         // Initialize with first logger
         LoggerBridge.initialize(testLogger1);
         await LoggerBridge.handleMethodCallForTesting(
-          MethodCall('log', {'level': 3, 'message': 'Message to logger 1'})
+          const MethodCall('log', {'level': 3, 'message': 'Message to logger 1'})
         );
         
         expect(testLogger1.logs.length, equals(1));
@@ -403,7 +403,7 @@ void main() {
         // Replace with second logger
         LoggerBridge.initialize(testLogger2);
         await LoggerBridge.handleMethodCallForTesting(
-          MethodCall('log', {'level': 3, 'message': 'Message to logger 2'})
+          const MethodCall('log', {'level': 3, 'message': 'Message to logger 2'})
         );
         
         expect(testLogger1.logs.length, equals(1)); // Unchanged
@@ -418,7 +418,7 @@ void main() {
         LoggerBridge.initialize(testLogger);
         
         await LoggerBridge.handleMethodCallForTesting(
-          MethodCall('log', {
+          const MethodCall('log', {
             'level': 3,
             'message': ''
           })
@@ -452,7 +452,7 @@ void main() {
         
         // Test with double level - should fail gracefully
         await LoggerBridge.handleMethodCallForTesting(
-          MethodCall('log', {
+          const MethodCall('log', {
             'level': 3.0, // Double instead of int
             'message': 'Message with double level'
           })

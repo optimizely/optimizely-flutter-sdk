@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
 import 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
