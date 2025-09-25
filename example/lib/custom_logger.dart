@@ -5,7 +5,7 @@ class CustomLogger implements OptimizelyLogger {
   @override
   void log(OptimizelyLogLevel level, String message) {
     if (kDebugMode) {
-      print('[Flutter LOGGER] ${level.name}: $message');
+      print('[OPTIMIZELY] ${level.name.toUpperCase()}: $message');
     }
   }
 }

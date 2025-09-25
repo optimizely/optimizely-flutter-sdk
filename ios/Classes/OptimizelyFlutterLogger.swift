@@ -28,21 +28,12 @@ public class OptimizelyFlutterLogger: NSObject, OPTLogger {
             return
         }
         
-        // Ensure logging happens on main thread as FlutterMethodChannel requires it
-        if Thread.isMainThread {
-            // Already on main thread
+        // https://docs.flutter.dev/platform-integration/platform-channels#jumping-to-the-main-thread-in-ios
+        DispatchQueue.main.async {
             channel.invokeMethod("log", arguments: [
                 "level": level.rawValue,
                 "message": message
             ])
-        } else {
-            // Switch to main thread
-            DispatchQueue.main.sync {
-                channel.invokeMethod("log", arguments: [
-                    "level": level.rawValue,
-                    "message": message
-                ])
-            }
         }
     }
 }

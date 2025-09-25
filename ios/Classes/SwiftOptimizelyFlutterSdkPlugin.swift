@@ -45,7 +45,11 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         registrar.addMethodCallDelegate(instance, channel: channel)
 
         // Separate logger channel for outgoing log calls
-        let loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL, binaryMessenger: registrar.messenger())
+        let taskQueue = registrar.messenger().makeBackgroundTaskQueue?()
+        let loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL, 
+                                                binaryMessenger: registrar.messenger(), 
+                                                codec: FlutterStandardMethodCodec.sharedInstance(),
+                                                taskQueue: taskQueue)
         OptimizelyFlutterLogger.setChannel(loggerChannel)
     }
     
