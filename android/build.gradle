@@ -24,15 +24,20 @@ rootProject.allprojects {
 
 
 ext {
-    compile_sdk_version = 32
-    build_tools_version = "30.0.3"
+    compile_sdk_version = 35
+    build_tools_version = "35.0.0"
     min_sdk_version = 21
-    target_sdk_version = 29
+    target_sdk_version = 35
 }
 
 android {
+    namespace 'com.optimizely.optimizely_flutter_sdk'
     compileSdkVersion compile_sdk_version
     buildToolsVersion build_tools_version
+
+    buildFeatures {
+        buildConfig true
+    }
 
     defaultConfig {
         minSdkVersion min_sdk_version
@@ -73,9 +78,9 @@ dependencies {
     implementation 'com.github.tony19:logback-android:3.0.0'
     implementation 'org.slf4j:slf4j-api:2.0.7'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0"
     implementation "com.optimizely.ab:android-sdk:5.0.1"
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
     implementation ('com.google.guava:guava:19.0') {
         exclude group:'com.google.guava', module:'listenablefuture'
     }
