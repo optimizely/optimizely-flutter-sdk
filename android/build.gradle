@@ -24,10 +24,10 @@ rootProject.allprojects {
 
 
 ext {
-    compile_sdk_version = 35
-    build_tools_version = "35.0.0"
+    compile_sdk_version = 36
+    build_tools_version = "36.0.0"
     min_sdk_version = 21
-    target_sdk_version = 35
+    target_sdk_version = 36
 }
 
 android {
