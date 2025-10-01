@@ -25,14 +25,14 @@ rootProject.allprojects {
 
 ext {
     compile_sdk_version = 35
-    build_tools_version = "35.0.0"
     min_sdk_version = 21
 }
 
 android {
     namespace 'com.optimizely.optimizely_flutter_sdk'
-    compileSdkVersion compile_sdk_version
-    buildToolsVersion build_tools_version
+    compileSdkVersion rootProject.hasProperty('flutter.compileSdkVersion') 
+                        ? rootProject.flutter.compileSdkVersion.toInteger() 
+                        : compile_sdk_version
 
     buildFeatures {
         buildConfig true
