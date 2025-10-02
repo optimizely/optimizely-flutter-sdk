@@ -30,9 +30,7 @@ ext {
 
 android {
     namespace 'com.optimizely.optimizely_flutter_sdk'
-    compileSdkVersion rootProject.hasProperty('flutter.compileSdkVersion') 
-                        ? rootProject.flutter.compileSdkVersion.toInteger() 
-                        : compile_sdk_version
+    compileSdkVersion compile_sdk_version
 
     buildFeatures {
         buildConfig true
