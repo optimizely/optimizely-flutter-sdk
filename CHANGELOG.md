@@ -1,5 +1,14 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.1.0
+October 3rd, 2025
+
+### Functionality Enhancements
+* Android 15 support added ([#84](https://github.com/optimizely/optimizely-flutter-sdk/pull/84))
+	- Update AGP version to 8.7.0
+	- Update gradle version to 8.10.2
+	- Update kotlin version to 2.1.0
+	
 ## 3.0.1
 Jun 4th, 2025
 
