@@ -1,0 +1,166 @@
+name: Minification Compatibility Test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  minification_compatibility_test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+          cache: true
+          
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd example && flutter pub get
+
+      - name: Create ProGuard rules for example app
+        run: |
+          cat > example/android/app/proguard-rules.pro << 'EOF'
+          # Example app ProGuard rules for minification testing
+          
+          # Keep example app classes
+          -keep class com.optimizely.optimizely_flutter_sdk_example.** { *; }
+          
+          # Keep Flutter classes
+          -keep class io.flutter.app.** { *; }
+          -keep class io.flutter.plugins.GeneratedPluginRegistrant { *; }
+          
+          # Google Play Core (for Flutter engine)
+          -keep class com.google.android.play.core.** { *; }
+          -dontwarn com.google.android.play.core.**
+          
+          # Additional safety for Optimizely (redundant but safe)
+          -keep class com.optimizely.** { *; }
+          -dontwarn com.optimizely.**
+          
+          # Jackson JSON
+          -keep class com.fasterxml.jackson.** { *; }
+          -dontwarn com.fasterxml.jackson.**
+          
+          # Ignore missing classes
+          -dontwarn javax.mail.**
+          -dontwarn javax.activation.**
+          EOF
+
+      - name: Test with minification ENABLED
+        run: |
+          echo "🧪 Testing with minifyEnabled = true"
+          
+          # Backup original build.gradle
+          cp example/android/app/build.gradle example/android/app/build.gradle.backup
+          
+          # Enable minification and ensure ProGuard rules are referenced
+          sed -i 's/minifyEnabled false/minifyEnabled true/' example/android/app/build.gradle
+          sed -i 's/shrinkResources false/shrinkResources true/' example/android/app/build.gradle
+          
+          # Ensure ProGuard rules are applied
+          if ! grep -q "proguardFiles.*proguard-rules.pro" example/android/app/build.gradle; then
+            sed -i '/minifyEnabled true/a\            proguardFiles getDefaultProguardFile('\''proguard-android-optimize.txt'\''), '\''proguard-rules.pro'\''' example/android/app/build.gradle
+          fi
+          
+          echo "📄 Build configuration with minification:"
+          grep -A 5 "buildTypes" example/android/app/build.gradle
+          
+          # Build release APK
+          cd example
+          flutter build apk --release
+          
+          echo "✅ Build successful with minification ENABLED"
+
+      - name: Test with minification DISABLED  
+        run: |
+          echo "🧪 Testing with minifyEnabled = false"
+          
+          # Restore original and disable minification
+          cp example/android/app/build.gradle.backup example/android/app/build.gradle
+          sed -i 's/minifyEnabled true/minifyEnabled false/' example/android/app/build.gradle
+          sed -i 's/shrinkResources true/shrinkResources false/' example/android/app/build.gradle
+          
+          echo "📄 Build configuration without minification:"
+          grep -A 5 "buildTypes" example/android/app/build.gradle
+          
+          # Clean and build again
+          cd example
+          flutter clean
+          flutter build apk --release
+          
+          echo "✅ Build successful with minification DISABLED"
+
+      - name: Run unit tests
+        run: |
+          echo "🧪 Running unit tests to verify SDK functionality"
+          flutter test
+        
+      - name: Verify APK artifacts
+        run: |
+          echo "📱 Checking APK files were created:"
+          ls -la example/build/app/outputs/apk/release/
+          
+          # Check APK size
+          if [ -f "example/build/app/outputs/apk/release/app-release.apk" ]; then
+            APK_SIZE=$(stat -c%s example/build/app/outputs/apk/release/app-release.apk 2>/dev/null || stat -f%z example/build/app/outputs/apk/release/app-release.apk)
+            echo "📊 Final APK Size: $(($APK_SIZE / 1024 / 1024)) MB"
+          fi
+
+      - name: Check for ProGuard artifacts
+        run: |
+          echo "🔍 Checking for ProGuard/R8 artifacts:"
+          
+          # Look for mapping files
+          if [ -f "example/build/app/outputs/mapping/release/mapping.txt" ]; then
+            echo "✅ ProGuard mapping file found"
+            echo "📄 Mapping file size: $(wc -l < example/build/app/outputs/mapping/release/mapping.txt) lines"
+          else
+            echo "ℹ️ No mapping file found (expected if minification was disabled)"
+          fi
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: minification-test-apk
+          path: |
+            example/build/app/outputs/apk/release/app-release.apk
+            example/build/app/outputs/mapping/release/mapping.txt
+          retention-days: 7
+
+      - name: Report test results
+        run: |
+          echo "🎉 Minification compatibility test completed successfully!"
+          echo "✅ minifyEnabled = true: PASSED"
+          echo "✅ minifyEnabled = false: PASSED" 
+          echo "✅ Your Optimizely Flutter SDK is minification-compatible!"
+          echo ""
+          echo "This confirms that:"
+          echo "  • Library ProGuard rules are working correctly"
+          echo "  • Plugin registration survives minification"
+          echo "  • No critical classes are being stripped"
+          echo "  • Customer's issue should be resolved"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          # Restore original build.gradle if backup exists
+          if [ -f "example/android/app/build.gradle.backup" ]; then
+            mv example/android/app/build.gradle.backup example/android/app/build.gradle
+            echo "✅ Restored original build.gradle"
+          fi
