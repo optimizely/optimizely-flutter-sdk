@@ -72,10 +72,6 @@ jobs:
           -keep class com.google.android.play.core.** { *; }
           -dontwarn com.google.android.play.core.**
           
-          # Additional safety for Optimizely
-          -keep class com.optimizely.** { *; }
-          -dontwarn com.optimizely.**
-          
           # Jackson JSON
           -keep class com.fasterxml.jackson.** { *; }
           -dontwarn com.fasterxml.jackson.**
@@ -146,15 +142,6 @@ jobs:
           else
             echo "ℹ️ No mapping file found"
           fi
-
-      - name: Upload APK artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: minification-test-apk
-          path: |
-            example/build/app/outputs/apk/release/*.apk
-            example/build/app/outputs/mapping/release/mapping.txt
-          retention-days: 7
 
       - name: Report test results
         run: |
