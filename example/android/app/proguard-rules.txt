@@ -1,4 +1,0 @@
-# Mail classes (Logback SMTP appender)
--dontwarn javax.mail.**
--dontwarn javax.mail.internet.**
--dontwarn javax.activation.**

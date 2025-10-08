@@ -56,13 +56,6 @@ android {
     packagingOptions {
         exclude 'androidsupportmultidexversion.txt'
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false 
-        }
-    }
-
 }
 
 dependencies {
