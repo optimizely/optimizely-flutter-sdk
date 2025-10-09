@@ -12,4 +12,10 @@
 -keep class com.fasterxml.jackson.** {*;}
 # Logback
 -keep class ch.qos.** { *; }
+
+# Mail classes (Logback SMTP appender)
+-dontwarn javax.mail.**
+-dontwarn javax.mail.internet.**
+-dontwarn javax.activation.**
+
 ##---------------End: proguard configuration ----------
