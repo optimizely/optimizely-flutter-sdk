@@ -36,7 +36,6 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implements FlutterPlugin, ActivityAware, MethodCallHandler {
 
   public static MethodChannel channel;
-  private static MethodChannel loggerChannel; 
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
@@ -157,18 +156,12 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     channel = new MethodChannel(binding.getBinaryMessenger(), "optimizely_flutter_sdk");
     channel.setMethodCallHandler(this);
-    
-    loggerChannel = new MethodChannel(binding.getBinaryMessenger(), OptimizelyFlutterLogger.LOGGER_CHANNEL);
-    OptimizelyFlutterLogger.setChannel(loggerChannel);
-
     context = binding.getApplicationContext();
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
-    loggerChannel.setMethodCallHandler(null); 
-    OptimizelyFlutterLogger.setChannel(null);
   }
 
   @Override
