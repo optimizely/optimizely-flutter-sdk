@@ -89,7 +89,7 @@ class OptimizelyFlutterSdk {
     Set<OptimizelyDecideOption> defaultDecideOptions = const {},
     OptimizelyLogLevel defaultLogLevel = OptimizelyLogLevel.info,
     SDKSettings sdkSettings = const SDKSettings(),
-    OptimizelyLogger? logger}) // Add logger parameter
+    OptimizelyLogger? logger}) 
     : _eventOptions = eventOptions,
       _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
       _datafileHostOptions = datafileHostOptions,

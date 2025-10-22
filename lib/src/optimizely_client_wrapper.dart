@@ -80,7 +80,7 @@ class OptimizelyClientWrapper {
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
-      Constants.customLogger: logger != null,
+      Constants.useCustomLogger: logger != null,
     };
 
     // Odp Request params
