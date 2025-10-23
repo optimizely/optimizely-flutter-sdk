@@ -25,7 +25,6 @@ import com.optimizely.ab.OptimizelyForcedDecision;
 import com.optimizely.ab.UnknownEventTypeException;
 import com.optimizely.ab.android.event_handler.DefaultEventHandler;
 import com.optimizely.ab.android.sdk.OptimizelyClient;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -187,6 +186,7 @@ public class OptimizelyFlutterClient {
         if (enableVuid) {
             optimizelyManagerBuilder.withVuidEnabled();
         }
+
         OptimizelyManager optimizelyManager = optimizelyManagerBuilder.build(context);
 
         optimizelyManager.initialize(context, null, (OptimizelyClient client) -> {

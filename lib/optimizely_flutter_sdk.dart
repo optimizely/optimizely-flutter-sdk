@@ -28,6 +28,8 @@ import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_respon
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
+import 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart';
+import 'package:optimizely_flutter_sdk/src/logger/logger_bridge.dart';
 
 export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
     show ClientPlatform, ListenerType;
@@ -53,6 +55,8 @@ export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
     show DatafileHostOptions;
 export 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart'
     show OptimizelyLogLevel;
+export 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart'
+    show OptimizelyLogger;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
@@ -68,20 +72,37 @@ class OptimizelyFlutterSdk {
   final Set<OptimizelyDecideOption> _defaultDecideOptions;
   final OptimizelyLogLevel _defaultLogLevel;
   final SDKSettings _sdkSettings;
+  static OptimizelyLogger? _customLogger;
+  /// Set a custom logger for the SDK
+  static void setLogger(OptimizelyLogger logger) {
+    _customLogger = logger;
+    LoggerBridge.initialize(logger);
+  }
+  /// Get the current logger
+  static OptimizelyLogger? get logger {
+    return _customLogger;
+  }
   OptimizelyFlutterSdk(this._sdkKey,
-      {EventOptions eventOptions = const EventOptions(),
-      int datafilePeriodicDownloadInterval =
-          10 * 60, // Default time interval in seconds
-      Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
-      Set<OptimizelyDecideOption> defaultDecideOptions = const {},
-      OptimizelyLogLevel defaultLogLevel = OptimizelyLogLevel.info,
-      SDKSettings sdkSettings = const SDKSettings()})
-      : _eventOptions = eventOptions,
-        _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
-        _datafileHostOptions = datafileHostOptions,
-        _defaultDecideOptions = defaultDecideOptions,
-        _defaultLogLevel = defaultLogLevel,
-        _sdkSettings = sdkSettings;
+    {EventOptions eventOptions = const EventOptions(),
+    int datafilePeriodicDownloadInterval = 10 * 60,
+    Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
+    Set<OptimizelyDecideOption> defaultDecideOptions = const {},
+    OptimizelyLogLevel defaultLogLevel = OptimizelyLogLevel.info,
+    SDKSettings sdkSettings = const SDKSettings(),
+    OptimizelyLogger? logger}) 
+    : _eventOptions = eventOptions,
+      _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
+      _datafileHostOptions = datafileHostOptions,
+      _defaultDecideOptions = defaultDecideOptions,
+      _defaultLogLevel = defaultLogLevel,
+      _sdkSettings = sdkSettings {
+      // Set the logger if provided
+      if (logger != null) {
+        setLogger(logger);
+      } else {
+        logWarning("Logger not provided.");
+      }
+  }
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   Future<BaseResponse> initializeClient() async {
@@ -92,7 +113,9 @@ class OptimizelyFlutterSdk {
         _datafileHostOptions,
         _defaultDecideOptions,
         _defaultLogLevel,
-        _sdkSettings);
+        _sdkSettings,
+        _customLogger
+    );
   }
 
   /// Use the activate method to start an experiment.

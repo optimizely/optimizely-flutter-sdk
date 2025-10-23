@@ -63,7 +63,8 @@ class OptimizelyClientWrapper {
       Map<ClientPlatform, DatafileHostOptions> datafileHostOptions,
       Set<OptimizelyDecideOption> defaultDecideOptions,
       OptimizelyLogLevel defaultLogLevel,
-      SDKSettings sdkSettings) async {
+      SDKSettings sdkSettings,
+      OptimizelyLogger? logger) async {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
@@ -79,6 +80,7 @@ class OptimizelyClientWrapper {
       Constants.eventBatchSize: eventOptions.batchSize,
       Constants.eventTimeInterval: eventOptions.timeInterval,
       Constants.eventMaxQueueSize: eventOptions.maxQueueSize,
+      Constants.useCustomLogger: logger != null,
     };
 
     // Odp Request params

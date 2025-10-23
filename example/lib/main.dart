@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:optimizely_flutter_sdk_example/custom_logger.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,16 +29,20 @@ class _MyAppState extends State<MyApp> {
       OptimizelyDecideOption.includeReasons,
       OptimizelyDecideOption.excludeVariables
     };
+    final customLogger = CustomLogger();
+
     var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
         datafilePeriodicDownloadInterval: 10 * 60,
         eventOptions: const EventOptions(
             batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
         defaultLogLevel: OptimizelyLogLevel.debug,
-        defaultDecideOptions: defaultOptions);
+        defaultDecideOptions: defaultOptions,
+        logger: customLogger,
+      );
     var response = await flutterSDK.initializeClient();
 
     setState(() {
-      uiResponse = "Optimizely Client initialized: ${response.success} ";
+      uiResponse = "[Optimizely] Client initialized: ${response.success} ";
     });
 
     var rng = Random();

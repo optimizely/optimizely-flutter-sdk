@@ -41,6 +41,14 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftOptimizelyFlutterSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
+
+        // Separate logger channel for outgoing log calls
+        let taskQueue = registrar.messenger().makeBackgroundTaskQueue?()
+        let loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL, 
+                                                binaryMessenger: registrar.messenger(), 
+                                                codec: FlutterStandardMethodCodec.sharedInstance(),
+                                                taskQueue: taskQueue)
+        OptimizelyFlutterLogger.setChannel(loggerChannel)
     }
     
     /// Part of FlutterPlugin protocol to handle communication with flutter sdk
@@ -110,6 +118,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         var defaultLogLevel = OptimizelyLogLevel.info
         if let logLevel = parameters[RequestParameterKey.defaultLogLevel] as? String {
             defaultLogLevel = Utils.getDefaultLogLevel(logLevel)
+            OptimizelyFlutterLogger.logLevel = defaultLogLevel
         }
 
         // SDK Settings Default Values
@@ -163,9 +172,19 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         notificationIdsTracker.removeValue(forKey: sdkKey)
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
+        // Check if custom logger is requested
+        var logger: OPTLogger?
+        if let useCustomLogger = parameters[RequestParameterKey.useCustomLogger] as? Bool, useCustomLogger {
+            // OptimizelyFlutterLogger bridges iOS logs to Flutter via Method Channel
+            // When useCustomLogger = true:
+            // iOS SDK log → OptimizelyFlutterLogger → Flutter Method Channel → Flutter console
+            logger = OptimizelyFlutterLogger()
+        }
+
         // Creating new instance
         let optimizelyInstance = OptimizelyClient(
             sdkKey:sdkKey, 
+            logger:logger,
             eventDispatcher: eventDispatcher, 
             datafileHandler: datafileHandler, 
             periodicDownloadInterval: datafilePeriodicDownloadInterval, 

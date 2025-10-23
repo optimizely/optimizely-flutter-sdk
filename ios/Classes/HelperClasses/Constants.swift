@@ -91,6 +91,7 @@ struct RequestParameterKey {
     static let reasons = "reasons"
     static let decideOptions = "optimizelyDecideOption"
     static let defaultLogLevel = "defaultLogLevel"
+    static let useCustomLogger = "useCustomLogger"
     static let eventBatchSize = "eventBatchSize"
     static let eventTimeInterval = "eventTimeInterval"
     static let eventMaxQueueSize = "eventMaxQueueSize"
