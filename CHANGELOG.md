@@ -1,5 +1,11 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.2.0
+October 24th, 2025
+
+### New Feature
+* Swift custom logger support added ([#88](https://github.com/optimizely/optimizely-flutter-sdk/pull/88))
+
 ## 3.1.0
 October 9th, 2025
 
