@@ -191,7 +191,7 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
     }
 
     // Clean up the channel
-    FlutterLogbackAppender.Companion.setChannel(null);
+    FlutterLogbackAppender.setChannel(null);
   }
 
   @Override
