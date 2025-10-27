@@ -5,7 +5,7 @@ import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 
 class LoggerBridge {
   static const MethodChannel _loggerChannel =
-      MethodChannel('optimizely_flutter_sdk_logger');
+      MethodChannel('optimizely_flutter_sdk/logs');
   static OptimizelyLogger? _customLogger;
 
   /// Initialize the logger bridge to receive calls from native

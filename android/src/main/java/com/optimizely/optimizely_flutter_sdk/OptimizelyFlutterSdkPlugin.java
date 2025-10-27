@@ -18,6 +18,7 @@ package com.optimizely.optimizely_flutter_sdk;
 import androidx.annotation.NonNull;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -26,17 +27,22 @@ import io.flutter.plugin.common.MethodChannel.Result;
 
 import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 
 import java.util.Map;
-
-import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 
 /** OptimizelyFlutterSdkPlugin */
 public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implements FlutterPlugin, ActivityAware, MethodCallHandler {
 
   public static MethodChannel channel;
-  private static MethodChannel loggerChannel; 
+  private Appender<ILoggingEvent> flutterLogbackAppender;
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
@@ -157,9 +163,17 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     channel = new MethodChannel(binding.getBinaryMessenger(), "optimizely_flutter_sdk");
     channel.setMethodCallHandler(this);
-    
-    loggerChannel = new MethodChannel(binding.getBinaryMessenger(), OptimizelyFlutterLogger.LOGGER_CHANNEL);
-    OptimizelyFlutterLogger.setChannel(loggerChannel);
+
+    MethodChannel loggerChannel = new MethodChannel(binding.getBinaryMessenger(), FlutterLogbackAppender.CHANNEL_NAME);
+    FlutterLogbackAppender.setChannel(loggerChannel);
+
+    // Add appender to logback
+    flutterLogbackAppender = new FlutterLogbackAppender();
+    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    flutterLogbackAppender.setContext(lc);
+    flutterLogbackAppender.start();
+    Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    rootLogger.addAppender(flutterLogbackAppender);
 
     context = binding.getApplicationContext();
   }
@@ -167,8 +181,17 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
-    loggerChannel.setMethodCallHandler(null); 
-    OptimizelyFlutterLogger.setChannel(null);
+
+    // Stop and detach the appender
+    if (flutterLogbackAppender != null) {
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.detachAppender(flutterLogbackAppender);
+        flutterLogbackAppender.stop();
+        flutterLogbackAppender = null;
+    }
+
+    // Clean up the channel
+    FlutterLogbackAppender.Companion.setChannel(null);
   }
 
   @Override

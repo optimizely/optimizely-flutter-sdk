@@ -189,12 +189,12 @@ public class OptimizelyFlutterClient {
         }
 
         // Check if custom logger is requested
-        Boolean useCustomLogger = argumentsParser.getCustomLogger();
-        Logger customLogger = null;
-        if (useCustomLogger != null && useCustomLogger) {
-            customLogger = new OptimizelyFlutterLogger("OptimizelySDK");
-            optimizelyManagerBuilder.withLogger(customLogger);
-        }
+        // Boolean useCustomLogger = argumentsParser.getCustomLogger();
+        // Logger customLogger = null;
+        // if (useCustomLogger != null && useCustomLogger) {
+        //     customLogger = new OptimizelyFlutterLogger("OptimizelySDK");
+        //     optimizelyManagerBuilder.withLogger(customLogger);
+        // }
 
         OptimizelyManager optimizelyManager = optimizelyManagerBuilder.build(context);
 
