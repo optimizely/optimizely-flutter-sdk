@@ -172,15 +172,10 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         notificationIdsTracker.removeValue(forKey: sdkKey)
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
-        // Check if custom logger is requested
-        var logger: OPTLogger?
-        if let useCustomLogger = parameters[RequestParameterKey.useCustomLogger] as? Bool, useCustomLogger {
-            // OptimizelyFlutterLogger bridges iOS logs to Flutter via Method Channel
-            // When useCustomLogger = true:
-            // iOS SDK log → OptimizelyFlutterLogger → Flutter Method Channel → Flutter console
-            logger = OptimizelyFlutterLogger()
-        }
-
+        // OptimizelyFlutterLogger bridges iOS logs to Flutter via Method Channel
+        // iOS SDK log → OptimizelyFlutterLogger → Flutter Method Channel → Flutter console
+        var logger: OPTLogger = OptimizelyFlutterLogger()
+        
         // Creating new instance
         let optimizelyInstance = OptimizelyClient(
             sdkKey:sdkKey, 

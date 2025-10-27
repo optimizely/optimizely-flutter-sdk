@@ -73,11 +73,6 @@ class OptimizelyFlutterSdk {
   final OptimizelyLogLevel _defaultLogLevel;
   final SDKSettings _sdkSettings;
   static OptimizelyLogger? _customLogger;
-  /// Set a custom logger for the SDK
-  static void setLogger(OptimizelyLogger logger) {
-    _customLogger = logger;
-    LoggerBridge.initialize(logger);
-  }
   /// Get the current logger
   static OptimizelyLogger? get logger {
     return _customLogger;
@@ -97,11 +92,8 @@ class OptimizelyFlutterSdk {
       _defaultLogLevel = defaultLogLevel,
       _sdkSettings = sdkSettings {
       // Set the logger if provided
-      if (logger != null) {
-        setLogger(logger);
-      } else {
-        logWarning("Logger not provided.");
-      }
+      _customLogger = logger ?? DefaultOptimizelyLogger();
+      LoggerBridge.initialize(_customLogger);
   }
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
