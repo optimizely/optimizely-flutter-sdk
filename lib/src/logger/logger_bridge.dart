@@ -17,7 +17,6 @@ class LoggerBridge {
 
   /// Handle incoming method calls from native Swift/Java code
   static Future<void> _handleMethodCall(MethodCall call) async {
-    logInfo('[LoggerBridge] Received method call: ${call.method}');
     try {
       switch (call.method) {
         case 'log':
@@ -45,8 +44,6 @@ class LoggerBridge {
       }
 
       final level = _convertLogLevel(levelRawValue);
-
-      logInfo('[LoggerBridge] Processing log: level=$levelRawValue, message=$message');
 
       if (_customLogger != null) {
         _customLogger!.log(level, message);
