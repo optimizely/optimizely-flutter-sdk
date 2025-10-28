@@ -50,7 +50,6 @@ public class FlutterLogbackAppender extends AppenderBase<ILoggingEvent> {
             case "ERROR":
                 return 1;
             case "WARN":
-            case "WARNING":
                 return 2;
             case "INFO":
                 return 3;
