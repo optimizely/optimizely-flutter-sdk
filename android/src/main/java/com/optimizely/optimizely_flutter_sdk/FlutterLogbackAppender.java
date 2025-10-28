@@ -29,8 +29,6 @@ public class FlutterLogbackAppender extends AppenderBase<ILoggingEvent> {
 
         String message = event.getFormattedMessage();
         String level = event.getLevel().toString();
-        // print level here
-        System.out.println("loglevel: " + level);
         int logLevel = convertLogLevel(level);
         Map<String, Object> logData = new HashMap<>();
         logData.put("level", logLevel);
@@ -44,28 +42,22 @@ public class FlutterLogbackAppender extends AppenderBase<ILoggingEvent> {
     }
 
      int convertLogLevel(String logLevel) {
-        int level = 3; // Default to INFO
-
         if (logLevel == null || logLevel.isEmpty()) {
-            return level;
+            return 3;
         }
         
-        switch (logLevel.toLowerCase()) {
-            case Constants.LogLevel.ERROR:
-                level = 1;
-                break;
-            case Constants.LogLevel.WARNING:
-                level = 2;
-                break;
-            case Constants.LogLevel.INFO:
-                level = 3;
-                break;
-            case Constants.LogLevel.DEBUG:
-                level = 4;
-                break;
-            default: {
-            }
+        switch (logLevel.toUpperCase()) { 
+            case "ERROR":
+                return 1;
+            case "WARN":
+            case "WARNING":
+                return 2;
+            case "INFO":
+                return 3;
+            case "DEBUG":
+                return 4;
+            default:
+                return 3;
         }
-        return level;
     }
 }
