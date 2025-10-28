@@ -176,6 +176,7 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
     flutterLogbackAppender.setContext(lc);
     flutterLogbackAppender.start();
     Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    rootLogger.setLevel(ch.qos.logback.classic.Level.ALL);
     rootLogger.addAppender(flutterLogbackAppender);
   }
 

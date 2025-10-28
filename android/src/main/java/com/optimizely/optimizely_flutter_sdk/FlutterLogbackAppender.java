@@ -1,4 +1,5 @@
 package com.optimizely.optimizely_flutter_sdk;
+import com.optimizely.optimizely_flutter_sdk.helper_classes.Constants;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -27,10 +28,12 @@ public class FlutterLogbackAppender extends AppenderBase<ILoggingEvent> {
         }
 
         String message = event.getFormattedMessage();
-        int level = event.getLevel().toInt();
-
+        String level = event.getLevel().toString();
+        // print level here
+        System.out.println("loglevel: " + level);
+        int logLevel = convertLogLevel(level);
         Map<String, Object> logData = new HashMap<>();
-        logData.put("level", level);
+        logData.put("level", logLevel);
         logData.put("message", message);
 
         mainThreadHandler.post(() -> {
@@ -38,5 +41,31 @@ public class FlutterLogbackAppender extends AppenderBase<ILoggingEvent> {
                 channel.invokeMethod("log", logData);
             }
         });
+    }
+
+     int convertLogLevel(String logLevel) {
+        int level = 3; // Default to INFO
+
+        if (logLevel == null || logLevel.isEmpty()) {
+            return level;
+        }
+        
+        switch (logLevel.toLowerCase()) {
+            case Constants.LogLevel.ERROR:
+                level = 1;
+                break;
+            case Constants.LogLevel.WARNING:
+                level = 2;
+                break;
+            case Constants.LogLevel.INFO:
+                level = 3;
+                break;
+            case Constants.LogLevel.DEBUG:
+                level = 4;
+                break;
+            default: {
+            }
+        }
+        return level;
     }
 }
