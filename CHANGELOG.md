@@ -1,5 +1,11 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.3.0
+October 29th, 2025
+
+### New Feature
+* Android custom logger support added ([#90](https://github.com/optimizely/optimizely-flutter-sdk/pull/90))
+
 ## 3.2.0
 October 24th, 2025
 
