@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
 
 abstract class OptimizelyLogger {
@@ -8,7 +9,9 @@ abstract class OptimizelyLogger {
 class DefaultOptimizelyLogger implements OptimizelyLogger {
   @override
   void log(OptimizelyLogLevel level, String message) {
-    print('[OPTIMIZELY] [${level.name.toUpperCase()}]: $message');
+    if (kDebugMode) {
+      print('[OPTIMIZELY] [${level.name.toUpperCase()}]: $message');
+    }
   }
 }
 

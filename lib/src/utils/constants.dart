@@ -86,7 +86,6 @@ class Constants {
   static const String optimizelyDecideOption = "optimizelyDecideOption";
   static const String optimizelySegmentOption = "optimizelySegmentOption";
   static const String optimizelySdkSettings = "optimizelySdkSettings";
-  static const String useCustomLogger = 'useCustomLogger';
   static const String defaultLogLevel = "defaultLogLevel";
   static const String payload = "payload";
   static const String value = "value";

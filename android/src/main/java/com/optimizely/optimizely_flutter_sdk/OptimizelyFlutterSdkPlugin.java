@@ -32,10 +32,19 @@ import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+
+
 /** OptimizelyFlutterSdkPlugin */
 public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implements FlutterPlugin, ActivityAware, MethodCallHandler {
 
   public static MethodChannel channel;
+  private Appender<ILoggingEvent> flutterLogbackAppender;
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
@@ -157,11 +166,32 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
     channel = new MethodChannel(binding.getBinaryMessenger(), "optimizely_flutter_sdk");
     channel.setMethodCallHandler(this);
     context = binding.getApplicationContext();
+
+    MethodChannel loggerChannel = new MethodChannel(binding.getBinaryMessenger(), FlutterLogbackAppender.CHANNEL_NAME);
+    FlutterLogbackAppender.setChannel(loggerChannel);
+
+    // Add appender to logback
+    flutterLogbackAppender = new FlutterLogbackAppender();
+    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    flutterLogbackAppender.setContext(lc);
+    flutterLogbackAppender.start();
+    Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    rootLogger.setLevel(ch.qos.logback.classic.Level.ALL);
+    rootLogger.addAppender(flutterLogbackAppender);
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
+    // Stop and detach the appender
+    if (flutterLogbackAppender != null) {
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.detachAppender(flutterLogbackAppender);
+        flutterLogbackAppender.stop();
+        flutterLogbackAppender = null;
+    }
+    // Clean up the channel
+    FlutterLogbackAppender.setChannel(null);
   }
 
   @Override
