@@ -43,46 +43,76 @@ class Utils {
     // Only keep primitive values
     Map<String, dynamic> primitiveMap = {};
     for (MapEntry e in map.entries) {
-      if (e.value is String) {
+      dynamic processedValue = _processValue(e.value);
+      if (processedValue != null) {
         primitiveMap[e.key] = e.value;
-        typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.stringType
-        };
-        continue;
+        typedMap[e.key] = processedValue;
       }
-      if (e.value is double) {
-        primitiveMap[e.key] = e.value;
-        typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.doubleType
-        };
-        continue;
-      }
-      if (e.value is int) {
-        primitiveMap[e.key] = e.value;
-        typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.intType
-        };
-        continue;
-      }
-      if (e.value is bool) {
-        primitiveMap[e.key] = e.value;
-        typedMap[e.key] = {
-          Constants.value: e.value,
-          Constants.type: Constants.boolType
-        };
-        continue;
-      }
-      // ignore: avoid_print
-      print('Unsupported value type for key: ${e.key}.');
     }
 
     if (Platform.isIOS) {
       return typedMap;
     }
     return primitiveMap;
+  }
+
+  /// Recursively processes values to add type information for iOS
+  static dynamic _processValue(dynamic value) {
+    if (value is String) {
+      return {
+        Constants.value: value,
+        Constants.type: Constants.stringType
+      };
+    }
+    if (value is double) {
+      return {
+        Constants.value: value,
+        Constants.type: Constants.doubleType
+      };
+    }
+    if (value is int) {
+      return {
+        Constants.value: value,
+        Constants.type: Constants.intType
+      };
+    }
+    if (value is bool) {
+      return {
+        Constants.value: value,
+        Constants.type: Constants.boolType
+      };
+    }
+    if (value is Map) {
+      // Handle nested maps
+      Map<String, dynamic> nestedMap = {};
+      (value as Map).forEach((k, v) {
+        dynamic processedValue = _processValue(v);
+        if (processedValue != null) {
+          nestedMap[k.toString()] = processedValue;
+        }
+      });
+      return {
+        Constants.value: nestedMap,
+        Constants.type: Constants.mapType
+      };
+    }
+    if (value is List) {
+      // Handle arrays
+      List<dynamic> nestedList = [];
+      for (var item in value) {
+        dynamic processedValue = _processValue(item);
+        if (processedValue != null) {
+          nestedList.add(processedValue);
+        }
+      }
+      return {
+        Constants.value: nestedList,
+        Constants.type: Constants.listType
+      };
+    }
+    // ignore: avoid_print
+    print('Unsupported value type: ${value.runtimeType}');
+    return null;
   }
 
   static List<String> convertDecideOptions(

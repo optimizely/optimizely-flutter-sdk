@@ -137,12 +137,22 @@ class _MyAppState extends State<MyApp> {
       print("log event notification received");
     });
 
-    // Track call
+    // Track call with nested objects
     response = await userContext.trackEvent("myevent", {
-      "age": 20,
-      "doubleValue": 12.12,
-      "boolValue": false,
-      "stringValue": "121"
+      "revenue": 99.99,
+      "user": {
+        "id": "user123",
+        "premium": true,
+        "tags": ["vip", "loyal"]
+      },
+      "items": [
+        {"name": "Product A", "quantity": 2, "price": 49.99},
+        {"name": "Product B", "quantity": 1, "price": 50.00}
+      ],
+      "metadata": {
+        "source": "mobile_app",
+        "platform": "ios"
+      }
     });
 
     // To cancel track listener

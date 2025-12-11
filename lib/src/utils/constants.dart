@@ -20,6 +20,8 @@ class Constants {
   static const String intType = "int";
   static const String doubleType = "double";
   static const String boolType = "bool";
+  static const String mapType = "map";
+  static const String listType = "list";
 
   // Supported Method Names
   static const String initializeMethod = "initialize";

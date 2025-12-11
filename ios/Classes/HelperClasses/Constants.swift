@@ -139,4 +139,6 @@ struct TypeValue {
     static let int = "int"
     static let double = "double"
     static let bool = "bool"
+    static let map = "map"
+    static let list = "list"
 }
