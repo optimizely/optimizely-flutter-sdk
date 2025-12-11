@@ -33,7 +33,17 @@ class Utils {
     OptimizelySegmentOption.resetCache: "resetCache",
   };
 
-  static Map<String, dynamic> convertToTypedMap(Map<String, dynamic> map) {
+  /// Converts a map to platform-specific typed format
+  ///
+  /// On iOS, returns a typed map with type information for proper native conversion.
+  /// On Android, returns the original primitive map.
+  ///
+  /// The [forceIOSFormat] parameter is used for testing purposes only to test
+  /// iOS format conversion without running on actual iOS platform.
+  static Map<String, dynamic> convertToTypedMap(
+    Map<String, dynamic> map, {
+    bool forceIOSFormat = false,
+  }) {
     if (map.isEmpty) {
       return map;
     }
@@ -50,7 +60,7 @@ class Utils {
       }
     }
 
-    if (Platform.isIOS) {
+    if (Platform.isIOS || forceIOSFormat) {
       return typedMap;
     }
     return primitiveMap;
