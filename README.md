@@ -111,5 +111,4 @@ Please see [CONTRIBUTING](CONTRIBUTING.md).
 - React - https://github.com/optimizely/react-sdk
 
 - Ruby - https://github.com/optimizely/ruby-sdk
-
 - Swift - https://github.com/optimizely/swift-sdk
