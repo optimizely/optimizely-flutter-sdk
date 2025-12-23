@@ -26,35 +26,58 @@ public class Utils: NSObject {
         }
         var typedDictionary = [String: Any]()
         for (k,v) in args {
-            if let typedValue = v as? Dictionary<String, Any?>, let value = typedValue["value"] as? Any, let type = typedValue["type"] as? String {
-                switch type {
-                case TypeValue.string:
-                    if let strValue = value as? String {
-                        typedDictionary[k] = strValue
-                    }
-                    break
-                case TypeValue.int:
-                    if let intValue = value as? Int {
-                        typedDictionary[k] = NSNumber(value: intValue).intValue
-                    }
-                    break
-                case TypeValue.double:
-                    if let doubleValue = value as? Double {
-                        typedDictionary[k] = NSNumber(value: doubleValue).doubleValue
-                    }
-                    break
-                case TypeValue.bool:
-                    if let booleanValue = value as? Bool {
-                        typedDictionary[k] = NSNumber(value: booleanValue).boolValue
-                    }
-                    break
-                default:
-                    break
-                }
+            if let processedValue = processTypedValue(v) {
+                typedDictionary[k] = processedValue
             }
-            continue
         }
         return typedDictionary
+    }
+
+    /// Recursively processes typed values from Flutter to native Swift types
+    private static func processTypedValue(_ value: Any?) -> Any? {
+        guard let typedValue = value as? Dictionary<String, Any?>,
+              let val = typedValue["value"],
+              let type = typedValue["type"] as? String else {
+            return nil
+        }
+
+        switch type {
+        case TypeValue.string:
+            return val as? String
+        case TypeValue.int:
+            if let intValue = val as? Int {
+                return NSNumber(value: intValue).intValue
+            }
+            return nil
+        case TypeValue.double:
+            if let doubleValue = val as? Double {
+                return NSNumber(value: doubleValue).doubleValue
+            }
+            return nil
+        case TypeValue.bool:
+            if let booleanValue = val as? Bool {
+                return NSNumber(value: booleanValue).boolValue
+            }
+            return nil
+        case TypeValue.map:
+            guard let nestedMap = val as? Dictionary<String, Any?> else {
+                return nil
+            }
+            var result = [String: Any]()
+            for (k, v) in nestedMap {
+                if let processedValue = processTypedValue(v) {
+                    result[k] = processedValue
+                }
+            }
+            return result
+        case TypeValue.list:
+            guard let nestedArray = val as? [Any?] else {
+                return nil
+            }
+            return nestedArray.compactMap { processTypedValue($0) }
+        default:
+            return nil
+        }
     }
     
     /// Returns callback required for LogEventListener

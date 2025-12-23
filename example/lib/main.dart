@@ -29,16 +29,18 @@ class _MyAppState extends State<MyApp> {
       OptimizelyDecideOption.includeReasons,
       OptimizelyDecideOption.excludeVariables
     };
+
     final customLogger = CustomLogger();
 
-    var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
-        datafilePeriodicDownloadInterval: 10 * 60,
-        eventOptions: const EventOptions(
-            batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
-        defaultLogLevel: OptimizelyLogLevel.debug,
-        defaultDecideOptions: defaultOptions,
-        logger: customLogger,
-      );
+    var flutterSDK = OptimizelyFlutterSdk(
+      "X9mZd2WDywaUL9hZXyh9A",
+      datafilePeriodicDownloadInterval: 10 * 60,
+      eventOptions: const EventOptions(
+          batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
+      defaultLogLevel: OptimizelyLogLevel.debug,
+      defaultDecideOptions: defaultOptions,
+      logger: customLogger,
+    );
     var response = await flutterSDK.initializeClient();
 
     setState(() {
@@ -60,7 +62,7 @@ class _MyAppState extends State<MyApp> {
       "stringValue": "121"
     });
 
-    // To add decide listener
+    // Add decide listener
     var decideListenerId =
         await flutterSDK.addDecisionNotificationListener((notification) {
       print("Parsed decision event ....................");
@@ -73,17 +75,13 @@ class _MyAppState extends State<MyApp> {
     Set<OptimizelyDecideOption> options = {
       OptimizelyDecideOption.ignoreUserProfileService,
     };
+
     // Decide call
     var decideResponse = await userContext.decide('flag1', options);
     uiResponse +=
         "\nFirst decide call variationKey: ${decideResponse.decision!.variationKey}";
 
-    // should return following response without forced decision
-    // flagKey: flag1
-    // ruleKey: default-rollout-7371-20896892800
-    // variationKey: off
-
-    // Setting forced decision
+    // Set forced decision
     await userContext.setForcedDecision(
         OptimizelyDecisionContext("flag1", "flag1_experiment"),
         OptimizelyForcedDecision("variation_a"));
@@ -92,11 +90,6 @@ class _MyAppState extends State<MyApp> {
     decideResponse = await userContext.decide('flag1');
     uiResponse +=
         "\nSecond decide call variationKey: ${decideResponse.decision!.variationKey}";
-
-    // should return following response with forced decision
-    // flagKey: flag1
-    // ruleKey: flag1_experiment
-    // variationKey: variation_a
 
     // removing forced decision
     await userContext.removeForcedDecision(
@@ -110,14 +103,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       uiResponse = uiResponse;
     });
-
-    // should return original response without forced decision
-    // flagKey: flag1
-    // ruleKey: default-rollout-7371-20896892800
-    // variationKey: off
-
-    // To cancel decide listener
-    // await flutterSDK.removeNotificationListener(decideListenerId);
 
     // To add track listener
     var trackListenerID =
@@ -137,12 +122,19 @@ class _MyAppState extends State<MyApp> {
       print("log event notification received");
     });
 
-    // Track call
+    // Track call with nested objects
     response = await userContext.trackEvent("myevent", {
-      "age": 20,
-      "doubleValue": 12.12,
-      "boolValue": false,
-      "stringValue": "121"
+      "revenue": 99.99,
+      "user": {
+        "id": "user123",
+        "premium": true,
+        "tags": ["vip", "loyal"]
+      },
+      "items": [
+        {"name": "Product A", "quantity": 2, "price": 49.99},
+        {"name": "Product B", "quantity": 1, "price": 50.00}
+      ],
+      "metadata": {"source": "mobile_app", "platform": "ios"}
     });
 
     // To cancel track listener
