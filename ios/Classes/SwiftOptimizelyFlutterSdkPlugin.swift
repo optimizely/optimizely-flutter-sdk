@@ -168,7 +168,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                 cacheTimeoutInSecs = timeout
             }
             if let endpoint = cmabConfigDict[RequestParameterKey.cmabPredictionEndpoint] as? String {
-                predictionEndpoint = endpoint
+                // Convert platform-agnostic placeholder {ruleId} to Swift format %@
+                predictionEndpoint = endpoint.replacingOccurrences(of: "{ruleId}", with: "%@")
             }
 
             cmabConfig = CmabConfig(
