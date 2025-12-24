@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 import 'package:optimizely_flutter_sdk_example/custom_logger.dart';
+import 'package:optimizely_flutter_sdk_example/sample_api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -143,6 +144,18 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
   }
 
+  Future<void> _runCmabExamples() async {
+    setState(() {
+      uiResponse = 'Running CMAB examples... Check console for output.';
+    });
+
+    await CmabSampleApi.runAllCmabExamples();
+
+    setState(() {
+      uiResponse = 'CMAB examples completed! Check console for detailed output.';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -151,7 +164,30 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text(uiResponse),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Text(uiResponse),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _runCmabExamples,
+                  child: const Text('Run CMAB Examples'),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Note: Update SDK_KEY and CMAB_FLAG_KEY\nin sample_api.dart before running',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
