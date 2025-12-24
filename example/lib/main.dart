@@ -180,11 +180,6 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Run CMAB Examples'),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Note: Update SDK_KEY and CMAB_FLAG_KEY\nin sample_api.dart before running',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
               ],
             ),
           ),
