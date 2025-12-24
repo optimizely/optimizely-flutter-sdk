@@ -34,6 +34,7 @@ public class Constants {
         public static final String SET_FORCED_DECISION = "setForcedDecision";
         public static final String TRACK_EVENT = "trackEvent";
         public static final String DECIDE = "decide";
+        public static final String DECIDE_ASYNC = "decideAsync";
         public static final String ADD_NOTIFICATION_LISTENER = "addNotificationListener";
         public static final String REMOVE_NOTIFICATION_LISTENER = "removeNotificationListener";
         public static final String CLEAR_ALL_NOTIFICATION_LISTENERS = "clearAllNotificationListeners";
@@ -97,6 +98,12 @@ public class Constants {
         public static final String TIMEOUT_FOR_ODP_EVENT_IN_SECONDS = "timeoutForOdpEventInSecs";
         public static final String DISABLE_ODP = "disableOdp";
         public static final String ENABLE_VUID = "enableVuid";
+
+        // CMAB Config
+        public static final String CMAB_CONFIG = "cmabConfig";
+        public static final String CMAB_CACHE_SIZE = "cmabCacheSize";
+        public static final String CMAB_CACHE_TIMEOUT_IN_SECS = "cmabCacheTimeoutInSecs";
+        public static final String CMAB_PREDICTION_ENDPOINT = "cmabPredictionEndpoint";
     }
 
     public static class ErrorMessage {
