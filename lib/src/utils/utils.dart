@@ -26,6 +26,9 @@ class Utils {
     OptimizelyDecideOption.ignoreUserProfileService: "ignoreUserProfileService",
     OptimizelyDecideOption.includeReasons: "includeReasons",
     OptimizelyDecideOption.excludeVariables: "excludeVariables",
+    OptimizelyDecideOption.ignoreCmabCache: "ignoreCmabCache",
+    OptimizelyDecideOption.resetCmabCache: "resetCmabCache",
+    OptimizelyDecideOption.invalidateUserCmabCache: "invalidateUserCmabCache",
   };
 
   static Map<OptimizelySegmentOption, String> segmentOptions = {

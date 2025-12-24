@@ -29,6 +29,7 @@ struct API {
     static let setAttributes = "setAttributes"
     static let trackEvent = "trackEvent"
     static let decide = "decide"
+    static let decideAsync = "decideAsync"
     static let setForcedDecision = "setForcedDecision"
     static let getForcedDecision = "getForcedDecision"
     static let removeForcedDecision = "removeForcedDecision"
@@ -62,6 +63,9 @@ struct DecideOption {
     static let ignoreUserProfileService = "ignoreUserProfileService"
     static let includeReasons = "includeReasons"
     static let excludeVariables = "excludeVariables"
+    static let ignoreCmabCache = "ignoreCmabCache"
+    static let resetCmabCache = "resetCmabCache"
+    static let invalidateUserCmabCache = "invalidateUserCmabCache"
 }
 
 struct SegmentOption {
@@ -115,7 +119,13 @@ struct RequestParameterKey {
     static let timeoutForOdpEventInSecs = "timeoutForOdpEventInSecs"
     static let disableOdp = "disableOdp"
     static let enableVuid = "enableVuid"
-    static let sdkVersion = "sdkVersion";  
+    static let sdkVersion = "sdkVersion"
+
+    // CMAB Config
+    static let cmabConfig = "cmabConfig"
+    static let cmabCacheSize = "cmabCacheSize"
+    static let cmabCacheTimeoutInSecs = "cmabCacheTimeoutInSecs"
+    static let cmabPredictionEndpoint = "cmabPredictionEndpoint"
 }
 
 struct ResponseKey {

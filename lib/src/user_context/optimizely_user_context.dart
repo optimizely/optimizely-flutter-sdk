@@ -41,7 +41,16 @@ enum OptimizelyDecideOption {
   includeReasons,
 
   /// exclude variable values from the decision result.
-  excludeVariables
+  excludeVariables,
+
+  /// ignore CMAB cache (bypass cache, make fresh request).
+  ignoreCmabCache,
+
+  /// reset entire CMAB cache.
+  resetCmabCache,
+
+  /// invalidate CMAB cache for current user only.
+  invalidateUserCmabCache
 }
 
 /// Options controlling audience segments.
@@ -210,6 +219,56 @@ class OptimizelyUserContext {
     final convertedOptions = Utils.convertDecideOptions(options);
     var result = Map<String, dynamic>.from(
         await _channel.invokeMethod(Constants.decideMethod, {
+      Constants.sdkKey: _sdkKey,
+      Constants.userContextId: _userContextId,
+      Constants.keys: keys,
+      Constants.optimizelyDecideOption: convertedOptions,
+    }));
+    return result;
+  }
+
+  /// Asynchronously returns a decision result for a given flag key and a user context.
+  /// This method supports CMAB (Contextual Multi-Armed Bandit) experiments.
+  ///
+  /// Takes [key] A flag key for which a decision will be made.
+  /// Optional [options] A set of [OptimizelyDecideOption] for decision-making.
+  /// Returns [DecideResponse] A decision result.
+  Future<DecideResponse> decideAsync(String key,
+      [Set<OptimizelyDecideOption> options = const {}]) async {
+    final result = await _decideAsync([key], options);
+    return DecideResponse(result);
+  }
+
+  /// Asynchronously returns a key-map of decision results for multiple flag keys.
+  /// This method supports CMAB (Contextual Multi-Armed Bandit) experiments.
+  ///
+  /// Takes [keys] A [List] of flag keys for which decisions will be made.
+  /// Optional [options] A set of [OptimizelyDecideOption] for decision-making.
+  /// Returns [DecideForKeysResponse] All decision results mapped by flag keys.
+  Future<DecideForKeysResponse> decideForKeysAsync(List<String> keys,
+      [Set<OptimizelyDecideOption> options = const {}]) async {
+    final result = await _decideAsync(keys, options);
+    return DecideForKeysResponse(result);
+  }
+
+  /// Asynchronously returns a key-map of decision results for all active flag keys.
+  /// This method supports CMAB (Contextual Multi-Armed Bandit) experiments.
+  ///
+  /// Optional [options] A set of [OptimizelyDecideOption] for decision-making.
+  /// Returns [DecideForKeysResponse] All decision results mapped by flag keys.
+  Future<DecideForKeysResponse> decideAllAsync(
+      [Set<OptimizelyDecideOption> options = const {}]) async {
+    final result = await _decideAsync([], options);
+    return DecideForKeysResponse(result);
+  }
+
+  /// Private helper for async decide operations
+  Future<Map<String, dynamic>> _decideAsync(
+      [List<String> keys = const [],
+      Set<OptimizelyDecideOption> options = const {}]) async {
+    final convertedOptions = Utils.convertDecideOptions(options);
+    var result = Map<String, dynamic>.from(
+        await _channel.invokeMethod(Constants.decideAsyncMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.keys: keys,

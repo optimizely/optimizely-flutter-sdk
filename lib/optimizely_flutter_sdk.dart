@@ -23,6 +23,7 @@ import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_vuid_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/sdk_settings.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/cmab_config.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
@@ -51,6 +52,8 @@ export 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart'
     show EventOptions;
 export 'package:optimizely_flutter_sdk/src/data_objects/sdk_settings.dart'
     show SDKSettings;
+export 'package:optimizely_flutter_sdk/src/data_objects/cmab_config.dart'
+    show CmabConfig;
 export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
     show DatafileHostOptions;
 export 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart'
@@ -72,6 +75,7 @@ class OptimizelyFlutterSdk {
   final Set<OptimizelyDecideOption> _defaultDecideOptions;
   final OptimizelyLogLevel _defaultLogLevel;
   final SDKSettings _sdkSettings;
+  final CmabConfig? _cmabConfig;
   static OptimizelyLogger? _customLogger;
   /// Get the current logger
   static OptimizelyLogger? get logger {
@@ -84,13 +88,15 @@ class OptimizelyFlutterSdk {
     Set<OptimizelyDecideOption> defaultDecideOptions = const {},
     OptimizelyLogLevel defaultLogLevel = OptimizelyLogLevel.info,
     SDKSettings sdkSettings = const SDKSettings(),
-    OptimizelyLogger? logger}) 
+    CmabConfig? cmabConfig,
+    OptimizelyLogger? logger})
     : _eventOptions = eventOptions,
       _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
       _datafileHostOptions = datafileHostOptions,
       _defaultDecideOptions = defaultDecideOptions,
       _defaultLogLevel = defaultLogLevel,
-      _sdkSettings = sdkSettings {
+      _sdkSettings = sdkSettings,
+      _cmabConfig = cmabConfig {
       // Set the logger if provided
       _customLogger = logger ?? DefaultOptimizelyLogger();
       LoggerBridge.initialize(_customLogger);
@@ -106,6 +112,7 @@ class OptimizelyFlutterSdk {
         _defaultDecideOptions,
         _defaultLogLevel,
         _sdkSettings,
+        _cmabConfig,
         _customLogger
     );
   }
