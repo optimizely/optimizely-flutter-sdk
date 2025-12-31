@@ -157,6 +157,9 @@ public class Constants {
         public static final String IGNORE_USER_PROFILE_SERVICE = "ignoreUserProfileService";
         public static final String INCLUDE_REASONS = "includeReasons";
         public static final String EXCLUDE_VARIABLES = "excludeVariables";
+        public static final String IGNORE_CMAB_CACHE = "ignoreCmabCache";
+        public static final String RESET_CMAB_CACHE = "resetCmabCache";
+        public static final String INVALIDATE_USER_CMAB_CACHE = "invalidateUserCmabCache";
     }
 
     public static class SegmentOption {
