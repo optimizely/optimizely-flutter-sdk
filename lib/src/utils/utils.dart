@@ -98,7 +98,7 @@ class Utils {
     if (value is Map) {
       // Handle nested maps
       Map<String, dynamic> nestedMap = {};
-      (value as Map).forEach((k, v) {
+      value.forEach((k, v) {
         dynamic processedValue = _processValue(v);
         if (processedValue != null) {
           nestedMap[k.toString()] = processedValue;
