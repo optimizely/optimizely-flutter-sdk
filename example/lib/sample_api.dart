@@ -15,6 +15,8 @@
 ///**************************************************************************/
 
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:optimizely_flutter_sdk_example/custom_logger.dart';
+
 
 /// CMAB (Contextual Multi-Armed Bandit) API usage examples
 ///
@@ -25,7 +27,7 @@ import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
 /// - Combining CMAB with other decide options
 class CmabSampleApi {
   // Replace with your actual SDK key
-  static const String SDK_KEY = 'Q9LjjQmUn5pDCjKMc1jFC';
+  static const String SDK_KEY = '2ExWptsTiSx1EZbpwSnoD';
 
   // Replace with your CMAB-enabled flag key
   static const String CMAB_FLAG_KEY = 'cmab-flag';
@@ -289,6 +291,65 @@ class CmabSampleApi {
     }
   }
 
+ static Future<void> testInvalidateUserCmabCacheOption() async {
+    try {
+      final sdk = OptimizelyFlutterSdk(SDK_KEY, cmabConfig: CmabConfig(), defaultLogLevel: OptimizelyLogLevel.debug,  logger: CustomLogger());
+      await sdk.initializeClient();
+
+      // Create two users and populate cache
+      const Map<String, dynamic> cmabAttrUS = {'country': 'us'};
+      const user1Id = 'user_invalidate_1';
+      final user1Context = (await sdk.createUserContext(
+        userId: user1Id,
+        attributes: cmabAttrUS,
+      ))!;
+
+      const user2Id = 'user_invalidate_2';
+      final user2Context = (await sdk.createUserContext(
+        userId: user2Id,
+        attributes: cmabAttrUS,
+      ))!;
+      
+      // Populate cache for both users
+      await user1Context.decideAsync(
+        CMAB_FLAG_KEY,
+        {
+          OptimizelyDecideOption.ignoreUserProfileService,
+          OptimizelyDecideOption.includeReasons,
+        },
+      );
+
+      await user2Context.decideAsync(
+        CMAB_FLAG_KEY,
+        {
+          OptimizelyDecideOption.ignoreUserProfileService,
+          OptimizelyDecideOption.includeReasons,
+        },
+      );
+
+      // Invalidate cache for user1 only
+      await user1Context.decideAsync(
+        CMAB_FLAG_KEY,
+        {
+          OptimizelyDecideOption.ignoreUserProfileService,
+          OptimizelyDecideOption.includeReasons,
+          OptimizelyDecideOption.invalidateUserCmabCache,
+        },
+      );
+
+    //  User2's call should still use cache (not affected by user1 invalidation)
+      await user2Context.decideAsync(
+        CMAB_FLAG_KEY,
+        {
+          OptimizelyDecideOption.ignoreUserProfileService,
+          OptimizelyDecideOption.includeReasons,
+        },
+      );
+
+    } catch (e) {
+      print('Error in testInvalidateUserCmabCacheOption: $e');
+    } 
+  }
   /// Run all CMAB examples sequentially
   ///
   /// This runs all the example methods in order, demonstrating
@@ -312,6 +373,9 @@ class CmabSampleApi {
       await Future.delayed(Duration(seconds: 1));
 
       await combinedOptionsExample();
+
+      await Future.delayed(Duration(seconds: 1));
+      await testInvalidateUserCmabCacheOption();
 
       print('\n╔════════════════════════════════════════════════════════╗');
       print('║  All CMAB Examples Completed Successfully! ✓          ║');

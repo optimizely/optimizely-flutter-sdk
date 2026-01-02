@@ -206,7 +206,7 @@ void main() {
       expect(sdk1, isNotNull);
       expect(sdk2, isNotNull);
     });
-
+  });
   group('decideAsync methods', () {
     test('decideAsync single flag sends correct method call', () async {
       List<String>? receivedKeys;
