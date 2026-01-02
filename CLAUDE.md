@@ -11,34 +11,11 @@ Optimizely Flutter SDK - Cross-platform plugin wrapping native Optimizely SDKs (
 ## Project Structure
 
 ```
-flutter-sdk/
-├── lib/                                    # Dart SDK code
-│   ├── optimizely_flutter_sdk.dart        # Main entry point
-│   └── src/
-│       ├── data_objects/                   # response/request models
-│       ├── logger/                         # Custom logger framework
-│       ├── user_context/                   # User context management
-│       ├── utils/                          # Constants & helpers
-│       └── optimizely_client_wrapper.dart  # Platform channel bridge
-├── android/                                # Android implementation 
-│   ├── build.gradle                        # Dependencies & build config
-│   └── src/main/java/.../
-│       ├── OptimizelyFlutterSdkPlugin.java # MethodChannel handler
-│       ├── OptimizelyFlutterClient.java    # Core client wrapper
-│       └── helper_classes/                 # Parsers, utils
-├── ios/                                    # iOS implementation
-│   ├── optimizely_flutter_sdk.podspec      # CocoaPods spec
-│   └── Classes/
-│       ├── SwiftOptimizelyFlutterSdkPlugin.swift  # MethodChannel handler
-│       ├── OptimizelyFlutterLogger.swift          # Logger bridge
-│       └── HelperClasses/                         # Utils, extensions
-├── test/                                   # Unit tests
-│   ├── optimizely_flutter_sdk_test.dart
-│   ├── cmab_test.dart
-│   ├── logger_test.dart
-│   └── nested_object_test.dart
-├── example/                                # Example Flutter app
-└── doc/                                    # Documentation
+lib/                        # Dart: Public API, data models, user context, platform bridge
+android/src/main/java/      # Java: OptimizelyFlutterClient.java, Plugin, helpers
+ios/Classes/                # Swift: Plugin, logger bridge, helpers
+test/                       # Unit tests (SDK, CMAB, logger, nested objects)
+example/                    # Example app
 ```
 
 ## Essential Commands
