@@ -112,6 +112,10 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         decide(argumentsParser, result);
         break;
       }
+      case APIs.DECIDE_ASYNC: {
+        decideAsync(argumentsParser, result);
+        break;
+      }
       case APIs.SET_FORCED_DECISION: {
         setForcedDecision(argumentsParser, result);
         break;

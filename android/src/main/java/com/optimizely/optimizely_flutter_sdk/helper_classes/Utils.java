@@ -65,6 +65,15 @@ public class Utils {
                 case Constants.DecideOption.INCLUDE_REASONS:
                     convertedOptions.add(OptimizelyDecideOption.INCLUDE_REASONS);
                     break;
+                case Constants.DecideOption.IGNORE_CMAB_CACHE:
+                    convertedOptions.add(OptimizelyDecideOption.IGNORE_CMAB_CACHE);
+                    break;
+                case Constants.DecideOption.RESET_CMAB_CACHE:
+                    convertedOptions.add(OptimizelyDecideOption.RESET_CMAB_CACHE);
+                    break;
+                case Constants.DecideOption.INVALIDATE_USER_CMAB_CACHE:
+                    convertedOptions.add(OptimizelyDecideOption.INVALIDATE_USER_CMAB_CACHE);
+                    break;
                 default:
                     break;
             }

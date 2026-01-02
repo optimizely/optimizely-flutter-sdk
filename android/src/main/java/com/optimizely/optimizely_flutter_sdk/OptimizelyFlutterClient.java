@@ -59,6 +59,10 @@ import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.Req
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.SEGMENTS_CACHE_TIMEOUT_IN_SECONDS;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.TIMEOUT_FOR_ODP_EVENT_IN_SECONDS;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.TIMEOUT_FOR_SEGMENT_FETCH_IN_SECONDS;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.CMAB_CONFIG;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.CMAB_CACHE_SIZE;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.CMAB_CACHE_TIMEOUT_IN_SECS;
+import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.RequestParameterKey.CMAB_PREDICTION_ENDPOINT;
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Utils.getNotificationListenerType;
 
 import java.util.Collections;
@@ -185,6 +189,25 @@ public class OptimizelyFlutterClient {
         }
         if (enableVuid) {
             optimizelyManagerBuilder.withVuidEnabled();
+        }
+
+        // CMAB Config
+        Map<String, Object> cmabConfig = argumentsParser.getCmabConfig();
+        if (cmabConfig != null) {
+            if (cmabConfig.containsKey(CMAB_CACHE_SIZE)) {
+                Integer cmabCacheSize = (Integer) cmabConfig.get(CMAB_CACHE_SIZE);
+                optimizelyManagerBuilder.withCmabCacheSize(cmabCacheSize);
+            }
+            if (cmabConfig.containsKey(CMAB_CACHE_TIMEOUT_IN_SECS)) {
+                Integer cmabCacheTimeout = (Integer) cmabConfig.get(CMAB_CACHE_TIMEOUT_IN_SECS);
+                optimizelyManagerBuilder.withCmabCacheTimeout(cmabCacheTimeout, TimeUnit.SECONDS);
+            }
+            if (cmabConfig.containsKey(CMAB_PREDICTION_ENDPOINT)) {
+                String endpoint = (String) cmabConfig.get(CMAB_PREDICTION_ENDPOINT);
+                // Convert platform-agnostic placeholder {ruleId} to Android format %s
+                String androidEndpoint = endpoint.replace("{ruleId}", "%s");
+                optimizelyManagerBuilder.withCmabPredictionEndpoint(androidEndpoint);
+            }
         }
 
         OptimizelyManager optimizelyManager = optimizelyManagerBuilder.build(context);
@@ -362,6 +385,55 @@ public class OptimizelyFlutterClient {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> s = mapper.convertValue(optimizelyDecisionResponseMap, LinkedHashMap.class);
         result.success(createResponse(s));
+    }
+
+    protected void decideAsync(ArgumentsParser argumentsParser, @NonNull Result result) {
+        String sdkKey = argumentsParser.getSdkKey();
+        OptimizelyUserContext userContext = getUserContext(argumentsParser);
+        if (!isUserContextValid(sdkKey, userContext, result)) {
+            return;
+        }
+
+        List<String> decideKeys = argumentsParser.getDecideKeys();
+        List<OptimizelyDecideOption> decideOptions = argumentsParser.getDecideOptions();
+
+        // Determine which async method to call based on keys
+        if (decideKeys == null || decideKeys.isEmpty()) {
+            // decideAllAsync
+            userContext.decideAllAsync(decideOptions, decisions -> {
+                Map<String, OptimizelyDecisionResponse> optimizelyDecisionResponseMap = new HashMap<>();
+                if (decisions != null) {
+                    for (Map.Entry<String, OptimizelyDecision> entry : decisions.entrySet()) {
+                        optimizelyDecisionResponseMap.put(entry.getKey(), new OptimizelyDecisionResponse(entry.getValue()));
+                    }
+                }
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String, Object> s = mapper.convertValue(optimizelyDecisionResponseMap, LinkedHashMap.class);
+                result.success(createResponse(s));
+            });
+        } else if (decideKeys.size() == 1) {
+            // decideAsync for single key
+            userContext.decideAsync(decideKeys.get(0), decideOptions, decision -> {
+                Map<String, OptimizelyDecisionResponse> optimizelyDecisionResponseMap = new HashMap<>();
+                optimizelyDecisionResponseMap.put(decideKeys.get(0), new OptimizelyDecisionResponse(decision));
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String, Object> s = mapper.convertValue(optimizelyDecisionResponseMap, LinkedHashMap.class);
+                result.success(createResponse(s));
+            });
+        } else {
+            // decideForKeysAsync for multiple keys
+            userContext.decideForKeysAsync(decideKeys, decideOptions, decisions -> {
+                Map<String, OptimizelyDecisionResponse> optimizelyDecisionResponseMap = new HashMap<>();
+                if (decisions != null) {
+                    for (Map.Entry<String, OptimizelyDecision> entry : decisions.entrySet()) {
+                        optimizelyDecisionResponseMap.put(entry.getKey(), new OptimizelyDecisionResponse(entry.getValue()));
+                    }
+                }
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String, Object> s = mapper.convertValue(optimizelyDecisionResponseMap, LinkedHashMap.class);
+                result.success(createResponse(s));
+            });
+        }
     }
 
     protected void setForcedDecision(ArgumentsParser argumentsParser, @NonNull Result result) {
