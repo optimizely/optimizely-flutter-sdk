@@ -151,4 +151,8 @@ public class ArgumentsParser {
     public Map<String, Object> getOptimizelySdkSettings() {
         return (Map<String, Object>) arguments.get(Constants.RequestParameterKey.OPTIMIZELY_SDK_SETTINGS);
     }
+
+    public Map<String, Object> getCmabConfig() {
+        return (Map<String, Object>) arguments.get(Constants.RequestParameterKey.CMAB_CONFIG);
+    }
 }

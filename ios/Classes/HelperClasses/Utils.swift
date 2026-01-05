@@ -169,6 +169,12 @@ public class Utils: NSObject {
                 convertedOptions.append(OptimizelyDecideOption.excludeVariables)
             case DecideOption.includeReasons:
                 convertedOptions.append(OptimizelyDecideOption.includeReasons)
+            case DecideOption.ignoreCmabCache:
+                convertedOptions.append(OptimizelyDecideOption.ignoreCmabCache)
+            case DecideOption.resetCmabCache:
+                convertedOptions.append(OptimizelyDecideOption.resetCmabCache)
+            case DecideOption.invalidateUserCmabCache:
+                convertedOptions.append(OptimizelyDecideOption.invalidateUserCmabCache)
             default: break
             }
         }
