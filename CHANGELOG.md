@@ -1,5 +1,21 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.4.0
+January 7th, 2026
+
+### New Features
+
+* **CMAB (Contextual Multi-Armed Bandit) Support** ([#94](https://github.com/optimizely/optimizely-flutter-sdk/pull/94))
+	- Added `CmabConfig` class for CMAB initialization with configurable cache settings and custom prediction endpoints.
+	- Added `decideAsync()` methods to `OptimizelyUserContext` for asynchronous CMAB decision-making.
+	- New CMAB-specific decide options: `ignoreCmabCache`, `resetCmabCache`, `invalidateUserCmabCache`
+* **Add Holdout support for feature experimentation.**
+* **Add Multi-Region Support for Data Hosting.**
+
+### Bug Fixes
+* **Nested Object Support in Event Metadata for Swift** ([#92](https://github.com/optimizely/optimizely-flutter-sdk/pull/92))
+	- Enhanced event metadata handling to support complex nested objects in iOS/Swift.
+	
 ## 3.3.0
 October 29th, 2025
 
