@@ -1,7 +1,7 @@
 # Optimizely Flutter SDK Changelog
 
 ## 3.4.0
-January 6th, 2026
+January 7th, 2026
 
 ### New Features
 
