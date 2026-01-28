@@ -78,7 +78,6 @@ class CmabSampleApi {
       print('\nMaking async decision for flag: $CMAB_FLAG_KEY');
       var decision = await userContext.decideAsync(
         CMAB_FLAG_KEY,
-        {OptimizelyDecideOption.ignoreUserProfileService},
       );
 
       // Access decision results
@@ -127,7 +126,6 @@ class CmabSampleApi {
         CMAB_FLAG_KEY,
         {
           OptimizelyDecideOption.ignoreCmabCache,
-          OptimizelyDecideOption.ignoreUserProfileService,
         },
       );
       print('  ✓ Fresh decision from CMAB service (cache bypassed)');
@@ -140,8 +138,7 @@ class CmabSampleApi {
       var decision2 = await userContext.decideAsync(
         CMAB_FLAG_KEY,
         {
-          OptimizelyDecideOption.resetCmabCache,
-          OptimizelyDecideOption.ignoreUserProfileService,
+          OptimizelyDecideOption.resetCmabCache
         },
       );
       print('  ✓ Entire CMAB cache cleared, new decision fetched');
@@ -154,8 +151,7 @@ class CmabSampleApi {
       var decision3 = await userContext.decideAsync(
         CMAB_FLAG_KEY,
         {
-          OptimizelyDecideOption.invalidateUserCmabCache,
-          OptimizelyDecideOption.ignoreUserProfileService,
+          OptimizelyDecideOption.invalidateUserCmabCache
         },
       );
       print('  ✓ User-specific cache cleared, new decision fetched');
@@ -164,8 +160,7 @@ class CmabSampleApi {
       // Regular cached decision (for comparison)
       print('\n4. Regular decision (uses cache if available):');
       var decision4 = await userContext.decideAsync(
-        CMAB_FLAG_KEY,
-        {OptimizelyDecideOption.ignoreUserProfileService},
+        CMAB_FLAG_KEY
       );
       print('  ✓ Decision returned (may be from cache)');
       print('  - Variation: ${decision4.decision?.variationKey}');
@@ -211,8 +206,7 @@ class CmabSampleApi {
 
       // Make decision with custom config
       var decision = await userContext.decideAsync(
-        CMAB_FLAG_KEY,
-        {OptimizelyDecideOption.ignoreUserProfileService},
+        CMAB_FLAG_KEY
       );
 
       print('\n✓ Decision made with custom cache settings:');
@@ -314,7 +308,6 @@ class CmabSampleApi {
       await user1Context.decideAsync(
         CMAB_FLAG_KEY,
         {
-          OptimizelyDecideOption.ignoreUserProfileService,
           OptimizelyDecideOption.includeReasons,
         },
       );
@@ -322,7 +315,6 @@ class CmabSampleApi {
       await user2Context.decideAsync(
         CMAB_FLAG_KEY,
         {
-          OptimizelyDecideOption.ignoreUserProfileService,
           OptimizelyDecideOption.includeReasons,
         },
       );
@@ -331,7 +323,6 @@ class CmabSampleApi {
       await user1Context.decideAsync(
         CMAB_FLAG_KEY,
         {
-          OptimizelyDecideOption.ignoreUserProfileService,
           OptimizelyDecideOption.includeReasons,
           OptimizelyDecideOption.invalidateUserCmabCache,
         },
@@ -341,7 +332,6 @@ class CmabSampleApi {
       await user2Context.decideAsync(
         CMAB_FLAG_KEY,
         {
-          OptimizelyDecideOption.ignoreUserProfileService,
           OptimizelyDecideOption.includeReasons,
         },
       );
