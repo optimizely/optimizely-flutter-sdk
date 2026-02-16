@@ -52,6 +52,14 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftOptimizelyFlutterSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
+
+        // Separate logger channel for outgoing log calls
+        let taskQueue = registrar.messenger().makeBackgroundTaskQueue?()
+        let loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL, 
+                                                binaryMessenger: registrar.messenger(), 
+                                                codec: FlutterStandardMethodCodec.sharedInstance(),
+                                                taskQueue: taskQueue)
+        OptimizelyFlutterLogger.setChannel(loggerChannel)
     }
     
     /// Part of FlutterPlugin protocol to handle communication with flutter sdk
@@ -73,6 +81,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         case API.setAttributes: setAttributes(call, result: result)
         case API.trackEvent: trackEvent(call, result: result)
         case API.decide: decide(call, result: result)
+        case API.decideAsync: decideAsync(call, result: result)
         case API.setForcedDecision: setForcedDecision(call, result: result)
         case API.getForcedDecision: getForcedDecision(call, result: result)
         case API.removeForcedDecision: removeForcedDecision(call, result: result)
@@ -121,6 +130,7 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         var defaultLogLevel = OptimizelyLogLevel.info
         if let logLevel = parameters[RequestParameterKey.defaultLogLevel] as? String {
             defaultLogLevel = Utils.getDefaultLogLevel(logLevel)
+            OptimizelyFlutterLogger.logLevel = defaultLogLevel
         }
 
         // SDK Settings Default Values
@@ -154,7 +164,32 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             }
         }
         let optimizelySdkSettings = OptimizelySdkSettings(segmentsCacheSize: segmentsCacheSize, segmentsCacheTimeoutInSecs: segmentsCacheTimeoutInSecs, timeoutForSegmentFetchInSecs: timeoutForSegmentFetchInSecs, timeoutForOdpEventInSecs: timeoutForOdpEventInSecs, disableOdp: disableOdp, enableVuid: enableVuid, sdkName: sdkName, sdkVersion: sdkVersion)
-        
+
+        // CMAB Config
+        var cmabConfig: CmabConfig?
+        if let cmabConfigDict = parameters[RequestParameterKey.cmabConfig] as? Dictionary<String, Any?> {
+            var cacheSize = 100
+            var cacheTimeoutInSecs = 1800
+            var predictionEndpoint: String? = nil
+
+            if let size = cmabConfigDict[RequestParameterKey.cmabCacheSize] as? Int {
+                cacheSize = size
+            }
+            if let timeout = cmabConfigDict[RequestParameterKey.cmabCacheTimeoutInSecs] as? Int {
+                cacheTimeoutInSecs = timeout
+            }
+            if let endpoint = cmabConfigDict[RequestParameterKey.cmabPredictionEndpoint] as? String {
+                // Convert platform-agnostic placeholder {ruleId} to Swift format %@
+                predictionEndpoint = endpoint.replacingOccurrences(of: "{ruleId}", with: "%@")
+            }
+
+            cmabConfig = CmabConfig(
+                cacheSize: cacheSize,
+                cacheTimeoutInSecs: cacheTimeoutInSecs,
+                predictionEndpoint: predictionEndpoint
+            )
+        }
+
         // Datafile Download Interval
         var datafilePeriodicDownloadInterval = 10 * 60 // seconds
         
@@ -174,15 +209,21 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         notificationIdsTracker.removeValue(forKey: sdkKey)
         optimizelyClientsTracker.removeValue(forKey: sdkKey)
         
+        // OptimizelyFlutterLogger bridges iOS logs to Flutter via Method Channel
+        // iOS SDK log → OptimizelyFlutterLogger → Flutter Method Channel → Flutter console
+        var logger: OPTLogger = OptimizelyFlutterLogger()
+        
         // Creating new instance
         let optimizelyInstance = OptimizelyClient(
-            sdkKey:sdkKey, 
-            eventDispatcher: eventDispatcher, 
-            datafileHandler: datafileHandler, 
-            periodicDownloadInterval: datafilePeriodicDownloadInterval, 
+            sdkKey:sdkKey,
+            logger:logger,
+            eventDispatcher: eventDispatcher,
+            datafileHandler: datafileHandler,
+            periodicDownloadInterval: datafilePeriodicDownloadInterval,
             defaultLogLevel: defaultLogLevel,
-            defaultDecideOptions: defaultDecideOptions, 
-            settings: optimizelySdkSettings)
+            defaultDecideOptions: defaultDecideOptions,
+            settings: optimizelySdkSettings,
+            cmabConfig: cmabConfig)
         
         optimizelyInstance.start{ [weak self] res in
             switch res {
@@ -577,7 +618,59 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         
         result(self.createResponse(success: true, result: resultMap))
     }
-    
+
+    /// Asynchronously returns a key-map of decision results for flag keys and a user context.
+    /// This method supports CMAB (Contextual Multi-Armed Bandit) experiments.
+    func decideAsync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let (parameters, userContext) = getParametersAndUserContext(
+            arguments: call.arguments, result: result) else {
+            return
+        }
+
+        var decideKeys: [String]?
+        if let keys = parameters[RequestParameterKey.decideKeys] as? [String] {
+            decideKeys = keys
+        }
+
+        var decideOptions: [String]?
+        if let options = parameters[RequestParameterKey.decideOptions] as? [String] {
+            decideOptions = options
+        }
+
+        let options = Utils.getDecideOptions(options: decideOptions)
+
+        // Call appropriate async method based on keys
+        if let keys = decideKeys, keys.count == 1 {
+            // Single key async
+            userContext.decideAsync(key: keys[0], options: options) { [weak self] decision in
+                guard let self = self else { return }
+                var resultMap = [String: Any]()
+                resultMap[keys[0]] = Utils.convertDecisionToDictionary(decision: decision)
+                result(self.createResponse(success: true, result: resultMap))
+            }
+        } else if let keys = decideKeys, keys.count > 1 {
+            // Multiple keys async
+            userContext.decideAsync(keys: keys, options: options) { [weak self] decisions in
+                guard let self = self else { return }
+                var resultMap = [String: Any]()
+                for (key, decision) in decisions {
+                    resultMap[key] = Utils.convertDecisionToDictionary(decision: decision)
+                }
+                result(self.createResponse(success: true, result: resultMap))
+            }
+        } else {
+            // All flags async
+            userContext.decideAllAsync(options: options) { [weak self] decisions in
+                guard let self = self else { return }
+                var resultMap = [String: Any]()
+                for (key, decision) in decisions {
+                    resultMap[key] = Utils.convertDecisionToDictionary(decision: decision)
+                }
+                result(self.createResponse(success: true, result: resultMap))
+            }
+        }
+    }
+
     /// Sets the forced decision for a given decision context.
     func setForcedDecision(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let (parameters, userContext) = getParametersAndUserContext(arguments: call.arguments, result: result) else {

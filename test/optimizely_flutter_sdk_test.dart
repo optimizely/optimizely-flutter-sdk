@@ -109,6 +109,14 @@ void main() {
             );
           }
 
+          // To Check if CmabConfig was received
+          var cmabConfigMap = methodCall.arguments[Constants.cmabConfig];
+          if (cmabConfigMap is Map) {
+            // CmabConfig received - validate it has expected keys
+            expect(cmabConfigMap.containsKey(Constants.cmabCacheSize), isTrue);
+            expect(cmabConfigMap.containsKey(Constants.cmabCacheTimeoutInSecs), isTrue);
+          }
+
           // Resetting to default for every test
           datafileHostOptions = const DatafileHostOptions("", "");
           if (methodCall.arguments[Constants.datafileHostPrefix] != null &&
@@ -310,6 +318,25 @@ void main() {
           return {
             Constants.responseSuccess: true,
             Constants.responseResult: result,
+          };
+        case Constants.decideAsyncMethod:
+          expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);
+          expect(methodCall.arguments[Constants.userContextId],
+              equals(userContextId));
+          var asyncKeys = List<String>.from(methodCall.arguments[Constants.keys]);
+          decideOptions.addAll(List<String>.from(
+              methodCall.arguments[Constants.optimizelyDecideOption]));
+          // for decideAllAsync
+          if (asyncKeys.isEmpty) {
+            asyncKeys = ["123", "456", "789"];
+          }
+          Map<String, dynamic> asyncResult = {};
+          for (final key in asyncKeys) {
+            asyncResult[key] = TestUtils.decideResponseMap;
+          }
+          return {
+            Constants.responseSuccess: true,
+            Constants.responseResult: asyncResult,
           };
         case Constants.setForcedDecision:
           expect(methodCall.arguments[Constants.sdkKey], isNotEmpty);

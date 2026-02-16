@@ -1,0 +1,5 @@
+# Project-specific documentation not needed in published package
+CLAUDE.md
+
+# Claude Code local configurations
+.claude/
