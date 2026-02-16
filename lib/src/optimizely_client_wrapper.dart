@@ -63,7 +63,9 @@ class OptimizelyClientWrapper {
       Map<ClientPlatform, DatafileHostOptions> datafileHostOptions,
       Set<OptimizelyDecideOption> defaultDecideOptions,
       OptimizelyLogLevel defaultLogLevel,
-      SDKSettings sdkSettings) async {
+      SDKSettings sdkSettings,
+      CmabConfig? cmabConfig,
+      OptimizelyLogger? logger) async {
     _channel.setMethodCallHandler(methodCallHandler);
     final convertedOptions = Utils.convertDecideOptions(defaultDecideOptions);
     final convertedLogLevel = Utils.convertLogLevel(defaultLogLevel);
@@ -93,6 +95,19 @@ class OptimizelyClientWrapper {
       Constants.enableVuid: sdkSettings.enableVuid,
     };
     requestDict[Constants.optimizelySdkSettings] = optimizelySdkSettings;
+
+    // CMAB Config params
+    if (cmabConfig != null) {
+      Map<String, dynamic> cmabConfigMap = {
+        Constants.cmabCacheSize: cmabConfig.cacheSize,
+        Constants.cmabCacheTimeoutInSecs: cmabConfig.cacheTimeoutInSecs,
+      };
+      if (cmabConfig.predictionEndpoint != null) {
+        cmabConfigMap[Constants.cmabPredictionEndpoint] =
+            cmabConfig.predictionEndpoint;
+      }
+      requestDict[Constants.cmabConfig] = cmabConfigMap;
+    }
 
     // clearing notification listeners, if they are mapped to the same sdkKey.
     activateCallbacksById.remove(sdkKey);
@@ -371,7 +386,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 
@@ -417,7 +431,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 
@@ -440,7 +453,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 
@@ -464,7 +476,6 @@ class OptimizelyClientWrapper {
 
     if (checkCallBackExist(sdkKey, callback)) {
       // ignore: avoid_print
-      print("callback already exists.");
       return -1;
     }
 

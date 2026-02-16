@@ -20,6 +20,8 @@ class Constants {
   static const String intType = "int";
   static const String doubleType = "double";
   static const String boolType = "bool";
+  static const String mapType = "map";
+  static const String listType = "list";
 
   // Supported Method Names
   static const String initializeMethod = "initialize";
@@ -35,6 +37,7 @@ class Constants {
   static const String getAttributesMethod = "getAttributes";
   static const String trackEventMethod = "trackEvent";
   static const String decideMethod = "decide";
+  static const String decideAsyncMethod = "decideAsync";
   static const String setForcedDecision = "setForcedDecision";
   static const String getForcedDecision = "getForcedDecision";
   static const String removeForcedDecision = "removeForcedDecision";
@@ -62,7 +65,9 @@ class Constants {
   static const String userContextId = "userContextId";
   static const String userContext = "userContext";
   static const String experiment = "experiment";
+  static const String experimentId = "experimentId";
   static const String variation = "variation";
+  static const String variationId = "variationId";
   static const String userId = "userId";
   static const String vuid = "vuid";
   static const String experimentKey = "experimentKey";
@@ -132,6 +137,12 @@ class Constants {
   static const String timeoutForOdpEventInSecs = "timeoutForOdpEventInSecs";
   static const String disableOdp = "disableOdp";
   static const String enableVuid = "enableVuid";
+
+  // CMAB Config params
+  static const String cmabConfig = "cmabConfig";
+  static const String cmabCacheSize = "cmabCacheSize";
+  static const String cmabCacheTimeoutInSecs = "cmabCacheTimeoutInSecs";
+  static const String cmabPredictionEndpoint = "cmabPredictionEndpoint";
 
   // Response keys
   static const String responseSuccess = "success";

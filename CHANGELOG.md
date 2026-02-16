@@ -1,5 +1,55 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.4.1
+January 28th, 2026
+
+### Enhancements
+* Exclude CMAB decision from UPS ([#96](https://github.com/optimizely/optimizely-flutter-sdk/pull/96))
+
+## 3.4.0
+January 7th, 2026
+
+### New Features
+
+* **CMAB (Contextual Multi-Armed Bandit) Support** ([#94](https://github.com/optimizely/optimizely-flutter-sdk/pull/94))
+	- Added `CmabConfig` class for CMAB initialization with configurable cache settings and custom prediction endpoints.
+	- Added `decideAsync()` methods to `OptimizelyUserContext` for asynchronous CMAB decision-making.
+	- New CMAB-specific decide options: `ignoreCmabCache`, `resetCmabCache`, `invalidateUserCmabCache`
+* **Add Holdout support for feature experimentation.**
+* **Add Multi-Region Support for Data Hosting.**
+
+### Bug Fixes
+* **Nested Object Support in Event Metadata for Swift** ([#92](https://github.com/optimizely/optimizely-flutter-sdk/pull/92))
+	- Enhanced event metadata handling to support complex nested objects in iOS/Swift.
+	
+## 3.3.0
+October 29th, 2025
+
+### New Feature
+* Android custom logger support added ([#90](https://github.com/optimizely/optimizely-flutter-sdk/pull/90))
+
+## 3.2.0
+October 24th, 2025
+
+### New Feature
+* Swift custom logger support added ([#88](https://github.com/optimizely/optimizely-flutter-sdk/pull/88))
+
+## 3.1.0
+October 9th, 2025
+
+This minor release added the following support:
+* Android 15 support ([#84](https://github.com/optimizely/optimizely-flutter-sdk/pull/84))
+* Update AGP version to 8.7.0
+* Update gradle version to 8.10.2
+* Update kotlin version to 2.1.0
+	
+## 3.0.1
+Jun 4th, 2025
+
+### Functionality Enhancements
+
+* Add experiment id and variation id added into decision notification payload ([#80](https://github.com/optimizely/optimizely-flutter-sdk/pull/80))
+
 ## 3.0.0
 November 28th, 2024
 

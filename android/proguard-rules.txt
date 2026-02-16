@@ -12,5 +12,10 @@
 -keep class com.fasterxml.jackson.** {*;}
 # Logback
 -keep class ch.qos.** { *; }
--dontwarn javax.mail.** # Suppress warnings for javax.mail, we don't use SMTP
+
+# Mail classes (Logback SMTP appender)
+-dontwarn javax.mail.**
+-dontwarn javax.mail.internet.**
+-dontwarn javax.activation.**
+
 ##---------------End: proguard configuration ----------

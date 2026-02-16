@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:optimizely_flutter_sdk/optimizely_flutter_sdk.dart';
+import 'package:optimizely_flutter_sdk_example/custom_logger.dart';
+import 'package:optimizely_flutter_sdk_example/sample_api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,16 +30,22 @@ class _MyAppState extends State<MyApp> {
       OptimizelyDecideOption.includeReasons,
       OptimizelyDecideOption.excludeVariables
     };
-    var flutterSDK = OptimizelyFlutterSdk("X9mZd2WDywaUL9hZXyh9A",
-        datafilePeriodicDownloadInterval: 10 * 60,
-        eventOptions: const EventOptions(
-            batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
-        defaultLogLevel: OptimizelyLogLevel.debug,
-        defaultDecideOptions: defaultOptions);
+
+    final customLogger = CustomLogger();
+
+    var flutterSDK = OptimizelyFlutterSdk(
+      "X9mZd2WDywaUL9hZXyh9A",
+      datafilePeriodicDownloadInterval: 10 * 60,
+      eventOptions: const EventOptions(
+          batchSize: 1, timeInterval: 60, maxQueueSize: 10000),
+      defaultLogLevel: OptimizelyLogLevel.debug,
+      defaultDecideOptions: defaultOptions,
+      logger: customLogger,
+    );
     var response = await flutterSDK.initializeClient();
 
     setState(() {
-      uiResponse = "Optimizely Client initialized: ${response.success} ";
+      uiResponse = "[Optimizely] Client initialized: ${response.success} ";
     });
 
     var rng = Random();
@@ -55,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       "stringValue": "121"
     });
 
-    // To add decide listener
+    // Add decide listener
     var decideListenerId =
         await flutterSDK.addDecisionNotificationListener((notification) {
       print("Parsed decision event ....................");
@@ -68,17 +76,13 @@ class _MyAppState extends State<MyApp> {
     Set<OptimizelyDecideOption> options = {
       OptimizelyDecideOption.ignoreUserProfileService,
     };
+
     // Decide call
     var decideResponse = await userContext.decide('flag1', options);
     uiResponse +=
         "\nFirst decide call variationKey: ${decideResponse.decision!.variationKey}";
 
-    // should return following response without forced decision
-    // flagKey: flag1
-    // ruleKey: default-rollout-7371-20896892800
-    // variationKey: off
-
-    // Setting forced decision
+    // Set forced decision
     await userContext.setForcedDecision(
         OptimizelyDecisionContext("flag1", "flag1_experiment"),
         OptimizelyForcedDecision("variation_a"));
@@ -87,11 +91,6 @@ class _MyAppState extends State<MyApp> {
     decideResponse = await userContext.decide('flag1');
     uiResponse +=
         "\nSecond decide call variationKey: ${decideResponse.decision!.variationKey}";
-
-    // should return following response with forced decision
-    // flagKey: flag1
-    // ruleKey: flag1_experiment
-    // variationKey: variation_a
 
     // removing forced decision
     await userContext.removeForcedDecision(
@@ -105,14 +104,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       uiResponse = uiResponse;
     });
-
-    // should return original response without forced decision
-    // flagKey: flag1
-    // ruleKey: default-rollout-7371-20896892800
-    // variationKey: off
-
-    // To cancel decide listener
-    // await flutterSDK.removeNotificationListener(decideListenerId);
 
     // To add track listener
     var trackListenerID =
@@ -132,18 +123,37 @@ class _MyAppState extends State<MyApp> {
       print("log event notification received");
     });
 
-    // Track call
+    // Track call with nested objects
     response = await userContext.trackEvent("myevent", {
-      "age": 20,
-      "doubleValue": 12.12,
-      "boolValue": false,
-      "stringValue": "121"
+      "revenue": 99.99,
+      "user": {
+        "id": "user123",
+        "premium": true,
+        "tags": ["vip", "loyal"]
+      },
+      "items": [
+        {"name": "Product A", "quantity": 2, "price": 49.99},
+        {"name": "Product B", "quantity": 1, "price": 50.00}
+      ],
+      "metadata": {"source": "mobile_app", "platform": "ios"}
     });
 
     // To cancel track listener
     await flutterSDK.removeNotificationListener(trackListenerID);
 
     if (!mounted) return;
+  }
+
+  Future<void> _runCmabExamples() async {
+    setState(() {
+      uiResponse = 'Running CMAB examples... Check console for output.';
+    });
+
+    await CmabSampleApi.runAllCmabExamples();
+
+    setState(() {
+      uiResponse = 'CMAB examples completed! Check console for detailed output.';
+    });
   }
 
   @override
@@ -154,7 +164,25 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text(uiResponse),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Text(uiResponse),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _runCmabExamples,
+                  child: const Text('Run CMAB Examples'),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
         ),
       ),
     );

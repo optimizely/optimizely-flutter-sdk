@@ -23,11 +23,14 @@ import 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_vuid_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/sdk_settings.dart';
+import 'package:optimizely_flutter_sdk/src/data_objects/cmab_config.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/get_variation_response.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/optimizely_config_response.dart';
 import 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart';
 import 'package:optimizely_flutter_sdk/src/user_context/optimizely_user_context.dart';
 import 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart';
+import 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart';
+import 'package:optimizely_flutter_sdk/src/logger/logger_bridge.dart';
 
 export 'package:optimizely_flutter_sdk/src/optimizely_client_wrapper.dart'
     show ClientPlatform, ListenerType;
@@ -49,10 +52,14 @@ export 'package:optimizely_flutter_sdk/src/data_objects/event_options.dart'
     show EventOptions;
 export 'package:optimizely_flutter_sdk/src/data_objects/sdk_settings.dart'
     show SDKSettings;
+export 'package:optimizely_flutter_sdk/src/data_objects/cmab_config.dart'
+    show CmabConfig;
 export 'package:optimizely_flutter_sdk/src/data_objects/datafile_options.dart'
     show DatafileHostOptions;
 export 'package:optimizely_flutter_sdk/src/data_objects/log_level.dart'
     show OptimizelyLogLevel;
+export 'package:optimizely_flutter_sdk/src/logger/flutter_logger.dart'
+    show OptimizelyLogger;
 
 /// The main client class for the Optimizely Flutter SDK.
 ///
@@ -68,20 +75,32 @@ class OptimizelyFlutterSdk {
   final Set<OptimizelyDecideOption> _defaultDecideOptions;
   final OptimizelyLogLevel _defaultLogLevel;
   final SDKSettings _sdkSettings;
+  final CmabConfig? _cmabConfig;
+  static OptimizelyLogger? _customLogger;
+  /// Get the current logger
+  static OptimizelyLogger? get logger {
+    return _customLogger;
+  }
   OptimizelyFlutterSdk(this._sdkKey,
-      {EventOptions eventOptions = const EventOptions(),
-      int datafilePeriodicDownloadInterval =
-          10 * 60, // Default time interval in seconds
-      Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
-      Set<OptimizelyDecideOption> defaultDecideOptions = const {},
-      OptimizelyLogLevel defaultLogLevel = OptimizelyLogLevel.info,
-      SDKSettings sdkSettings = const SDKSettings()})
-      : _eventOptions = eventOptions,
-        _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
-        _datafileHostOptions = datafileHostOptions,
-        _defaultDecideOptions = defaultDecideOptions,
-        _defaultLogLevel = defaultLogLevel,
-        _sdkSettings = sdkSettings;
+    {EventOptions eventOptions = const EventOptions(),
+    int datafilePeriodicDownloadInterval = 10 * 60,
+    Map<ClientPlatform, DatafileHostOptions> datafileHostOptions = const {},
+    Set<OptimizelyDecideOption> defaultDecideOptions = const {},
+    OptimizelyLogLevel defaultLogLevel = OptimizelyLogLevel.info,
+    SDKSettings sdkSettings = const SDKSettings(),
+    CmabConfig? cmabConfig,
+    OptimizelyLogger? logger})
+    : _eventOptions = eventOptions,
+      _datafilePeriodicDownloadInterval = datafilePeriodicDownloadInterval,
+      _datafileHostOptions = datafileHostOptions,
+      _defaultDecideOptions = defaultDecideOptions,
+      _defaultLogLevel = defaultLogLevel,
+      _sdkSettings = sdkSettings,
+      _cmabConfig = cmabConfig {
+      // Set the logger if provided
+      _customLogger = logger ?? DefaultOptimizelyLogger();
+      LoggerBridge.initialize(_customLogger);
+  }
 
   /// Starts Optimizely SDK (Synchronous) with provided sdkKey.
   Future<BaseResponse> initializeClient() async {
@@ -92,7 +111,10 @@ class OptimizelyFlutterSdk {
         _datafileHostOptions,
         _defaultDecideOptions,
         _defaultLogLevel,
-        _sdkSettings);
+        _sdkSettings,
+        _cmabConfig,
+        _customLogger
+    );
   }
 
   /// Use the activate method to start an experiment.
