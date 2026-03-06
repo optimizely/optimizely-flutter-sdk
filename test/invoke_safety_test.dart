@@ -37,15 +37,19 @@ void main() {
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  TestDefaultBinaryMessenger? tester;
+
+  setUp(() {
+    tester = TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger;
+  });
+
   group('OptimizelyClientWrapper._invoke — null return safety', () {
     setUp(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (_) async => null);
+      tester?.setMockMethodCallHandler(channel, (_) async => null);
     });
 
     tearDown(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, null);
+      tester?.setMockMethodCallHandler(channel, null);
     });
 
     test('initializeClient returns success:false instead of TypeError', () async {
@@ -82,15 +86,13 @@ void main() {
 
   group('OptimizelyClientWrapper._invoke — PlatformException safety', () {
     setUp(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (_) async {
+      tester?.setMockMethodCallHandler(channel, (_) async {
         throw PlatformException(code: 'ERROR', message: 'native error');
       });
     });
 
     tearDown(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, null);
+      tester?.setMockMethodCallHandler(channel, null);
     });
 
     test('initializeClient returns success:false with reason', () async {
@@ -121,8 +123,7 @@ void main() {
     setUp(() async {
       // First call (createUserContext) returns a valid user context id.
       bool firstCall = true;
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (_) async {
+      tester?.setMockMethodCallHandler(channel, (_) async {
         if (firstCall) {
           firstCall = false;
           return {
@@ -138,8 +139,7 @@ void main() {
     });
 
     tearDown(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, null);
+      tester?.setMockMethodCallHandler(channel, null);
     });
 
     test('getUserId returns success:false instead of TypeError', () async {
@@ -184,8 +184,7 @@ void main() {
 
     setUp(() async {
       bool firstCall = true;
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (_) async {
+      tester?.setMockMethodCallHandler(channel, (_) async {
         if (firstCall) {
           firstCall = false;
           return {
@@ -201,8 +200,7 @@ void main() {
     });
 
     tearDown(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, null);
+      tester?.setMockMethodCallHandler(channel, null);
     });
 
     test('getUserId returns success:false with reason', () async {
