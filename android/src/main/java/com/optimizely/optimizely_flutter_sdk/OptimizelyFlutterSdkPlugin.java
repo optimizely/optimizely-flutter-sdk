@@ -28,6 +28,9 @@ import com.optimizely.optimizely_flutter_sdk.helper_classes.ArgumentsParser;
 
 import static com.optimizely.optimizely_flutter_sdk.helper_classes.Constants.*;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -46,122 +49,164 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
   public static MethodChannel channel;
   private Appender<ILoggingEvent> flutterLogbackAppender;
 
+  /**
+   * Wraps a {@link Result} so that all callbacks ({@code success}, {@code error},
+   * {@code notImplemented}) are guaranteed to run on the Android main thread.
+   *
+   * <p>Flutter's {@code MethodChannel.Result} must be called from the main thread.
+   * Native SDK callbacks (e.g. {@code decideAsync}, {@code initialize}) may fire on
+   * background threads. Wrapping {@code result} here once in {@code onMethodCall}
+   * protects every handler automatically — current and future.
+   */
+  private Result safeResult(@NonNull Result result) {
+    Handler mainHandler = new Handler(Looper.getMainLooper());
+    return new Result() {
+      @Override
+      public void success(Object o) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+          result.success(o);
+        } else {
+          mainHandler.post(() -> result.success(o));
+        }
+      }
+
+      @Override
+      public void error(@NonNull String code, String message, Object details) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+          result.error(code, message, details);
+        } else {
+          mainHandler.post(() -> result.error(code, message, details));
+        }
+      }
+
+      @Override
+      public void notImplemented() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+          result.notImplemented();
+        } else {
+          mainHandler.post(result::notImplemented);
+        }
+      }
+    };
+  }
+
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    Result safeResult = safeResult(result);
     Map<String, ?> arguments = call.arguments();
     ArgumentsParser argumentsParser = new ArgumentsParser(arguments);
     switch (call.method) {
       case APIs.INITIALIZE: {
-        initializeOptimizely(argumentsParser, result);
+        initializeOptimizely(argumentsParser, safeResult);
         break;
       }
       case APIs.ACTIVATE: {
-        activate(argumentsParser, result);
+        activate(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_VARIATION: {
-        getVariation(argumentsParser, result);
+        getVariation(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_FORCED_VARIATION: {
-        getForcedVariation(argumentsParser, result);
+        getForcedVariation(argumentsParser, safeResult);
         break;
       }
       case APIs.SET_FORCED_VARIATION: {
-        setForcedVariation(argumentsParser, result);
+        setForcedVariation(argumentsParser, safeResult);
         break;
       }
       case APIs.ADD_NOTIFICATION_LISTENER: {
-        addNotificationListener(argumentsParser, result);
+        addNotificationListener(argumentsParser, safeResult);
         break;
       }
       case APIs.REMOVE_NOTIFICATION_LISTENER: {
-        removeNotificationListener(argumentsParser, result);
+        removeNotificationListener(argumentsParser, safeResult);
         break;
       }
       case APIs.CLEAR_NOTIFICATION_LISTENERS:
       case APIs.CLEAR_ALL_NOTIFICATION_LISTENERS: {
-        clearAllNotificationListeners(argumentsParser, result);
+        clearAllNotificationListeners(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_OPTIMIZELY_CONFIG: {
-        getOptimizelyConfig(argumentsParser, result);
+        getOptimizelyConfig(argumentsParser, safeResult);
         break;
       }
       case APIs.CREATE_USER_CONTEXT: {
-        createUserContext(argumentsParser, result);
+        createUserContext(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_USER_ID: {
-        getUserId(argumentsParser, result);
+        getUserId(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_ATTRIBUTES: {
-        getAttributes(argumentsParser, result);
+        getAttributes(argumentsParser, safeResult);
         break;
       }
       case APIs.SET_ATTRIBUTES: {
-        setAttribute(argumentsParser, result);
+        setAttribute(argumentsParser, safeResult);
         break;
       }
       case APIs.TRACK_EVENT: {
-        trackEvent(argumentsParser, result);
+        trackEvent(argumentsParser, safeResult);
         break;
       }
       case APIs.DECIDE: {
-        decide(argumentsParser, result);
+        decide(argumentsParser, safeResult);
         break;
       }
       case APIs.DECIDE_ASYNC: {
-        decideAsync(argumentsParser, result);
+        decideAsync(argumentsParser, safeResult);
         break;
       }
       case APIs.SET_FORCED_DECISION: {
-        setForcedDecision(argumentsParser, result);
+        setForcedDecision(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_FORCED_DECISION: {
-        getForcedDecision(argumentsParser, result);
+        getForcedDecision(argumentsParser, safeResult);
         break;
       }
       case APIs.REMOVE_FORCED_DECISION: {
-        removeForcedDecision(argumentsParser, result);
+        removeForcedDecision(argumentsParser, safeResult);
         break;
       }
       case APIs.REMOVE_ALL_FORCED_DECISIONS: {
-        removeAllForcedDecisions(argumentsParser, result);
+        removeAllForcedDecisions(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_QUALIFIED_SEGMENTS: {
-        getQualifiedSegments(argumentsParser, result);
+        getQualifiedSegments(argumentsParser, safeResult);
         break;
       }
       case APIs.SET_QUALIFIED_SEGMENTS: {
-        setQualifiedSegments(argumentsParser, result);
+        setQualifiedSegments(argumentsParser, safeResult);
         break;
       }
       case APIs.GET_VUID: {
-        getVuid(argumentsParser, result);
+        getVuid(argumentsParser, safeResult);
         break;
       }
       case APIs.IS_QUALIFIED_FOR: {
-        isQualifiedFor(argumentsParser, result);
+        isQualifiedFor(argumentsParser, safeResult);
         break;
       }
       case APIs.SEND_ODP_EVENT: {
-        sendODPEvent(argumentsParser, result);
+        sendODPEvent(argumentsParser, safeResult);
         break;
       }
       case APIs.FETCH_QUALIFIED_SEGMENTS: {
-        fetchQualifiedSegments(argumentsParser, result);
+        fetchQualifiedSegments(argumentsParser, safeResult);
         break;
       }
       case APIs.CLOSE: {
-        close(argumentsParser, result);
+        close(argumentsParser, safeResult);
         break;
       }
       default:
-        result.notImplemented();
+        safeResult.notImplemented();
     }
   }
 
