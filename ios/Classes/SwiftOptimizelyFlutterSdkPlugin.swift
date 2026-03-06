@@ -51,40 +51,65 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         OptimizelyFlutterLogger.setChannel(loggerChannel)
     }
     
-    /// Part of FlutterPlugin protocol to handle communication with flutter sdk
+    /// Part of FlutterPlugin protocol to handle communication with flutter sdk.
+    /// All method handlers receive a main-thread-safe result callback so that
+    /// any handler calling result() from a background thread (e.g. async SDK
+    /// completion handlers) still delivers the response correctly on iOS 16.
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        
+        let safeResult = mainThreadResult(result)
         switch call.method {
-        case API.initialize: initialize(call, result: result)
-        case API.addNotificationListener: addNotificationListener(call, result: result)
-        case API.removeNotificationListener: removeNotificationListener(call, result: result)
-        case API.clearNotificationListeners, API.clearAllNotificationListeners: clearAllNotificationListeners(call, result: result)
-        case API.getOptimizelyConfig: getOptimizelyConfig(call, result: result)
-        case API.activate: activate(call, result: result)
-        case API.getVariation: getVariation(call, result: result)
-        case API.getForcedVariation: getForcedVariation(call, result: result)
-        case API.setForcedVariation: setForcedVariation(call, result: result)
-        case API.createUserContext: createUserContext(call, result: result)
-        case API.getUserId: getUserId(call, result: result)
-        case API.getAttributes: getAttributes(call, result: result)
-        case API.setAttributes: setAttributes(call, result: result)
-        case API.trackEvent: trackEvent(call, result: result)
-        case API.decide: decide(call, result: result)
-        case API.decideAsync: decideAsync(call, result: result)
-        case API.setForcedDecision: setForcedDecision(call, result: result)
-        case API.getForcedDecision: getForcedDecision(call, result: result)
-        case API.removeForcedDecision: removeForcedDecision(call, result: result)
-        case API.removeAllForcedDecisions: removeAllForcedDecisions(call, result: result)
-        case API.close: close(call, result: result)
-            
+        case API.initialize: initialize(call, result: safeResult)
+        case API.addNotificationListener: addNotificationListener(call, result: safeResult)
+        case API.removeNotificationListener: removeNotificationListener(call, result: safeResult)
+        case API.clearNotificationListeners, API.clearAllNotificationListeners: clearAllNotificationListeners(call, result: safeResult)
+        case API.getOptimizelyConfig: getOptimizelyConfig(call, result: safeResult)
+        case API.activate: activate(call, result: safeResult)
+        case API.getVariation: getVariation(call, result: safeResult)
+        case API.getForcedVariation: getForcedVariation(call, result: safeResult)
+        case API.setForcedVariation: setForcedVariation(call, result: safeResult)
+        case API.createUserContext: createUserContext(call, result: safeResult)
+        case API.getUserId: getUserId(call, result: safeResult)
+        case API.getAttributes: getAttributes(call, result: safeResult)
+        case API.setAttributes: setAttributes(call, result: safeResult)
+        case API.trackEvent: trackEvent(call, result: safeResult)
+        case API.decide: decide(call, result: safeResult)
+        case API.decideAsync: decideAsync(call, result: safeResult)
+        case API.setForcedDecision: setForcedDecision(call, result: safeResult)
+        case API.getForcedDecision: getForcedDecision(call, result: safeResult)
+        case API.removeForcedDecision: removeForcedDecision(call, result: safeResult)
+        case API.removeAllForcedDecisions: removeAllForcedDecisions(call, result: safeResult)
+        case API.close: close(call, result: safeResult)
+
         // ODP
-        case API.getQualifiedSegments: getQualifiedSegments(call, result: result)
-        case API.setQualifiedSegments: setQualifiedSegments(call, result: result)
-        case API.getVuid: getVuid(call, result: result)
-        case API.isQualifiedFor: isQualifiedFor(call, result: result)
-        case API.sendOdpEvent: sendOdpEvent(call, result: result)
-        case API.fetchQualifiedSegments: fetchQualifiedSegments(call, result: result)
-        default: result(FlutterMethodNotImplemented)
+        case API.getQualifiedSegments: getQualifiedSegments(call, result: safeResult)
+        case API.setQualifiedSegments: setQualifiedSegments(call, result: safeResult)
+        case API.getVuid: getVuid(call, result: safeResult)
+        case API.isQualifiedFor: isQualifiedFor(call, result: safeResult)
+        case API.sendOdpEvent: sendOdpEvent(call, result: safeResult)
+        case API.fetchQualifiedSegments: fetchQualifiedSegments(call, result: safeResult)
+        default: safeResult(FlutterMethodNotImplemented)
+        }
+    }
+
+    /// Wraps a FlutterResult so it is always invoked on the main thread.
+    ///
+    /// iOS 16 requires FlutterResult to be called on the main thread. When an
+    /// async native callback (e.g. OptimizelyClient.start completion) calls
+    /// result() from a background thread, iOS 16 silently drops the response
+    /// under multi-SDK startup contention, causing the Dart side to hang or
+    /// receive nil. iOS 17+ relaxed this requirement, which is why the bug is
+    /// version-specific.
+    ///
+    /// Applying this wrapper once in handle() protects every current and future
+    /// method handler automatically — no individual handler needs to remember
+    /// to dispatch to main.
+    private func mainThreadResult(_ result: @escaping FlutterResult) -> FlutterResult {
+        return { value in
+            if Thread.isMainThread {
+                result(value)
+            } else {
+                DispatchQueue.main.async { result(value) }
+            }
         }
     }
     

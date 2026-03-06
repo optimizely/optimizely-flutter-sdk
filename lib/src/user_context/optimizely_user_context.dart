@@ -72,23 +72,45 @@ class OptimizelyUserContext {
 
   OptimizelyUserContext(this._sdkKey, this._userContextId, this._channel);
 
+  /// Safe wrapper around [MethodChannel.invokeMethod] for this user context.
+  ///
+  /// Mirrors [OptimizelyClientWrapper._invoke]: returns a [Map<String, dynamic>]
+  /// in all cases, never throws. Null returns and [PlatformException]s are both
+  /// converted to `{success: false}` so callers never see an unhandled exception.
+  Future<Map<String, dynamic>> _invoke(String method, [dynamic args]) async {
+    try {
+      final raw = await _channel.invokeMethod(method, args);
+      if (raw == null) {
+        return {
+          Constants.responseSuccess: false,
+          Constants.responseReason:
+              'Native channel returned null for method: $method',
+        };
+      }
+      return Map<String, dynamic>.from(raw);
+    } on PlatformException catch (e) {
+      return {
+        Constants.responseSuccess: false,
+        Constants.responseReason: e.message ?? e.toString(),
+      };
+    }
+  }
+
   /// Returns [GetUserIdResponse] object containing userId for the user context.
   Future<GetUserIdResponse> getUserId() async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getUserIdMethod, {
+    final result = await _invoke(Constants.getUserIdMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
-    }));
+    });
     return GetUserIdResponse(result);
   }
 
   /// Returns [GetAttributesResponse] object containing attributes for the user context.
   Future<GetAttributesResponse> getAttributes() async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getAttributesMethod, {
+    final result = await _invoke(Constants.getAttributesMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
-    }));
+    });
     return GetAttributesResponse(result);
   }
 
@@ -97,22 +119,20 @@ class OptimizelyUserContext {
   /// Takes [attributes] A [Map] of custom key-value string pairs specifying attributes for the user.
   /// Returns [BaseResponse]
   Future<BaseResponse> setAttributes(Map<String, dynamic> attributes) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.setAttributesMethod, {
+    final result = await _invoke(Constants.setAttributesMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
-    }));
+    });
     return BaseResponse(result);
   }
 
   /// Returns [GetQualifiedSegmentsResponse] object containing an array of segment names that the user is qualified for.
   Future<GetQualifiedSegmentsResponse> getQualifiedSegments() async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getQualifiedSegmentsMethod, {
+    final result = await _invoke(Constants.getQualifiedSegmentsMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
-    }));
+    });
     return GetQualifiedSegmentsResponse(result);
   }
 
@@ -122,12 +142,11 @@ class OptimizelyUserContext {
   /// Returns [BaseResponse]
   Future<BaseResponse> setQualifiedSegments(
       List<String> qualifiedSegments) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.setQualifiedSegmentsMethod, {
+    final result = await _invoke(Constants.setQualifiedSegmentsMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.qualifiedSegments: qualifiedSegments
-    }));
+    });
     return BaseResponse(result);
   }
 
@@ -136,12 +155,11 @@ class OptimizelyUserContext {
   /// Takes [segment] The segment name to check qualification for.
   /// Returns [BaseResponse]
   Future<BaseResponse> isQualifiedFor(String segment) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.isQualifiedForMethod, {
+    final result = await _invoke(Constants.isQualifiedForMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.segment: segment
-    }));
+    });
     return BaseResponse(result);
   }
 
@@ -153,12 +171,11 @@ class OptimizelyUserContext {
   /// Returns [BaseResponse]
   Future<BaseResponse> fetchQualifiedSegments(
       [Set<OptimizelySegmentOption> options = const {}]) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.fetchQualifiedSegmentsMethod, {
+    final result = await _invoke(Constants.fetchQualifiedSegmentsMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.optimizelySegmentOption: Utils.convertSegmentOptions(options),
-    }));
+    });
     return BaseResponse(result);
   }
 
@@ -169,13 +186,12 @@ class OptimizelyUserContext {
   /// Returns [BaseResponse]
   Future<BaseResponse> trackEvent(String eventKey,
       [Map<String, dynamic> eventTags = const {}]) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.trackEventMethod, {
+    final result = await _invoke(Constants.trackEventMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.eventKey: eventKey,
       Constants.eventTags: Utils.convertToTypedMap(eventTags)
-    }));
+    });
     return BaseResponse(result);
   }
 
@@ -217,14 +233,12 @@ class OptimizelyUserContext {
       [List<String> keys = const [],
       Set<OptimizelyDecideOption> options = const {}]) async {
     final convertedOptions = Utils.convertDecideOptions(options);
-    var result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.decideMethod, {
+    return await _invoke(Constants.decideMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.keys: keys,
       Constants.optimizelyDecideOption: convertedOptions,
-    }));
-    return result;
+    });
   }
 
   /// Asynchronously returns a decision result for a given flag key and a user context.
@@ -267,14 +281,12 @@ class OptimizelyUserContext {
       [List<String> keys = const [],
       Set<OptimizelyDecideOption> options = const {}]) async {
     final convertedOptions = Utils.convertDecideOptions(options);
-    var result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.decideAsyncMethod, {
+    return await _invoke(Constants.decideAsyncMethod, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
       Constants.keys: keys,
       Constants.optimizelyDecideOption: convertedOptions,
-    }));
-    return result;
+    });
   }
 
   /// Sets the forced decision for a given decision context.
@@ -293,8 +305,7 @@ class OptimizelyUserContext {
     if (context.ruleKey != null) {
       request[Constants.ruleKey] = context.ruleKey;
     }
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.setForcedDecision, request));
+    final result = await _invoke(Constants.setForcedDecision, request);
     return BaseResponse(result);
   }
 
@@ -313,8 +324,7 @@ class OptimizelyUserContext {
       request[Constants.ruleKey] = context.ruleKey;
     }
 
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getForcedDecision, request));
+    final result = await _invoke(Constants.getForcedDecision, request);
     return GetForcedDecisionResponse(result);
   }
 
@@ -332,8 +342,7 @@ class OptimizelyUserContext {
     if (context.ruleKey != null) {
       request[Constants.ruleKey] = context.ruleKey;
     }
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.removeForcedDecision, request));
+    final result = await _invoke(Constants.removeForcedDecision, request);
     return BaseResponse(result);
   }
 
@@ -341,11 +350,10 @@ class OptimizelyUserContext {
   ///
   /// Returns [BaseResponse]
   Future<BaseResponse> removeAllForcedDecisions() async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.removeAllForcedDecisions, {
+    final result = await _invoke(Constants.removeAllForcedDecisions, {
       Constants.sdkKey: _sdkKey,
       Constants.userContextId: _userContextId,
-    }));
+    });
     return BaseResponse(result);
   }
 }
