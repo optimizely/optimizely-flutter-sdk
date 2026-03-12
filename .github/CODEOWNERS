@@ -1,0 +1,7 @@
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# This file designates code owners for the repository. The purpose is to automatically request reviews from the code
+# owners when changes are made to the code they own. This helps ensure that the right people are reviewing changes
+# and maintaining the quality of the codebase.
+# All files are owned by the mobile team — at least one review is required to merge.
+
+*  @damian-kaczmarek @joachimschmidt @lukkas @mbojec
