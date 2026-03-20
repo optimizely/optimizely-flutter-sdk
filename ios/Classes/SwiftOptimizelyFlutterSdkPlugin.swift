@@ -225,13 +225,15 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
             settings: optimizelySdkSettings,
             cmabConfig: cmabConfig)
         
-        optimizelyInstance.start{ [weak self] res in
-            switch res {
-            case .success(_):
-                self?.optimizelyClientsTracker[sdkKey] = optimizelyInstance
-                result(self?.createResponse(success: true))
-            case .failure(let err):
-                result(self?.createResponse(success: false, reason: err.localizedDescription))
+        optimizelyInstance.start { [weak self] res in
+            DispatchQueue.main.async {
+                switch res {
+                    case .success(_):
+                    self?.optimizelyClientsTracker[sdkKey] = optimizelyInstance
+                    result(self?.createResponse(success: true))
+                    case .failure(let err):
+                    result(self?.createResponse(success: false, reason: err.localizedDescription))
+                }
             }
         }
     }
