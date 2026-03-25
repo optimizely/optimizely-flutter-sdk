@@ -128,8 +128,7 @@ class OptimizelyClientWrapper {
       }
     });
 
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.initializeMethod, requestDict));
+    final result = await _invoke(Constants.initializeMethod, requestDict);
     return BaseResponse(result);
   }
 
@@ -140,13 +139,12 @@ class OptimizelyClientWrapper {
   static Future<ActivateResponse> activate(
       String sdkKey, String experimentKey, String userId,
       [Map<String, dynamic> attributes = const {}]) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.activate, {
+    final result = await _invoke(Constants.activate, {
       Constants.sdkKey: sdkKey,
       Constants.experimentKey: experimentKey,
       Constants.userId: userId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
-    }));
+    });
     return ActivateResponse(result);
   }
 
@@ -154,25 +152,23 @@ class OptimizelyClientWrapper {
   static Future<GetVariationResponse> getVariation(
       String sdkKey, String experimentKey, String userId,
       [Map<String, dynamic> attributes = const {}]) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getVariation, {
+    final result = await _invoke(Constants.getVariation, {
       Constants.sdkKey: sdkKey,
       Constants.experimentKey: experimentKey,
       Constants.userId: userId,
       Constants.attributes: Utils.convertToTypedMap(attributes)
-    }));
+    });
     return GetVariationResponse(result);
   }
 
   /// Get forced variation for experiment and user ID.
   static Future<GetVariationResponse> getForcedVariation(
       String sdkKey, String experimentKey, String userId) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getForcedVariation, {
+    final result = await _invoke(Constants.getForcedVariation, {
       Constants.sdkKey: sdkKey,
       Constants.experimentKey: experimentKey,
       Constants.userId: userId,
-    }));
+    });
     return GetVariationResponse(result);
   }
 
@@ -188,16 +184,15 @@ class OptimizelyClientWrapper {
     if (variationKey != "") {
       request[Constants.variationKey] = variationKey;
     }
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.setForcedVariation, request));
+    final result = await _invoke(Constants.setForcedVariation, request);
     return BaseResponse(result);
   }
 
   /// Returns a snapshot of the current project configuration.
   static Future<OptimizelyConfigResponse> getOptimizelyConfig(
       String sdkKey) async {
-    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.getOptimizelyConfigMethod, {Constants.sdkKey: sdkKey}));
+    final result = await _invoke(
+        Constants.getOptimizelyConfigMethod, {Constants.sdkKey: sdkKey});
     return OptimizelyConfigResponse(result);
   }
 
@@ -216,17 +211,15 @@ class OptimizelyClientWrapper {
       request[Constants.type] = type;
     }
 
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.sendOdpEventMethod, request));
+    final result = await _invoke(Constants.sendOdpEventMethod, request);
     return BaseResponse(result);
   }
 
   /// Returns the device vuid (read only)
   static Future<GetVuidResponse> getVuid(String sdkKey) async {
-    final result = Map<String, dynamic>.from(
-        await _channel.invokeMethod(Constants.getVuidMethod, {
+    final result = await _invoke(Constants.getVuidMethod, {
       Constants.sdkKey: sdkKey,
-    }));
+    });
     return GetVuidResponse(result);
   }
 
@@ -241,8 +234,8 @@ class OptimizelyClientWrapper {
     configUpdateCallbacksById[sdkKey]?.remove(id);
     trackCallbacksById[sdkKey]?.remove(id);
 
-    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.removeNotificationListenerMethod, request));
+    final result = await _invoke(
+        Constants.removeNotificationListenerMethod, request);
     return BaseResponse(result);
   }
 
@@ -255,8 +248,8 @@ class OptimizelyClientWrapper {
       Constants.type: listenerType.name,
       Constants.callbackIds: callbackIds
     };
-    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.clearNotificationListenersMethod, request));
+    final result = await _invoke(
+        Constants.clearNotificationListenersMethod, request);
     return BaseResponse(result);
   }
 
@@ -268,15 +261,15 @@ class OptimizelyClientWrapper {
       Constants.sdkKey: sdkKey,
       Constants.callbackIds: callbackIds
     };
-    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.clearAllNotificationListenersMethod, request));
+    final result = await _invoke(
+        Constants.clearAllNotificationListenersMethod, request);
     return BaseResponse(result);
   }
 
   /// Returns a success true if optimizely client closed successfully.
   static Future<BaseResponse> close(String sdkKey) async {
-    final result = Map<String, dynamic>.from(await _channel
-        .invokeMethod(Constants.close, {Constants.sdkKey: sdkKey}));
+    final result = await _invoke(
+        Constants.close, {Constants.sdkKey: sdkKey});
     return BaseResponse(result);
   }
 
@@ -292,8 +285,7 @@ class OptimizelyClientWrapper {
     if (userId != null) {
       request[Constants.userId] = userId;
     }
-    final result = Map<String, dynamic>.from(await _channel.invokeMethod(
-        Constants.createUserContextMethod, request));
+    final result = await _invoke(Constants.createUserContextMethod, request);
 
     if (result[Constants.responseSuccess] == true) {
       final response =
@@ -393,7 +385,7 @@ class OptimizelyClientWrapper {
     activateCallbacksById.putIfAbsent(sdkKey, () => {});
     activateCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.activate.name;
-    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+    await _invoke(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,
       Constants.type: listenerTypeStr
@@ -416,7 +408,7 @@ class OptimizelyClientWrapper {
     decisionCallbacksById.putIfAbsent(sdkKey, () => {});
     decisionCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.decision.name;
-    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+    await _invoke(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,
       Constants.type: listenerTypeStr
@@ -438,7 +430,7 @@ class OptimizelyClientWrapper {
     trackCallbacksById.putIfAbsent(sdkKey, () => {});
     trackCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.track.name;
-    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+    await _invoke(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,
       Constants.type: listenerTypeStr
@@ -460,7 +452,7 @@ class OptimizelyClientWrapper {
     logEventCallbacksById.putIfAbsent(sdkKey, () => {});
     logEventCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.logEvent.name;
-    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+    await _invoke(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,
       Constants.type: listenerTypeStr
@@ -483,13 +475,45 @@ class OptimizelyClientWrapper {
     configUpdateCallbacksById.putIfAbsent(sdkKey, () => {});
     configUpdateCallbacksById[sdkKey]?[currentListenerId] = callback;
     final listenerTypeStr = ListenerType.projectConfigUpdate.name;
-    await _channel.invokeMethod(Constants.addNotificationListenerMethod, {
+    await _invoke(Constants.addNotificationListenerMethod, {
       Constants.sdkKey: sdkKey,
       Constants.id: currentListenerId,
       Constants.type: listenerTypeStr
     });
     // Returning an id that allows the user to remove the added notification listener
     return currentListenerId;
+  }
+
+  /// Safe wrapper around [MethodChannel.invokeMethod].
+  ///
+  /// Returns a [Map<String, dynamic>] in all cases — never throws.
+  /// - If native returns `null` (e.g. dropped response on iOS 16 when
+  ///   FlutterResult is called from a background thread), returns a
+  ///   `{success: false}` map instead of crashing with [TypeError].
+  /// - If native throws [PlatformException], returns `{success: false}`
+  ///   instead of propagating an unhandled exception to the caller.
+  ///
+  /// Every [MethodChannel.invokeMethod] call in this class must go through
+  /// [_invoke] so that new methods added in future automatically inherit
+  /// these safety guarantees.
+  static Future<Map<String, dynamic>> _invoke(
+      String method, [dynamic args]) async {
+    try {
+      final raw = await _channel.invokeMethod(method, args);
+      if (raw == null) {
+        return {
+          Constants.responseSuccess: false,
+          Constants.responseReason:
+              'Native channel returned null for method: $method',
+        };
+      }
+      return Map<String, dynamic>.from(raw);
+    } on PlatformException catch (e) {
+      return {
+        Constants.responseSuccess: false,
+        Constants.responseReason: e.message ?? e.toString(),
+      };
+    }
   }
 
   static Future<void> methodCallHandler(MethodCall call) async {
