@@ -1,5 +1,11 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.4.1
+January 28th, 2026
+
+### Enhancements
+* Exclude CMAB decision from UPS ([#96](https://github.com/optimizely/optimizely-flutter-sdk/pull/96))
+
 ## 3.4.0
 January 7th, 2026
 
