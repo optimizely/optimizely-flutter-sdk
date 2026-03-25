@@ -1,5 +1,11 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.4.2
+March 25, 2026
+
+### Bug Fixes
+* Ensure FlutterResult and invokeMethod are always called on main thread ([#98](https://github.com/optimizely/optimizely-flutter-sdk/pull/98))
+
 ## 3.4.1
 January 28th, 2026
 
