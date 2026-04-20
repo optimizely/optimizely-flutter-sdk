@@ -1,5 +1,18 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.4.3-easyjet
+April 20, 2026
+
+**Note:** This is a client-specific pre-release version for EasyJet.
+
+### Bug Fixes
+* Upgrade NWPathMonitor iOS requirement to iOS 17.0 to address rare crash on older iOS versions
+* Add fail-safe initialization guards in NetworkReachability to prevent null pointer crashes
+* Use custom swift-sdk branch with defensive NWPathMonitor handling
+
+**Dependencies:**
+* OptimizelySwiftSDK: git branch `fix/upgrade-nwpathmonitor-ios17-requirement`
+
 ## 3.4.2
 March 25, 2026
 
