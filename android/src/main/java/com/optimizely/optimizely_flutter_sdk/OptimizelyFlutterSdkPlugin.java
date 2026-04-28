@@ -243,8 +243,8 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
         flutterLogbackAppender.stop();
         flutterLogbackAppender = null;
     }
-    // Clean up the channel
-    FlutterLogbackAppender.setChannel(null);
+    // Clean up the logger channel
+    FlutterLogbackAppender.clearChannel();
   }
 
   @Override
