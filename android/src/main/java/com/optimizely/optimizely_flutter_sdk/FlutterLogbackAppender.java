@@ -17,8 +17,10 @@ public class FlutterLogbackAppender extends AppenderBase<ILoggingEvent> {
     public static MethodChannel channel;
     private static final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
-    public static void setChannel(MethodChannel channel) {
-        FlutterLogbackAppender.channel = channel;
+    public static void setChannel(MethodChannel newChannel) {
+        if (newChannel == null || FlutterLogbackAppender.channel == null) {
+            FlutterLogbackAppender.channel = newChannel;
+        }
     }
 
     @Override
