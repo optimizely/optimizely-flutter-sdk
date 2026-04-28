@@ -38,6 +38,9 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     /// Registers optimizely_flutter_sdk channel to communicate with the flutter sdk to receive requests and send responses
     public static func register(with registrar: FlutterPluginRegistrar) {
+        if channel != nil {
+            return
+        }
         channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftOptimizelyFlutterSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
