@@ -212,6 +212,9 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+    if (channel != null) {
+      return;
+    }
     channel = new MethodChannel(binding.getBinaryMessenger(), "optimizely_flutter_sdk");
     channel.setMethodCallHandler(this);
     context = binding.getApplicationContext();
@@ -232,6 +235,7 @@ public class OptimizelyFlutterSdkPlugin extends OptimizelyFlutterClient implemen
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
+    channel = null;
     // Stop and detach the appender
     if (flutterLogbackAppender != null) {
         Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
