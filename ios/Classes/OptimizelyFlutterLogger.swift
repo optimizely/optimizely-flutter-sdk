@@ -13,7 +13,13 @@ public class OptimizelyFlutterLogger: NSObject, OPTLogger {
     }
     
     public static func setChannel(_ channel: FlutterMethodChannel) {
-        loggerChannel = channel
+        if loggerChannel == nil {
+            loggerChannel = channel
+        }
+    }
+
+    public static func clearChannel() {
+        loggerChannel = nil
     }
     
     public func log(level: OptimizelyLogLevel, message: String) {

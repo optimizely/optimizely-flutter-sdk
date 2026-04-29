@@ -14,11 +14,17 @@ import io.flutter.plugin.common.MethodChannel;
 public class FlutterLogbackAppender extends AppenderBase<ILoggingEvent> {
 
     public static final String CHANNEL_NAME = "optimizely_flutter_sdk_logger";
-    public static MethodChannel channel;
+    private static MethodChannel channel;
     private static final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
-    public static void setChannel(MethodChannel channel) {
-        FlutterLogbackAppender.channel = channel;
+    public static void setChannel(MethodChannel newChannel) {
+        if (channel == null) {
+            channel = newChannel;
+        }
+    }
+
+    public static void clearChannel() {
+        channel = null;
     }
 
     @Override
