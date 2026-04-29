@@ -53,7 +53,13 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
                                                 taskQueue: taskQueue)
         OptimizelyFlutterLogger.setChannel(loggerChannel)
     }
-    
+
+    public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+        Self.channel?.setMethodCallHandler(nil)
+        Self.channel = nil
+        OptimizelyFlutterLogger.clearChannel()
+    }
+
     /// Part of FlutterPlugin protocol to handle communication with flutter sdk.
     /// All method handlers receive a main-thread-safe result callback so that
     /// any handler calling result() from a background thread (e.g. async SDK
