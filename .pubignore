@@ -3,3 +3,6 @@ CLAUDE.md
 
 # Claude Code local configurations
 .claude/
+
+# Spec Kit framework files
+.specify/
