@@ -194,3 +194,8 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 - `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` - Plugin implementation (786 LOC)
 - `ios/Classes/OptimizelyFlutterLogger.swift` - Logger bridge with task queue
 - `ios/optimizely_flutter_sdk.podspec` - CocoaPods dependencies
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
