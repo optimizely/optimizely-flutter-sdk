@@ -1,5 +1,13 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.4.3
+May 01, 2026
+
+### Bug Fixes
+* Guard static MethodChannel from multi-engine overwrite ([#103](https://github.com/optimizely/optimizely-flutter-sdk/pull/103))
+* Guard detachFromEngine from multi-engine channel teardown ([#105](https://github.com/optimizely/optimizely-flutter-sdk/pull/105))
+
+
 ## 3.4.2
 March 25, 2026
 
