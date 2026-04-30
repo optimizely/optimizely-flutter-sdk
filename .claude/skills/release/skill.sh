@@ -1,0 +1,79 @@
+#!/bin/bash
+set -euo pipefail
+
+# Optimizely Flutter SDK - Release (Step 2)
+# Publishes to pub.dev and creates GitHub release
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+error() { echo -e "${RED}✗ Error: $1${NC}" >&2; exit 1; }
+success() { echo -e "${GREEN}✓ $1${NC}"; }
+info() { echo -e "${YELLOW}ℹ $1${NC}"; }
+
+VERSION="${1:-}"
+PRERELEASE=""
+[[ "${2:-}" == "--prerelease" ]] && PRERELEASE="--prerelease"
+
+[[ -z "$VERSION" ]] && error "Usage: /release <version> [--prerelease]"
+[[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9]+)?$ ]] && error "Invalid version: $VERSION"
+
+# Pre-flight checks
+info "Running pre-flight checks..."
+[[ "$(git branch --show-current)" != "master" ]] && error "Must be on master branch"
+git diff-index --quiet HEAD -- || error "Working tree has uncommitted changes"
+
+PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+[[ "$PUBSPEC_VERSION" != "$VERSION" ]] && error "Version mismatch! pubspec.yaml: $PUBSPEC_VERSION, requested: $VERSION"
+
+success "Pre-flight checks passed"
+
+# Dry run
+info "Running pub publish dry-run..."
+if ! flutter packages pub publish --dry-run 2>&1 | tee /tmp/pub-dry-run.log; then
+    echo ""
+    read -p "Dry-run found warnings. Continue? (y/N) " -n 1 -r
+    echo
+    [[ ! $REPLY =~ ^[Yy]$ ]] && error "Aborted by user"
+fi
+
+# Publish
+info "Publishing to pub.dev..."
+flutter packages pub publish || error "Publishing failed"
+success "Published to pub.dev!"
+
+# Extract CHANGELOG
+CHANGELOG_CONTENT=$(awk "/^## $VERSION/,/^## / {print}" CHANGELOG.md | sed '$d' | sed '1d')
+[[ -z "$CHANGELOG_CONTENT" ]] && CHANGELOG_CONTENT="Release $VERSION\n\nSee CHANGELOG.md for details."
+
+RELEASE_NOTES="## $VERSION
+
+$CHANGELOG_CONTENT"
+
+# Create GitHub release
+info "Creating GitHub draft release..."
+GH_RELEASE_URL=$(gh release create "v${VERSION}" \
+    --title "Release ${VERSION}" \
+    --notes "$RELEASE_NOTES" \
+    --target master \
+    --draft \
+    $PRERELEASE)
+
+success "GitHub draft release created!"
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${GREEN}✓ Release complete!${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "Version: $VERSION"
+echo "Pub.dev: https://pub.dev/packages/optimizely_flutter_sdk/versions/$VERSION"
+echo "GitHub Release: $GH_RELEASE_URL"
+echo ""
+echo "Next Steps:"
+echo "1. 🔍 Verify package on pub.dev (1-3 minutes)"
+echo "2. ✏️  Review GitHub draft release"
+echo "3. ✅ Publish GitHub release"
+echo ""
