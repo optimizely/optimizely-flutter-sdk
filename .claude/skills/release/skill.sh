@@ -45,7 +45,7 @@ flutter packages pub publish || error "Publishing failed"
 success "Published to pub.dev!"
 
 # Extract CHANGELOG
-CHANGELOG_CONTENT=$(awk "/^## $VERSION/,/^## / {print}" CHANGELOG.md | sed '$d' | sed '1d')
+CHANGELOG_CONTENT=$(sed -n "/^## ${VERSION}\$/,/^## [0-9]/p" CHANGELOG.md | sed '1d;$d')
 [[ -z "$CHANGELOG_CONTENT" ]] && CHANGELOG_CONTENT="Release $VERSION\n\nSee CHANGELOG.md for details."
 
 RELEASE_NOTES="## $VERSION
@@ -55,7 +55,7 @@ $CHANGELOG_CONTENT"
 # Create GitHub release
 info "Creating GitHub draft release..."
 GH_RELEASE_URL=$(gh release create "v${VERSION}" \
-    --title "Release ${VERSION}" \
+    --title "Release v${VERSION}" \
     --notes "$RELEASE_NOTES" \
     --target master \
     --draft \
@@ -73,7 +73,7 @@ echo "Pub.dev: https://pub.dev/packages/optimizely_flutter_sdk/versions/$VERSION
 echo "GitHub Release: $GH_RELEASE_URL"
 echo ""
 echo "Next Steps:"
-echo "1. 🔍 Verify package on pub.dev (1-3 minutes)"
-echo "2. ✏️  Review GitHub draft release"
-echo "3. ✅ Publish GitHub release"
+echo "1. 🔍 Verify package on pub.dev (may take 1-10 minutes to appear)"
+echo "2. ✏️  Review the draft release at: $GH_RELEASE_URL"
+echo "3. ✅ Make the draft release public once verified"
 echo ""

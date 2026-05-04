@@ -69,7 +69,20 @@ sed -i.bak "s/static const String version = '.*';/static const String version = 
 sed -i.bak "s/optimizely_flutter_sdk: \^.*/optimizely_flutter_sdk: ^$NEW_VERSION/" README.md && rm README.md.bak
 
 # Update CHANGELOG
-CURRENT_DATE=$(date "+%B %d, %Y")
+# Generate date with ordinal suffix (e.g., "May 1st, 2026")
+DAY=$(date "+%-d")  # Day without leading zero
+MONTH=$(date "+%B")
+YEAR=$(date "+%Y")
+
+# Add ordinal suffix
+case $DAY in
+    1|21|31) SUFFIX="st" ;;
+    2|22) SUFFIX="nd" ;;
+    3|23) SUFFIX="rd" ;;
+    *) SUFFIX="th" ;;
+esac
+
+CURRENT_DATE="${MONTH} ${DAY}${SUFFIX}, ${YEAR}"
 
 # Build CHANGELOG entries from PRs
 CHANGELOG_ENTRIES=""
