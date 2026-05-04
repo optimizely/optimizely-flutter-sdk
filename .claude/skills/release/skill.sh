@@ -28,11 +28,18 @@ git diff-index --quiet HEAD -- || error "Working tree has uncommitted changes"
 PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
 [[ "$PUBSPEC_VERSION" != "$VERSION" ]] && error "Version mismatch! pubspec.yaml: $PUBSPEC_VERSION, requested: $VERSION"
 
+# Verify authentication
+gh auth status &>/dev/null || error "GitHub CLI not authenticated. Run: gh auth login"
+
 success "Pre-flight checks passed"
+
+# Create temporary file for dry-run output (prevents symlink attacks)
+DRY_RUN_LOG=$(mktemp)
+trap "rm -f '$DRY_RUN_LOG'" EXIT
 
 # Dry run
 info "Running pub publish dry-run..."
-if ! flutter packages pub publish --dry-run 2>&1 | tee /tmp/pub-dry-run.log; then
+if ! flutter packages pub publish --dry-run 2>&1 | tee "$DRY_RUN_LOG"; then
     echo ""
     read -p "Dry-run found warnings. Continue? (y/N) " -n 1 -r
     echo
@@ -59,7 +66,7 @@ GH_RELEASE_URL=$(gh release create "v${VERSION}" \
     --notes "$RELEASE_NOTES" \
     --target master \
     --draft \
-    $PRERELEASE)
+    ${PRERELEASE:+$PRERELEASE})
 
 success "GitHub draft release created!"
 
