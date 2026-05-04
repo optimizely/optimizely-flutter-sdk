@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+set +H  # Disable history expansion to prevent '!' in content from being expanded
 
 # Optimizely Flutter SDK - Release (Step 2)
 # Publishes to pub.dev and creates GitHub release
@@ -28,22 +29,28 @@ git diff-index --quiet HEAD -- || error "Working tree has uncommitted changes"
 PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
 [[ "$PUBSPEC_VERSION" != "$VERSION" ]] && error "Version mismatch! pubspec.yaml: $PUBSPEC_VERSION, requested: $VERSION"
 
-# Verify authentication
+# Verify authentication (note: gh auth status only checks authentication, not that the
+# token has the required 'repo' scope needed to create releases)
 gh auth status &>/dev/null || error "GitHub CLI not authenticated. Run: gh auth login"
 
 success "Pre-flight checks passed"
 
 # Create temporary file for dry-run output (prevents symlink attacks)
 DRY_RUN_LOG=$(mktemp)
-trap "rm -f '$DRY_RUN_LOG'" EXIT
+trap "rm -f \"${DRY_RUN_LOG}\"" EXIT
 
 # Dry run
 info "Running pub publish dry-run..."
-if ! flutter packages pub publish --dry-run 2>&1 | tee "$DRY_RUN_LOG"; then
+flutter packages pub publish --dry-run 2>&1 | tee "$DRY_RUN_LOG"
+FLUTTER_EXIT="${PIPESTATUS[0]}"
+if [[ "$FLUTTER_EXIT" != "0" ]]; then
     echo ""
-    read -p "Dry-run found warnings. Continue? (y/N) " -n 1 -r
+    if [[ ! -t 0 ]]; then
+        error "Dry-run found warnings. Cannot prompt in non-interactive mode. Fix warnings or run interactively."
+    fi
+    read -p "Dry-run found warnings. Continue? (y/N) " -r -n 1
     echo
-    [[ ! $REPLY =~ ^[Yy]$ ]] && error "Aborted by user"
+    [[ ! "$REPLY" =~ ^[Yy]$ ]] && error "Aborted by user"
 fi
 
 # Publish
@@ -52,10 +59,13 @@ flutter packages pub publish || error "Publishing failed"
 success "Published to pub.dev!"
 
 # Extract CHANGELOG
-# Escape VERSION for use in sed regex (prevent regex metacharacter interpretation)
+# Escape VERSION for use in sed regex (prevent regex metacharacter interpretation).
+# VERSION is already validated against ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9]+)?$ above,
+# so it cannot contain '|' (the alternate sed delimiter used below); escaping here
+# is an additional safety measure for other metacharacters.
 ESCAPED_VERSION=$(printf '%s\n' "$VERSION" | sed 's/[.[\*^$()+?{|]/\\&/g')
-CHANGELOG_CONTENT=$(sed -n "/^## ${ESCAPED_VERSION}\$/,/^## [0-9]/p" CHANGELOG.md | sed '1d;$d')
-[[ -z "$CHANGELOG_CONTENT" ]] && CHANGELOG_CONTENT="Release $VERSION\n\nSee CHANGELOG.md for details."
+CHANGELOG_CONTENT=$(sed -n "\|^## ${ESCAPED_VERSION}\$|,\|^## [0-9]|p" CHANGELOG.md | sed '1d;$d')
+[[ -z "$CHANGELOG_CONTENT" ]] && CHANGELOG_CONTENT=$(printf 'Release %s\n\nSee CHANGELOG.md for details.' "$VERSION")
 
 RELEASE_NOTES="## $VERSION
 
