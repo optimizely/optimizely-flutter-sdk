@@ -133,6 +133,18 @@ Month Day, Year
 
 ## Contributing Guidelines
 
+### Project Constitution
+
+**All code changes MUST comply with the project constitution** at `.specify/memory/constitution.md`. This document defines the team's non-negotiable standards for correctness, testing, security, observability, naming, PR discipline, and architectural simplicity.
+
+**When to consult the constitution:**
+- Before implementing any feature (large or small)
+- During code reviews to validate adherence
+- When making architectural decisions
+- For day-to-day changes that don't require full SDD workflow
+
+Read the constitution before proposing changes.
+
 ### Commit Messages
 Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#-commit-message-guidelines):
 - `feat:` - New features
@@ -194,3 +206,8 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 - `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` - Plugin implementation (786 LOC)
 - `ios/Classes/OptimizelyFlutterLogger.swift` - Logger bridge with task queue
 - `ios/optimizely_flutter_sdk.podspec` - CocoaPods dependencies
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->

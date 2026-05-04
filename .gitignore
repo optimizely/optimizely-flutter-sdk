@@ -125,3 +125,15 @@ app.*.symbols
 .env
 .mcp.json
 .claude/settings.local.json
+.claude/plans/
+
+# Spec Kit framework files (managed by spec-kit, not committed)
+.specify/extensions/
+.specify/scripts/
+.specify/templates/
+.specify/workflows/
+.specify/integrations/
+.specify/extensions.yml
+.specify/init-options.json
+.specify/integration.json
+.claude/skills/speckit-*/

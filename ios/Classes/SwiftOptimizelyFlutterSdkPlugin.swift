@@ -30,7 +30,8 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     // to communicate with optimizely flutter sdk
     static var channel: FlutterMethodChannel!
-    
+    private static weak var attachedMessenger: FlutterBinaryMessenger?
+
     // to track each unique userContext
     var uuid: String {
         return UUID().uuidString
@@ -41,7 +42,9 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
         if channel != nil {
             return
         }
-        channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: registrar.messenger())
+        let messenger = registrar.messenger()
+        attachedMessenger = messenger
+        channel = FlutterMethodChannel(name: "optimizely_flutter_sdk", binaryMessenger: messenger)
         let instance = SwiftOptimizelyFlutterSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
 
@@ -55,8 +58,12 @@ public class SwiftOptimizelyFlutterSdkPlugin: NSObject, FlutterPlugin {
     }
 
     public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+        guard registrar.messenger() === Self.attachedMessenger else {
+            return
+        }
         Self.channel?.setMethodCallHandler(nil)
         Self.channel = nil
+        Self.attachedMessenger = nil
         OptimizelyFlutterLogger.clearChannel()
     }
 
