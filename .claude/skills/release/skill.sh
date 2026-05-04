@@ -52,7 +52,9 @@ flutter packages pub publish || error "Publishing failed"
 success "Published to pub.dev!"
 
 # Extract CHANGELOG
-CHANGELOG_CONTENT=$(sed -n "/^## ${VERSION}\$/,/^## [0-9]/p" CHANGELOG.md | sed '1d;$d')
+# Escape VERSION for use in sed regex (prevent regex metacharacter interpretation)
+ESCAPED_VERSION=$(printf '%s\n' "$VERSION" | sed 's/[.[\*^$()+?{|]/\\&/g')
+CHANGELOG_CONTENT=$(sed -n "/^## ${ESCAPED_VERSION}\$/,/^## [0-9]/p" CHANGELOG.md | sed '1d;$d')
 [[ -z "$CHANGELOG_CONTENT" ]] && CHANGELOG_CONTENT="Release $VERSION\n\nSee CHANGELOG.md for details."
 
 RELEASE_NOTES="## $VERSION
@@ -61,12 +63,20 @@ $CHANGELOG_CONTENT"
 
 # Create GitHub release
 info "Creating GitHub draft release..."
-GH_RELEASE_URL=$(gh release create "v${VERSION}" \
-    --title "Release v${VERSION}" \
-    --notes "$RELEASE_NOTES" \
-    --target master \
-    --draft \
-    ${PRERELEASE:+$PRERELEASE})
+if [[ -n "$PRERELEASE" ]]; then
+    GH_RELEASE_URL=$(gh release create "v${VERSION}" \
+        --title "Release v${VERSION}" \
+        --notes "$RELEASE_NOTES" \
+        --target master \
+        --draft \
+        "$PRERELEASE")
+else
+    GH_RELEASE_URL=$(gh release create "v${VERSION}" \
+        --title "Release v${VERSION}" \
+        --notes "$RELEASE_NOTES" \
+        --target master \
+        --draft)
+fi
 
 success "GitHub draft release created!"
 
