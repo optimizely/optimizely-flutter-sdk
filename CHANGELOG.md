@@ -13,7 +13,6 @@ May 13, 2026
 * Bumped Android android-sdk from 5.1.1 to 5.2.0
 
 * Bump native SDKs for feature rollout support ([#111](https://github.com/optimizely/optimizely-flutter-sdk/pull/111))
-* Security hardening for release skill ([#108](https://github.com/optimizely/optimizely-flutter-sdk/pull/108))
 
 ## 3.4.3
 May 01, 2026
