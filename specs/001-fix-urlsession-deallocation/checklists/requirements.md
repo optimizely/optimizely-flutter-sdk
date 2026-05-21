@@ -1,7 +1,7 @@
 # Specification Quality Checklist: Fix Premature URLSession Deallocation Crash
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-05-11
+**Created**: 2026-05-21
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -18,8 +18,8 @@
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
+- [x] Edge cases are identified and resolved
+- [x] Scope is clearly bounded (swift-sdk only; flutter plugin out of scope)
 - [x] Dependencies and assumptions identified
 
 ## Feature Readiness
@@ -31,5 +31,8 @@
 
 ## Notes
 
-- All items pass. Spec is ready for `/speckit-clarify` or `/speckit-plan`.
-- The spec references specific file names (e.g., `DefaultDatafileHandler`) in FR-003 for precision since this is a targeted bug fix — these are the "what" (which modules are affected), not the "how" (implementation approach).
+- All items pass. Spec re-written 2026-05-21 to focus exclusively on the swift-sdk URLSession lifecycle fix (BUG-8628).
+- FR-003 and FR-006 reference specific module names and repository scope for precision — this is a targeted bug fix where naming affected modules defines "what" is in scope, not "how" to implement.
+- SC-001 validation is code review only (confirmed via clarification 2026-05-21): crash is non-reproducible internally and root cause is deterministic.
+- Flutter plugin threading issue (`optimizelyClientsTracker` data race) is explicitly excluded — separate concern to be tracked separately.
+- Ready for `/speckit-plan`.

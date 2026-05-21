@@ -3,98 +3,106 @@
 **Feature Branch**: `001-fix-urlsession-deallocation`
 **Created**: 2026-05-11
 **Status**: Draft
-**Input**: Fix EXC_BAD_ACCESS crash caused by premature URLSession invalidation in Optimizely Swift SDK network modules
+**Input**: Fix EXC_BAD_ACCESS crash caused by premature network session invalidation in Optimizely Swift SDK network modules (BUG-8628)
+
+## Clarifications
+
+### Session 2026-05-21
+
+- Q: Given the crash cannot be reproduced in-house (BUG-8628), what is the primary validation strategy for SC-001? → A: Code review only — root cause is clear (misplaced `defer` block fires before async completion callback), fix is deterministic; no test-based reproduction required.
 
 ## User Scenarios & Testing
 
-### User Story 1 - Datafile Download Without Crash (Priority: P1)
+### User Story 1 - SDK Initialization Completes Without Crash (Priority: P1)
 
-An SDK consumer initializes the Optimizely client with `OptimizelyClient.start(resourceTimeout:completion:)`. The SDK downloads the datafile over the network. The download completes successfully without crashing, regardless of network latency, and the completion handler is called with valid data.
+An SDK consumer starts the Optimizely client, triggering a datafile download over the network. The download completes and the initialization callback is invoked with a valid result — no crash occurs, regardless of network latency or third-party library interference.
 
-**Why this priority**: This is the primary crash path reported in production. The datafile download is the first network operation during SDK initialization — a crash here prevents the SDK from functioning at all.
+**Why this priority**: The datafile download is the first network operation during SDK initialization. A crash here prevents the SDK from functioning at all, blocking any A/B testing or feature flag evaluation.
 
-**Independent Test**: Initialize an OptimizelyClient with a valid SDK key on a slow or throttled network connection. Verify initialization completes without EXC_BAD_ACCESS and the completion handler receives either a success result with datafile data or a well-formed error.
+**Independent Test**: Start the Optimizely client with a valid SDK key under slow or throttled network conditions. Verify the initialization completion callback is called with either a success result or a well-formed error. Confirm no EXC_BAD_ACCESS crash occurs.
 
 **Acceptance Scenarios**:
 
-1. **Given** the SDK is initializing, **When** the datafile download completes on a slow network (>2s latency), **Then** the completion handler is called with a valid result and no crash occurs.
-2. **Given** the SDK is initializing, **When** the datafile download fails due to a network error, **Then** the completion handler is called with an appropriate error result (not a crash).
-3. **Given** the SDK is initializing and Firebase Performance Monitoring is active, **When** Firebase swizzles the NSURLSession delegate, **Then** the download still completes without EXC_BAD_ACCESS.
+1. **Given** the SDK is starting up, **When** the datafile download completes on a slow network (>2s latency), **Then** the initialization completion callback is called with a valid result and no crash occurs.
+2. **Given** the SDK is starting up, **When** the datafile download fails due to a network error, **Then** the initialization completion callback is called with an appropriate error result (not a crash).
+3. **Given** a third-party performance monitoring library (e.g., Firebase Performance Monitoring) is active, **When** the SDK downloads the datafile, **Then** the download completes without EXC_BAD_ACCESS regardless of any network session method interception by that library.
 
 ---
 
-### User Story 2 - Event Dispatch Without Crash (Priority: P1)
+### User Story 2 - Event Dispatch Completes Without Crash (Priority: P1)
 
-An SDK consumer tracks events via the Optimizely SDK. The event dispatcher sends batched events to the Optimizely backend. The upload completes and the completion handler executes without accessing deallocated memory.
+An SDK consumer tracks events. The SDK dispatches batched events to the Optimizely backend. Each dispatch completes and the callback executes with a valid result — no crash occurs under any network condition or concurrency level.
 
-**Why this priority**: Event dispatch is a high-frequency operation. The same premature deallocation pattern exists in the event dispatcher, making it a crash risk under normal SDK usage.
+**Why this priority**: Event dispatch is a high-frequency operation used throughout normal SDK usage. The same premature session cleanup vulnerability exists here as in datafile download.
 
-**Independent Test**: Track multiple events in rapid succession under varying network conditions. Verify all event dispatch completion handlers execute without crash.
+**Independent Test**: Track multiple events in rapid succession under varying network conditions. Verify all dispatch completion callbacks execute without crash.
 
 **Acceptance Scenarios**:
 
-1. **Given** the SDK is tracking events, **When** multiple events are dispatched concurrently, **Then** all completion handlers are called with valid results and no crash occurs.
-2. **Given** the SDK is dispatching an event, **When** the network request takes longer than expected, **Then** the URLSession remains valid until the completion handler finishes executing.
+1. **Given** the SDK is dispatching events, **When** multiple events are sent in rapid succession, **Then** all dispatch completion callbacks are called with valid results and no crash occurs.
+2. **Given** the SDK is dispatching an event, **When** the network request takes longer than expected, **Then** the network session remains valid until the callback finishes, and the callback fires with a valid result.
 
 ---
 
-### User Story 3 - ODP Operations Without Crash (Priority: P2)
+### User Story 3 - ODP Operations Complete Without Crash (Priority: P2)
 
-An SDK consumer uses ODP (Optimizely Data Platform) features including segment fetching and event sending. These operations make network requests that complete without crashing, even under concurrent usage or slow network conditions.
+An SDK consumer uses ODP (Optimizely Data Platform) features. ODP segment fetches and ODP event sends complete and their callbacks execute without crashing, even under concurrent usage or slow network conditions.
 
-**Why this priority**: ODP operations are used less frequently than datafile downloads and event dispatch, but contain the same vulnerability and will crash under the same race conditions.
+**Why this priority**: ODP operations are used less frequently than datafile download and event dispatch, but contain the same session lifecycle vulnerability and will crash under the same conditions.
 
-**Independent Test**: Trigger ODP segment fetch and ODP event dispatch under throttled network conditions. Verify completion handlers execute without crash.
+**Independent Test**: Trigger an ODP segment fetch and an ODP event send under throttled network conditions. Verify both completion callbacks execute without crash.
 
 **Acceptance Scenarios**:
 
-1. **Given** the SDK is fetching ODP segments via GraphQL, **When** the network response is delayed, **Then** the completion handler executes with a valid result and no crash occurs.
-2. **Given** the SDK is sending ODP events, **When** the network response is delayed, **Then** the completion handler executes with a valid result and no crash occurs.
+1. **Given** the SDK is fetching ODP segments, **When** the GraphQL network response is delayed, **Then** the completion callback executes with a valid result and no crash occurs.
+2. **Given** the SDK is sending ODP events, **When** the network response is delayed, **Then** the completion callback executes with a valid result and no crash occurs.
 
 ---
 
 ### Edge Cases
 
-- What happens when the URLSession completion handler fires after the enclosing object is deallocated (e.g., `OptimizelyClient.close()` called during in-flight request)?
-- What happens under extreme memory pressure where the system aggressively reclaims resources?
-- What happens when multiple concurrent datafile downloads or event dispatches are triggered simultaneously?
-- What happens when a third-party library (e.g., Firebase Performance) swizzles NSURLSession methods, altering the callback delivery timing?
+- **`close()` called during an in-flight request**: The fix does not change `close()` semantics. Behavior when `OptimizelyClient.close()` is called while a request is in-flight is preserved as-is from before the fix. This scenario is explicitly out of scope.
+- **Concurrent datafile downloads**: The existing serial dispatch queue already serializes download requests. The fix does not alter this queuing behavior.
+- **Third-party NSURLSession interception (e.g., Firebase Performance)**: The fix is agnostic to method swizzling. Moving session invalidation inside the completion callback resolves the race condition regardless of whether any third-party library intercepts network session methods.
+- **Memory pressure**: The fix does not alter memory management for sessions. Each session is still invalidated after its callback completes, bounding its lifetime.
 
 ## Requirements
 
 ### Functional Requirements
 
-- **FR-001**: The URLSession instance used for network requests MUST remain valid and not be invalidated until after the associated completion handler has finished executing.
-- **FR-002**: The `session.finishTasksAndInvalidate()` call MUST occur inside the URLSession task completion handler closure, not in a `defer` block at the enclosing async scope level.
-- **FR-003**: This fix MUST be applied consistently across all four affected network modules:
+- **FR-001**: Each network session used for a request MUST remain valid and accessible until after the associated completion callback has fully executed.
+- **FR-002**: Session cleanup MUST occur inside the completion callback of the network task — not in a synchronous `defer` block at the enclosing scope level that exits before the async callback fires.
+- **FR-003**: This correction MUST be applied to all four affected network modules in the Optimizely Swift SDK:
   - `DefaultDatafileHandler.downloadDatafile()`
   - `DefaultEventDispatcher.sendEvent()`
   - `OdpEventApiManager.sendOdpEvents()`
   - `OdpSegmentApiManager.fetchQualifiedSegments()`
-- **FR-004**: The URLSession MUST still be properly invalidated after use to prevent resource leaks (preserving the intent of the original code).
-- **FR-005**: The fix MUST NOT change any public API surface, method signatures, or observable behavior beyond eliminating the crash.
-- **FR-006**: All existing unit tests for the affected modules MUST continue to pass without modification (unless a test was explicitly relying on the broken behavior).
+- **FR-004**: Each session MUST still be invalidated exactly once after use — the fix MUST NOT introduce network session resource leaks.
+- **FR-005**: The fix MUST NOT alter any public API surface, method signatures, or observable SDK behavior beyond eliminating the crash.
+- **FR-006**: All changes MUST be made exclusively in the Optimizely Swift SDK repository. The Optimizely Flutter SDK repository requires no code changes — it receives the fix by updating its dependency to the new Swift SDK release.
 
 ### Key Entities
 
-- **URLSession**: The Apple networking primitive that manages HTTP requests. Must follow a strict lifecycle: create, use for tasks, invalidate only after all task callbacks complete.
-- **Completion Handler**: Asynchronous callback closures that execute when network requests finish. These closures capture `self` and must execute while the session is still valid.
-- **Dispatch Queue**: Serial queue (`downloadQueue`) used to serialize datafile downloads. The `defer` in this queue's async block is the root cause — it fires when the block exits, not when the task completes.
+- **Network Session**: Manages the lifecycle of a single HTTP request. Must be kept alive until all callbacks associated with its tasks have finished executing.
+- **Completion Callback**: An asynchronous closure invoked when a network request finishes. Executes on a background thread after the enclosing function has already returned. Must execute while the session is still valid.
+- **Session Cleanup**: The act of releasing a network session after its task completes. Must occur after — not before — the completion callback finishes.
+- **Synchronous Scope Exit**: The point at which a function or async block returns. A `defer` registered at this scope fires here, which is earlier than when an async completion callback executes.
 
 ## Success Criteria
 
 ### Measurable Outcomes
 
-- **SC-001**: Zero EXC_BAD_ACCESS crashes originating from URLSession delegate callbacks in the Optimizely SDK across all network modules.
-- **SC-002**: All four affected code paths maintain proper URLSession lifecycle — session invalidation occurs only after completion handler execution, verified by code review and tests.
-- **SC-003**: No URLSession resource leaks introduced — sessions are still invalidated after use, confirmed by profiling or leak-detection tests.
-- **SC-004**: All existing unit and integration tests pass without modification after the fix is applied.
-- **SC-005**: SDK initialization, event dispatch, and ODP operations function correctly under slow network conditions (>2s latency) without crash or hang.
+- **SC-001**: Zero EXC_BAD_ACCESS crashes originating from network session callbacks across all four corrected modules. Verified by code review — the crash is not reproducible in-house (BUG-8628) and the root cause is deterministic and unambiguous.
+- **SC-002**: All four corrected code paths exhibit session cleanup occurring after completion callback execution, confirmed by code review of each change.
+- **SC-003**: No network session resource leaks are introduced — each session is invalidated exactly once, confirmed by code review.
+- **SC-004**: All existing unit and integration tests in the Optimizely Swift SDK pass without modification after the fix is applied.
 
 ## Assumptions
 
-- The crash is caused solely by the misplaced `defer { session.finishTasksAndInvalidate() }` statement and not by a deeper architectural issue in URLSession lifecycle management.
-- The fix applies to the Optimizely Swift SDK source (swift-sdk repository), which is consumed as a dependency by the Flutter SDK via CocoaPods (`OptimizelySwiftSDK 5.2.1`).
-- Firebase Performance Monitoring's NSURLSession swizzling exacerbates the race condition but is not the root cause — the fix must work regardless of whether Firebase is present.
-- The `getSession()` factory methods create ephemeral, non-shared URLSession instances, meaning each network request owns its session exclusively.
-- Moving `finishTasksAndInvalidate()` inside the completion handler is safe because the session is not reused after the task completes.
+- The crash is caused solely by session cleanup being triggered before the async completion callback executes. No deeper architectural issue in session lifecycle management is assumed.
+- The fix applies exclusively to the Optimizely Swift SDK source repository. The Flutter SDK receives the fix by updating its CocoaPods dependency to the new Swift SDK release containing the fix.
+- Firebase Performance Monitoring's NSURLSession method interception exacerbates the race condition but is not the root cause. The fix resolves the crash regardless of whether Firebase or any similar library is present.
+- The session factory methods (`getSession()`) create ephemeral, non-shared session instances — each network request owns its session exclusively. Moving cleanup inside the callback does not affect session reuse.
+- Flutter SDK plugin-level threading issues (e.g., potential data race on `optimizelyClientsTracker` dictionary) are a separate concern and explicitly out of scope for this fix.
+- The crash cannot be reproduced in-house (BUG-8628). Validation relies on code review of the deterministic, clearly-scoped fix rather than test-based reproduction.
+- The fix is self-contained: no changes to public API, no new dependencies, no behavioral changes other than eliminating the crash.
