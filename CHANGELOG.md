@@ -1,5 +1,20 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.5.0
+May 13, 2026
+
+### New Features
+
+**Feature Rollout**: Introduced Feature Rollout capabilities. Feature Rollouts represent a new experiment type merging Targeted Delivery simplicity with A/B test measurement capabilities.
+See [Feature Rollout docs](https://support.optimizely.com/hc/en-us/articles/45552846481037-Run-Feature-Rollouts-in-Feature-Experimentation) for more information.
+
+### Dependency Updates
+
+* Bumped iOS OptimizelySwiftSDK from 5.2.1 to 5.3.0
+* Bumped Android android-sdk from 5.1.1 to 5.2.0
+
+* Bump native SDKs for feature rollout support ([#111](https://github.com/optimizely/optimizely-flutter-sdk/pull/111))
+
 ## 3.4.3
 May 01, 2026
 
