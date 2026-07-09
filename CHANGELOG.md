@@ -1,5 +1,12 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.6.0
+July 9th, 2026
+
+### Bug Fixes
+* Update with actual release notes
+
+
 ## 3.5.0
 May 13, 2026
 
