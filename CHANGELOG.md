@@ -1,5 +1,30 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.6.0
+July 9th, 2026
+
+### Dependency Updates
+
+* Bumped iOS OptimizelySwiftSDK from 5.3.0 to 5.4.2 and Android android-sdk from 5.2.0 to 5.3.0 ([#113](https://github.com/optimizely/optimizely-flutter-sdk/pull/113))
+
+The native SDK bump includes the following changes:
+
+### New Features
+
+* **Local Holdouts**: Added support for Local Holdouts, enabling holdout experiments to be scoped to specific feature flags rather than applied globally. Local Holdouts let you measure the true incremental impact of individual features by holding out a subset of users from specific rollouts while still serving them other experiences. See [Holdouts docs](https://support.optimizely.com/hc/en-us/articles/38941939408269-Global-holdouts) for more information.
+
+### Enhancements
+
+* Block ODP identify event for single identifier
+* Use attribute id instead of key for CMAB prediction requests
+
+### Bug Fixes
+
+* Defer NWPathMonitor creation to avoid crash during multi-SDK startup
+* Prevent EXC_BAD_ACCESS from premature URLSession deallocation
+* Replace non-numeric holdout placeholder IDs in event-construction tests
+* Normalize campaign_id, variation_id, and entity_id on decision events
+
 ## 3.5.0
 May 13, 2026
 
