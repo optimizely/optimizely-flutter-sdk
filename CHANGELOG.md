@@ -16,7 +16,6 @@ The native SDK bump includes the following changes:
 ### Enhancements
 
 * Block ODP identify event for single identifier
-* Use attribute id instead of key for CMAB prediction requests
 
 ### Bug Fixes
 
@@ -24,6 +23,7 @@ The native SDK bump includes the following changes:
 * Prevent EXC_BAD_ACCESS from premature URLSession deallocation
 * Replace non-numeric holdout placeholder IDs in event-construction tests
 * Normalize campaign_id, variation_id, and entity_id on decision events
+* Use attribute id instead of key for CMAB prediction requests
 
 ## 3.5.0
 May 13, 2026
