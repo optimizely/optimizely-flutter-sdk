@@ -1,40 +1,67 @@
-# Quickstart Validation Guide: CocoaPods to SPM Migration
+# Quickstart Validation Guide: Add SPM Support with CocoaPods Backward Compatibility
 
-**Date**: 2026-08-20 | **Feature**: [spec.md](spec.md)
+**Date**: 2026-08-20 (Revised) | **Feature**: [spec.md](spec.md)
 
 ## Prerequisites
 
-- Flutter SDK (stable channel, 3.44+)
+- Flutter SDK (stable channel)
 - Xcode 15+ with iOS simulators
-- No CocoaPods required (that's the point)
+- CocoaPods installed (for backward compatibility validation)
 - Access to `optimizely-flutter-testapp` repo
 
 ## Validation Scenario 1: SDK Plugin Builds via SPM
 
-**Goal**: Verify the SDK's Package.swift is correctly structured and the OptimizelySwiftSDK dependency resolves via SPM.
+**Goal**: Verify the SDK's Package.swift is correctly structured and OptimizelySwiftSDK resolves via SPM.
 
 ```bash
-# From SDK repo root
+# From SDK repo root (with Flutter 3.44+ or SPM enabled)
+flutter config --enable-swift-package-manager
 flutter clean
 flutter pub get
 cd example
 flutter build ios --simulator --no-codesign
 ```
 
-**Expected**: Build succeeds. Console shows SPM resolving `swift-sdk` package (not pod install). No CocoaPods warnings.
+**Expected**: Build succeeds. Console shows SPM resolving `swift-sdk` package. No CocoaPods warnings.
 
-## Validation Scenario 2: Unit Tests Pass
+## Validation Scenario 2: SDK Plugin Builds via CocoaPods
 
-**Goal**: Verify no test regressions from the migration.
+**Goal**: Verify the podspec still works with updated source file paths.
+
+```bash
+# From SDK repo root (with CocoaPods path)
+flutter config --no-enable-swift-package-manager
+flutter clean
+flutter pub get
+cd example
+flutter build ios --simulator --no-codesign
+```
+
+**Expected**: Build succeeds via CocoaPods. `pod install` finds source files at the new path. No missing file errors.
+
+## Validation Scenario 3: Podspec Lint
+
+**Goal**: Verify the podspec is valid after source path changes.
+
+```bash
+cd ios
+pod lib lint optimizely_flutter_sdk.podspec --allow-warnings
+```
+
+**Expected**: Lint passes. Source files found at updated paths.
+
+## Validation Scenario 4: Unit Tests Pass
+
+**Goal**: Verify no test regressions from the file restructuring.
 
 ```bash
 # From SDK repo root
 flutter test
 ```
 
-**Expected**: All existing tests pass with zero failures. Test count matches pre-migration count.
+**Expected**: All existing tests pass with zero failures.
 
-## Validation Scenario 3: Lint Clean
+## Validation Scenario 5: Lint Clean
 
 **Goal**: Verify no analysis issues introduced.
 
@@ -44,20 +71,21 @@ flutter analyze
 
 **Expected**: No issues found.
 
-## Validation Scenario 4: Test App Builds and Runs
+## Validation Scenario 6: Test App Builds via SPM
 
 **Goal**: Verify the test app resolves the SDK via SPM and integration tests pass.
 
 ```bash
-# From optimizely-flutter-testapp repo
+# From optimizely-flutter-testapp repo (with SPM enabled)
+flutter config --enable-swift-package-manager
 flutter clean
 flutter pub get
 flutter build ios --simulator --no-codesign
 ```
 
-**Expected**: Build succeeds without CocoaPods. The SDK plugin is resolved via SPM.
+**Expected**: Build succeeds with SPM dependency resolution.
 
-## Validation Scenario 5: Integration Tests Pass
+## Validation Scenario 7: Test App Integration Tests
 
 **Goal**: Verify end-to-end functionality on iOS simulator.
 
@@ -68,55 +96,50 @@ flutter test integration_test -d <simulator_id>
 
 **Expected**: All e2e test cases pass with zero failures.
 
-## Validation Scenario 6: CocoaPods Artifacts Removed
+## Validation Scenario 8: Version Consistency
 
-**Goal**: Verify no CocoaPods remnants in either repo.
+**Goal**: Verify both dependency files declare the same OptimizelySwiftSDK version.
 
 ```bash
 # From SDK repo root
-find . -name "Podfile" -o -name "Podfile.lock" -o -name "*.podspec" -o -name "Pods" -type d | grep -v ".git"
-
-# From test app repo root
-find . -name "Podfile" -o -name "Podfile.lock" -o -name "Pods" -type d | grep -v ".git"
+grep "OptimizelySwiftSDK" ios/optimizely_flutter_sdk.podspec
+grep "exact:" ios/optimizely_flutter_sdk/Package.swift
 ```
 
-**Expected**: Both commands return empty output (no matches).
+**Expected**: Both show version `5.4.2` (or whatever the current pinned version is).
 
-## Validation Scenario 7: Clean Machine Build
+## Validation Scenario 9: CI Version Drift Check (FR-014)
 
-**Goal**: Verify a developer without CocoaPods can build the SDK.
+**Goal**: Verify the CI validation step detects version mismatches between Package.swift and podspec.
 
 ```bash
-# Temporarily hide CocoaPods if installed
-which pod && echo "CocoaPods present — test on clean env or rename binary"
-
-# Create a fresh Flutter project and add the SDK
-flutter create spm_test_app
-cd spm_test_app
-# Add SDK dependency pointing to local path
-flutter pub add optimizely_flutter_sdk --path /path/to/optimizely-flutter-sdk
-flutter build ios --simulator --no-codesign
+# Extract versions and compare
+PODSPEC_VER=$(grep "OptimizelySwiftSDK" ios/optimizely_flutter_sdk.podspec | grep -oE "'[0-9]+\.[0-9]+\.[0-9]+'" | tr -d "'")
+SPM_VER=$(grep 'exact:' ios/optimizely_flutter_sdk/Package.swift | grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' | tr -d '"')
+[ "$PODSPEC_VER" = "$SPM_VER" ] && echo "PASS: versions match ($PODSPEC_VER)" || echo "FAIL: podspec=$PODSPEC_VER spm=$SPM_VER"
 ```
 
-**Expected**: Build succeeds. No errors about missing CocoaPods or podspec.
+**Expected**: Versions match. If intentionally mismatched for testing, the check should fail.
 
-## Validation Scenario 8: CI Pipeline
+## Validation Scenario 10: CI Pipeline
 
 **Goal**: Verify all five CI jobs pass.
 
-Push the migration branch and create a PR against `master`. Monitor:
+Push the branch and create a PR against `master`. Monitor:
 
 1. `unit_test_coverage` — Dart tests + coverage
-2. `build_test_android` — Android build (should be unaffected)
-3. `build_test_ios` — iOS build via SPM
-4. `integration_android_tests` — Android e2e (should be unaffected)
-5. `integration_ios_tests` — iOS e2e via SPM
+2. `build_test_android` — Android build (unaffected)
+3. `build_test_ios` — iOS build
+4. `integration_android_tests` — Android e2e (unaffected)
+5. `integration_ios_tests` — iOS e2e
 
 **Expected**: All five jobs pass green.
 
 ## Troubleshooting
 
 - **SPM resolution fails**: Verify the `swift-sdk` git tag for version 5.4.2 exists. Check Package.swift URL.
-- **Mixed ObjC/Swift errors**: If ObjC bridging files were kept, ensure they're in a separate target or removed.
+- **CocoaPods can't find source files**: Verify podspec `source_files` path matches the new directory layout.
+- **ObjC header not found**: Check that the `.h` file is in `include/optimizely_flutter_sdk/` and import path in `.m` is updated.
+- **Mixed ObjC/Swift errors in SPM**: Ensure `cSettings: [.headerSearchPath("include/optimizely_flutter_sdk")]` is in Package.swift target.
 - **Xcode cache issues**: Run `flutter clean`, delete `~/Library/Developer/Xcode/DerivedData/`, rebuild.
-- **Old Pods artifacts**: Delete `ios/Pods/`, `ios/Podfile.lock`, `example/ios/Pods/`, `example/ios/Podfile.lock`.
+- **Wrong dependency path used**: Use `flutter config --enable-swift-package-manager` or `--no-enable-swift-package-manager` to force a specific path for testing.

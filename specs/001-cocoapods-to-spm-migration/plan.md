@@ -1,18 +1,18 @@
-# Implementation Plan: CocoaPods to SPM Migration
+# Implementation Plan: Add SPM Support with CocoaPods Backward Compatibility
 
-**Branch**: `001-cocoapods-to-spm-migration` | **Date**: 2026-08-20 | **Spec**: [spec.md](spec.md)
+**Branch**: `001-cocoapods-to-spm-migration` | **Date**: 2026-08-20 (Revised) | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `specs/001-cocoapods-to-spm-migration/spec.md`
 
 ## Summary
 
-Migrate the Optimizely Flutter SDK's iOS dependency management from CocoaPods to Swift Package Manager. This is a clean cut — no dual-support period. The SDK plugin will declare its OptimizelySwiftSDK dependency via a `Package.swift` file following Flutter's official SPM plugin structure. Source files move from `ios/Classes/` to the SPM-standard layout. The example app, test app, CI workflows, and documentation are all updated to remove CocoaPods references.
+Add Swift Package Manager support to the Optimizely Flutter SDK's iOS plugin while retaining CocoaPods backward compatibility. Source files move from `ios/Classes/` to the SPM-standard layout at `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/`. Both the new Package.swift and the existing podspec (with updated source paths) reference the same files. Flutter selects the dependency mechanism based on version and configuration. The Dart and Android layers are unaffected.
 
 ## Technical Context
 
 **Language/Version**: Dart >=2.16.2 <4.0.0, Swift 5.0+, Java/Kotlin 2.1.0
 
-**Primary Dependencies**: Flutter SDK (stable), OptimizelySwiftSDK 5.4.2 (via SPM), android-sdk (unchanged via Gradle)
+**Primary Dependencies**: Flutter SDK (stable), OptimizelySwiftSDK 5.4.2 (via SPM AND CocoaPods), android-sdk (unchanged via Gradle)
 
 **Storage**: N/A
 
@@ -22,11 +22,11 @@ Migrate the Optimizely Flutter SDK's iOS dependency management from CocoaPods to
 
 **Project Type**: Flutter plugin (cross-platform library wrapping native SDKs)
 
-**Performance Goals**: N/A — infrastructure migration, no behavioral changes
+**Performance Goals**: N/A — infrastructure change, no behavioral changes
 
-**Constraints**: Must be backward compatible at the Dart API level. iOS minimum stays at 10.0. All existing tests must pass.
+**Constraints**: Must maintain backward compatibility with CocoaPods. iOS minimum stays at 10.0. All existing tests must pass. Both dependency mechanisms must pin the same OptimizelySwiftSDK version.
 
-**Scale/Scope**: 2 repositories (SDK + test app), ~7 Swift source files to move, 2 CI workflows to update
+**Scale/Scope**: 2 repositories (SDK + test app), ~7 Swift/ObjC source files to move, 1 podspec to update, 1 Package.swift to create
 
 ## Constitution Check
 
@@ -40,14 +40,16 @@ Migrate the Optimizely Flutter SDK's iOS dependency management from CocoaPods to
 | IV. Type Safety Across Bridge | PASS | No changes to type encoding or `Utils.convertToTypedMap()`. |
 | V. Thread Safety | PASS | No changes to main-thread dispatch patterns. |
 | VI. Multi-Instance State Isolation | PASS | No changes to state management. |
-| VII. Version Synchronisation | PASS | No version bump in this migration (infra change). |
-| VIII. Native SDK Version Pinning | PASS | Version pinning preserved: `.exact("5.4.2")` in Package.swift matches podspec. |
+| VII. Version Synchronisation | PASS | No version bump for this change (infra). |
+| VIII. Native SDK Version Pinning | PASS | Version pinning preserved in BOTH files: `.exact("5.4.2")` in Package.swift AND `'5.4.2'` in podspec. Source-of-truth files now include both. |
 | IX. CMAB & Async Decide | PASS | No changes to CMAB functionality. |
 | X. ODP Integration | PASS | No changes to ODP functionality. |
 | XI. Event Batching Configuration | PASS | No changes to event batching. |
 | XII. Logger Bridge Architecture | PASS | Logger channel and bridge files are moved but unchanged. |
 
 **Gate Result**: ALL PASS — no violations.
+
+**Post-Design Re-Check**: ALL PASS — dual support adds a version synchronization requirement across two files, which strengthens Principle VIII rather than violating it. FR-014 (CI version drift check) provides automated enforcement.
 
 ## Project Structure
 
@@ -56,7 +58,7 @@ Migrate the Optimizely Flutter SDK's iOS dependency management from CocoaPods to
 ```text
 specs/001-cocoapods-to-spm-migration/
 ├── plan.md              # This file
-├── research.md          # Phase 0 output — SPM integration research
+├── research.md          # Phase 0 output — dual support research
 ├── data-model.md        # Phase 1 output — file structure changes
 ├── quickstart.md        # Phase 1 output — validation guide
 └── tasks.md             # Phase 2 output (created by /speckit-tasks)
@@ -67,52 +69,48 @@ specs/001-cocoapods-to-spm-migration/
 ```text
 # SDK repo — iOS layer changes
 ios/
+├── optimizely_flutter_sdk.podspec                   # UPDATED: source_files path changed
 ├── optimizely_flutter_sdk/                          # NEW: SPM package directory
 │   ├── Package.swift                                # NEW: SPM manifest
 │   └── Sources/
 │       └── optimizely_flutter_sdk/                  # NEW: SPM sources
-│           ├── SwiftOptimizelyFlutterSdkPlugin.swift # MOVED from Classes/
-│           ├── OptimizelyFlutterLogger.swift          # MOVED from Classes/
-│           ├── Constants.swift                        # MOVED from Classes/HelperClasses/
-│           ├── OptimizelyConfig+Extension.swift       # MOVED from Classes/HelperClasses/
-│           └── Utils.swift                            # MOVED from Classes/HelperClasses/
+│           ├── include/
+│           │   └── optimizely_flutter_sdk/
+│           │       └── OptimizelyFlutterSdkPlugin.h  # MOVED from Classes/
+│           ├── OptimizelyFlutterSdkPlugin.m           # MOVED from Classes/ (import path updated)
+│           ├── SwiftOptimizelyFlutterSdkPlugin.swift  # MOVED from Classes/
+│           ├── OptimizelyFlutterLogger.swift           # MOVED from Classes/
+│           ├── Constants.swift                         # MOVED from Classes/HelperClasses/
+│           ├── OptimizelyConfig+Extension.swift        # MOVED from Classes/HelperClasses/
+│           └── Utils.swift                             # MOVED from Classes/HelperClasses/
 ├── Classes/                                          # REMOVED (files moved to SPM layout)
-├── Assets/                                           # REMOVED (empty)
-└── optimizely_flutter_sdk.podspec                   # REMOVED (replaced by Package.swift)
+└── Assets/                                           # REMOVED (empty)
 
-# SDK repo — example app
+# Example app — NO CHANGES (keeps Podfile for CocoaPods backward compat)
 example/ios/
-├── Podfile                                          # REMOVED
-├── Podfile.lock                                     # REMOVED
-└── Pods/                                            # REMOVED
+├── Podfile                                          # KEPT
+├── Podfile.lock                                     # KEPT (regenerated on next pod install)
+└── Pods/                                            # KEPT
 
-# Test app repo
+# Test app — CI updates + SPM configuration added
 optimizely-flutter-testapp/ios/
-├── Podfile                                          # REMOVED
-├── Podfile.lock                                     # REMOVED
-└── Pods/                                            # REMOVED
+├── Podfile                                          # KEPT for CocoaPods fallback
+├── Podfile.lock                                     # KEPT
+└── Pods/                                            # KEPT
 
 # Test app CI
 optimizely-flutter-testapp/.github/workflows/
-└── ios.yml                                          # MODIFIED: remove cocoapods install step
+└── ios.yml                                          # UPDATED: SPM-compatible build steps
 
 # SDK CI
 .github/workflows/
-└── flutter.yml                                      # NO CHANGES needed (no pod commands)
+└── flutter.yml                                      # UPDATED: version drift check step added (FR-014)
 
 # Dart layer — NO CHANGES
 # Android layer — NO CHANGES
 ```
 
-**Structure Decision**: Only the `ios/` directory structure changes. All files move from the CocoaPods-style `ios/Classes/` to the SPM-style `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/`. The Dart and Android layers are untouched.
-
-### ObjC Bridging Files Decision
-
-The ObjC files (`OptimizelyFlutterSdkPlugin.h`, `OptimizelyFlutterSdkPlugin.m`) are a thin bridge for CocoaPods-style plugin registration. During implementation, determine if:
-1. They can be removed entirely (pure Swift SPM registration) — preferred
-2. They need to be kept in a separate clang target within Package.swift
-
-This is an implementation detail to resolve during the task execution phase.
+**Structure Decision**: Source files move from `ios/Classes/` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/` (SPM-standard layout). The podspec's `source_files` is updated to point to the new location. Both dependency mechanisms share the same physical files. ObjC header goes into an `include/` subdirectory per SPM convention.
 
 ## Complexity Tracking
 
@@ -125,14 +123,17 @@ No constitution violations — this section is empty.
 ## Research Artifacts
 
 See [research.md](research.md) for detailed findings on:
-- Flutter plugin SPM integration structure
+- Flutter plugin dual SPM + CocoaPods support (official recommendation)
+- Source file layout for dual support
+- ObjC bridging file handling in SPM
+- Podspec path updates
 - OptimizelySwiftSDK SPM compatibility
-- Source file migration approach
-- Example and test app migration
-- CI impact analysis
+- Version synchronization requirements
 
 ## Key Risks
 
 1. **SPM version tag**: The podspec pins OptimizelySwiftSDK 5.4.2, but the git tag format on `swift-sdk` repo needs verification (could be `5.4.2` or `v5.4.2`).
-2. **ObjC/Swift mixed target**: SPM doesn't support mixed ObjC/Swift in a single target. The ObjC bridging files need special handling.
-3. **Flutter version requirement**: SPM plugin support requires Flutter 3.44+. Consumers on older Flutter versions will not be able to use this version of the SDK.
+2. **ObjC header search paths**: SPM requires headers in an `include/` subdirectory with `cSettings`. This must be validated against both SPM and CocoaPods builds.
+3. **Podspec source path**: After moving files, `pod lib lint` must pass to confirm CocoaPods can still find all sources. Note: the current glob is `'Classes/**/*'` (all types), so the updated path must preserve this pattern.
+4. **Version drift**: Two files now declare the native SDK version. **Mitigated by FR-014**: a CI validation check MUST fail the build if versions diverge.
+5. **Mixed CocoaPods/SPM state**: Resolved — Flutter's tooling handles resolution automatically. No SDK-level detection or intervention needed.

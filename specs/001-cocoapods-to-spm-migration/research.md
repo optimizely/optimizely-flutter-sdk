@@ -1,21 +1,22 @@
-# Research: CocoaPods to SPM Migration
+# Research: Add SPM Support with CocoaPods Backward Compatibility
 
-**Date**: 2026-08-20 | **Feature**: [spec.md](spec.md)
+**Date**: 2026-08-20 (Revised) | **Feature**: [spec.md](spec.md)
 
-## 1. Flutter Plugin SPM Integration
+## 1. Flutter Plugin Dual SPM + CocoaPods Support
 
-**Decision**: Use Flutter's official SPM plugin structure with `Package.swift` in `ios/<plugin_name>/`.
+**Decision**: Add SPM support via Package.swift while retaining the podspec with updated source paths. Follow Flutter's official recommendation for dual support.
 
-**Rationale**: Flutter's official documentation defines the canonical directory layout and Package.swift structure for SPM-based plugins. This is the only supported approach for plugins that want to work with Flutter's SPM integration.
+**Rationale**: Flutter explicitly states: "Flutter plugins should support both Swift Package Manager and CocoaPods until further notice." The official guide provides a migration path that preserves CocoaPods compatibility.
 
 **Key Findings**:
 
 - **Package.swift location**: `ios/optimizely_flutter_sdk/Package.swift`
 - **Source files location**: `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/`
-- Source files must be moved from `ios/Classes/` to the new SPM sources directory
+- Source files move from `ios/Classes/` to the new SPM sources directory
 - Library product name replaces underscores with hyphens: `optimizely-flutter-sdk`
 - `FlutterFramework` dependency with `path: "../FlutterFramework"` is mandatory — Flutter tooling provides this at build time
-- The ObjC bridging files (`.h`, `.m`) are used for CocoaPods plugin registration; SPM plugins may handle registration differently
+- **Podspec stays**: Update `s.source_files` from `'Classes/**/*.swift'` to `'optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/**/*.swift'`
+- Both Package.swift and podspec reference the same files in the new location
 
 **Package.swift Template**:
 ```swift
@@ -38,40 +39,46 @@ let package = Package(
             dependencies: [
                 .product(name: "FlutterFramework", package: "FlutterFramework"),
                 .product(name: "Optimizely", package: "swift-sdk")
+            ],
+            cSettings: [
+                .headerSearchPath("include/optimizely_flutter_sdk")
             ]
         )
     ]
 )
 ```
 
+**Updated Podspec Changes**:
+```ruby
+# Before: s.source_files = 'Classes/**/*'
+# After:
+s.source_files = 'optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/**/*'
+```
+
 **Alternatives Considered**:
-- Dual CocoaPods+SPM support: Rejected by user (clean cut decision)
-- Custom SPM layout: Rejected — must follow Flutter's canonical structure
+- Clean cut (remove CocoaPods entirely): Rejected by user — backward compatibility required
+- Keep source files in `ios/Classes/` and symlink for SPM: Rejected — fragile, not recommended by Flutter
 
 ## 2. OptimizelySwiftSDK SPM Compatibility
 
-**Decision**: Use `https://github.com/optimizely/swift-sdk.git` with `.exact("5.4.2")` version pinning.
+**Decision**: Use `https://github.com/optimizely/swift-sdk.git` with `.exact("5.4.2")` version pinning in Package.swift. Keep `OptimizelySwiftSDK`, `5.4.2` in podspec.
 
-**Rationale**: The OptimizelySwiftSDK has first-class SPM support. The SPM product name is `Optimizely` (from the `swift-sdk` package). Exact version pinning matches the current podspec strategy and aligns with Constitution Principle VIII.
+**Rationale**: The OptimizelySwiftSDK has first-class SPM support. Both dependency mechanisms must pin the same version to prevent drift (FR-006).
 
 **Key Findings**:
 - SPM repo URL: `https://github.com/optimizely/swift-sdk.git`
 - Package name: `swift-sdk`
 - Product/library name: `Optimizely`
 - Supported platforms: iOS 10.0+, tvOS 10.0+, macOS 10.14+, watchOS 3.0+
-- swift-tools-version: 5.3
+- CocoaPods pod name: `OptimizelySwiftSDK`
 
 **Verification Required**: Confirm that git tag `5.4.2` exists on the `swift-sdk` repo. If the tag format is `v5.4.2`, the exact version string may need adjustment.
 
-**Alternatives Considered**:
-- `.upToNextMinor(from: "5.4.2")`: Rejected — user chose exact pinning for stability
-- `.upToNextMajor(from: "5.4.2")`: Rejected — too permissive for a bridge SDK
+## 3. Source File Migration (Dual Support Layout)
 
-## 3. Source File Migration
+**Decision**: Move all source files from `ios/Classes/` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/`. ObjC headers go into an `include/` subdirectory. Update podspec paths to match.
 
-**Decision**: Move all Swift source files from `ios/Classes/` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/`. Evaluate ObjC bridging files for removal or migration.
-
-**Rationale**: SPM requires sources in a specific directory structure. The current `ios/Classes/` layout is CocoaPods-specific.
+**Rationale**: This is the canonical Flutter dual-support layout. Both Package.swift and podspec reference the same physical files, just via different path declarations.
 
 **Current Files**:
 - `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` — main plugin
@@ -82,32 +89,63 @@ let package = Package(
 - `ios/Classes/OptimizelyFlutterSdkPlugin.h` — ObjC header (bridging)
 - `ios/Classes/OptimizelyFlutterSdkPlugin.m` — ObjC implementation (bridging)
 
-**ObjC Bridging Files**: The `.h` and `.m` files are a thin bridge that calls `SwiftOptimizelyFlutterSdkPlugin.registerWithRegistrar()`. SPM does not support mixed ObjC/Swift in a single target without a separate clang target. Options:
-1. Convert to pure Swift registration (preferred for clean cut)
-2. Use separate SPM targets for ObjC and Swift (adds complexity)
+**New Layout**:
+```
+ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/
+├── include/
+│   └── optimizely_flutter_sdk/
+│       └── OptimizelyFlutterSdkPlugin.h     # ObjC public header
+├── OptimizelyFlutterSdkPlugin.m              # ObjC bridge implementation
+├── SwiftOptimizelyFlutterSdkPlugin.swift
+├── OptimizelyFlutterLogger.swift
+├── Constants.swift
+├── OptimizelyConfig+Extension.swift
+└── Utils.swift
+```
 
-## 4. Example App Migration
+**ObjC Bridging Files**:
+- Public header (`.h`) goes in `include/optimizely_flutter_sdk/` subdirectory
+- Implementation (`.m`) stays in the main sources directory
+- Import path in `.m` must be updated: `#import "OptimizelyFlutterSdkPlugin.h"` → `#import "./include/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.h"`
+- Package.swift needs `cSettings: [.headerSearchPath("include/optimizely_flutter_sdk")]`
 
-**Decision**: Remove CocoaPods artifacts from `example/ios/` (Podfile, Podfile.lock, Pods/). Flutter tooling will resolve the SDK plugin via SPM automatically.
+## 4. Podspec Updates
 
-**Rationale**: The example app follows the same pattern as any consuming Flutter app. Once the plugin has a Package.swift, Flutter resolves it via SPM.
+**Decision**: Keep `optimizely_flutter_sdk.podspec` at `ios/optimizely_flutter_sdk.podspec` and update `source_files` to point to the new directory layout.
 
-**Current State**: Example app has `Podfile` (platform :ios, '11.0'), `Podfile.lock`, and `Pods/` directory.
+**Changes Required**:
+```ruby
+# Before
+s.source_files = 'Classes/**/*'
 
-## 5. Test App Migration
+# After
+s.source_files = 'optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/**/*'
+```
 
-**Decision**: Remove CocoaPods artifacts from `optimizely-flutter-testapp/ios/` and update CI workflow to remove CocoaPods installation step.
+**Verification**: Run `pod lib lint optimizely_flutter_sdk.podspec` after changes to ensure CocoaPods can still find and compile all source files.
 
-**Rationale**: The test app is the SDK's end-to-end validation layer. Its CI (`ios.yml`) currently runs `brew install cocoapods` + `pod repo update` — these steps must be removed.
+## 5. Example App
 
-**Current State**: Test app has `Podfile` (platform :ios, '13.0'), `Podfile.lock`, `Pods/` directory. iOS CI has explicit CocoaPods installation.
+**Decision**: No changes needed to the example app itself. Flutter tooling will use whichever dependency mechanism is available (SPM on 3.44+, CocoaPods on older versions). The example app's Podfile, Podfile.lock, and Pods/ remain as-is for CocoaPods compatibility.
 
-**CI Change Required**: In `optimizely-flutter-testapp/.github/workflows/ios.yml`, remove or replace the "Install Xcode Dependencies" step that runs `brew install cocoapods` and `pod repo update`.
+**Rationale**: The example app is a consumer of the plugin. Flutter handles the CocoaPods-to-SPM routing transparently. Removing the Podfile would break builds on older Flutter versions.
 
-## 6. SDK CI Impact
+## 6. Test App
 
-**Decision**: SDK CI workflows (`flutter.yml`) require no changes to CocoaPods steps.
+**Decision**: The test app needs both CI workflow updates and SPM configuration added to its iOS project. The test app's Podfile can be kept for CocoaPods fallback or removed if the CI Flutter version defaults to SPM.
 
-**Rationale**: The SDK CI does not have explicit `pod install` calls — Flutter tooling handles dependency resolution. Integration test jobs just trigger the test app repo. The `build_test_ios` and `unit_test_coverage` jobs only run `flutter pub get` + `flutter test`.
+**Rationale**: The test app validates the SDK end-to-end. Per clarification, changes include CI workflow updates + adding SPM configuration to the test app's iOS project. This ensures US-3 acceptance scenarios can be verified.
 
-**Note**: While the SDK CI doesn't need CocoaPods step changes, the integration test jobs trigger the test app, which does need changes (covered in section 5).
+## 7. SDK CI Impact
+
+**Decision**: SDK CI workflows (`flutter.yml`) require no changes — they don't have explicit `pod install` calls. The test app CI (`ios.yml`) may need adjustment if it currently uses `brew install cocoapods` and the CI Flutter version defaults to SPM.
+
+**Note**: The `brew install cocoapods` + `pod repo update` step in test app CI can remain (for CocoaPods fallback) or be removed (if CI Flutter version uses SPM by default). The test app CI should be reviewed but not necessarily changed if it works.
+
+## 8. Version Synchronization (Critical)
+
+**Decision**: Both Package.swift and podspec MUST declare the same OptimizelySwiftSDK version. When bumping native SDK versions, both files must be updated simultaneously. A CI validation check (FR-014) MUST fail the build if versions diverge.
+
+**Implementation**: Add a CI validation step that extracts and compares the OptimizelySwiftSDK version from both files. Add a note to CLAUDE.md's version management section about the dual-file requirement. Constitution Principle VIII (Native SDK Version Pinning) already covers this — the source-of-truth files now include both `ios/optimizely_flutter_sdk.podspec` AND `ios/optimizely_flutter_sdk/Package.swift`.
+
+**No Deprecation Notices**: Per clarification, this release does not include deprecation notices or migration guides for CocoaPods users. That will be addressed closer to Flutter's actual CocoaPods removal.

@@ -1,4 +1,4 @@
-# Specification Quality Checklist: CocoaPods to SPM Migration
+# Specification Quality Checklist: Add SPM Support with CocoaPods Backward Compatibility
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-08-20
@@ -32,6 +32,7 @@
 ## Notes
 
 - All items pass validation. Spec is ready for `/speckit-plan`.
-- FR-010 clarified: SDK keeps iOS 10.0, test app keeps iOS 13.0 (resolved during clarification).
+- Spec revised on 2026-08-20: changed from "clean cut" to dual CocoaPods + SPM support.
+- FR-010 clarified: SDK keeps iOS 10.0, test app keeps iOS 13.0.
 - The spec references both the SDK repo and the test app repo as in-scope.
-- Re-validated after clarification session on 2026-08-20 (3 questions answered).
+- Re-validated after spec revision (dual support) on 2026-08-20.
