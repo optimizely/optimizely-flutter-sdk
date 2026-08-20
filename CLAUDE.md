@@ -37,7 +37,7 @@ Wrapper (OptimizelyClientWrapper) + MethodChannel
     ↓
 Native Plugins (Swift/Java)
     ↓
-Native Optimizely SDKs (5.2.1 iOS / 5.1.1 Android)
+Native Optimizely SDKs (check podspec/build.gradle for current versions)
 ```
 
 ### Critical Patterns
@@ -161,7 +161,7 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 
 ### Requirements
 - Tests required for all code changes
-- All CI checks must pass (4 parallel workflows)
+- All CI checks must pass (5 parallel workflows)
 - Apache 2.0 license header on new files
 - Sign CLA (Contributor License Agreement)
 
@@ -182,12 +182,12 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 - minSdk: 21 (Android 5.0)
 - compileSdk: 35 (Android 15)
 - Kotlin: 2.1.0
-- Native SDK: android-sdk 5.1.1
+- Native SDK: android-sdk (see android/build.gradle for current version)
 
 **iOS:**
 - Minimum: iOS 10.0
 - Swift: 5.0
-- Native SDK: OptimizelySwiftSDK 5.2.1
+- Native SDK: OptimizelySwiftSDK (see ios/optimizely_flutter_sdk.podspec for current version)
 
 ## Key Implementation Files
 
@@ -204,7 +204,7 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 
 **iOS Layer:**
 - `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` - Plugin implementation (786 LOC)
-- `ios/Classes/OptimizelyFlutterLogger.swift` - Logger bridge with task queue
+- `ios/Classes/OptimizelyFlutterLogger.swift` - Logger bridge (main-thread dispatch)
 - `ios/optimizely_flutter_sdk.podspec` - CocoaPods dependencies
 
 <!-- SPECKIT START -->

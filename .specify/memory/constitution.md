@@ -1,17 +1,21 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 0.0.0 → 1.0.0 (initial ratification)
+Version change: 1.0.0 → 1.1.0 (codebase alignment audit)
 
-Modified principles: N/A (initial version)
+Modified principles:
+  - V. Thread Safety — corrected Android/iOS threading descriptions
+  - VIII. Native SDK Version Pinning — removed stale pinned versions,
+    now references source-of-truth files only
 
 Added sections:
-  - Core Principles (8 principles)
-  - Platform Compatibility Standards
-  - Development Workflow & Quality Gates
-  - Governance
+  - IX. CMAB & Async Decide
+  - X. ODP Integration
+  - XI. Event Batching Configuration
+  - XII. Logger Bridge Architecture
+  - Platform Compatibility: macOS/Windows noted as experimental
 
-Removed sections: N/A (initial version)
+Removed sections: N/A
 
 Templates requiring updates:
   - .specify/templates/plan-template.md — ✅ reviewed, compatible
@@ -91,14 +95,19 @@ Platform-specific type encoding MUST be handled transparently by
 
 All MethodChannel result callbacks MUST execute on the main thread.
 
-- **iOS**: Use the `mainThreadResult` wrapper for every `FlutterResult`
-  callback. This is required by iOS 16+ and prevents crashes.
-- **Android**: Use the `MainThreadResult` wrapper to enforce main-thread
-  execution of `MethodChannel.Result` callbacks.
+- **iOS**: The `mainThreadResult` wrapper is applied once at the top of
+  `handle()` in `SwiftOptimizelyFlutterSdkPlugin.swift`, wrapping all
+  handlers automatically. It checks `Thread.isMainThread` and dispatches
+  to `DispatchQueue.main.async` if needed. Required by iOS 16+.
+- **Android**: The inline `safeResult()` method in
+  `OptimizelyFlutterSdkPlugin.java` routes all three `Result` methods
+  (success/error/notImplemented) to the main thread via
+  `Handler(Looper.getMainLooper())`. Short-circuits if already on main.
 - Native → Dart notification dispatch (activate, track, decision,
   logEvent, configUpdate) MUST use `invokeMethod` on the main thread.
-- Logger bridge callbacks MUST be dispatched safely from background
-  task queues to the main channel.
+- Logger bridge callbacks MUST be dispatched to the main thread:
+  iOS uses `DispatchQueue.main.async`, Android uses
+  `mainThreadHandler.post()` in `FlutterLogbackAppender`.
 
 ### VI. Multi-Instance State Isolation
 
@@ -127,7 +136,9 @@ minor. Bug fixes increment patch.
 
 ### VIII. Native SDK Version Pinning
 
-Native Optimizely SDK versions are pinned in build configuration:
+Native Optimizely SDK versions are pinned in build configuration.
+The source-of-truth for current versions is always the build files
+themselves — not this document:
 
 - **iOS**: `OptimizelySwiftSDK` version in
   `ios/optimizely_flutter_sdk.podspec`.
@@ -143,6 +154,73 @@ Native SDK upgrades MUST:
 4. Document the upgrade in `CHANGELOG.md` with the old and new
    versions.
 
+### IX. CMAB & Async Decide
+
+The SDK supports Contextual Multi-Armed Bandit (CMAB) decisions.
+
+- `CmabConfig` data object (in `lib/src/data_objects/`) carries CMAB
+  configuration in decide responses.
+- `decideAsync`, `decideForKeysAsync`, and `decideAllAsync` provide
+  non-blocking decide calls that support CMAB lookups requiring
+  network round-trips.
+- Three CMAB-specific decide options MUST be supported:
+  `ignoreCmabCache`, `resetCmabCache`, `invalidateUserCmabCache`.
+- Async decide methods MUST have dispatch cases on both iOS and
+  Android native layers alongside their synchronous counterparts.
+- CMAB constants MUST be synchronised across Dart, Swift, and Java
+  constant files.
+
+### X. ODP Integration
+
+The SDK integrates with Optimizely Data Platform (ODP) for audience
+segmentation and event tracking.
+
+- **Segments**: `fetchQualifiedSegments`, `getQualifiedSegments`,
+  `setQualifiedSegments`, and `isQualifiedFor` manage user segment
+  membership. Segment fetch options control caching behaviour.
+- **Events**: `sendOdpEvent` dispatches custom events to ODP.
+- **VUID**: `getVuid()` returns the Visitor UUID. Enabled via
+  `enableVuid` in `SDKSettings`.
+- **Configuration**: `SDKSettings` exposes ODP tuning fields:
+  `segmentsCacheSize`, `segmentsCacheTimeoutInSecs`, `disableOdp`.
+- All ODP features MUST follow the same cross-platform parity
+  requirements as other SDK features (Principle III).
+
+### XI. Event Batching Configuration
+
+The SDK supports configurable event batching via `EventOptions`:
+
+- `batchSize` — number of events per batch.
+- `timeInterval` — flush interval in milliseconds.
+- `maxQueueSize` — maximum queued events before forced flush.
+
+Event batching settings are passed during SDK initialisation and
+forwarded to the native SDKs. Changes to event batching MUST be
+tested on both platforms.
+
+### XII. Logger Bridge Architecture
+
+The SDK uses a dual-channel architecture for logging:
+
+- **Main channel** (`optimizely_flutter_sdk`) — all API operations.
+- **Logger channel** (`optimizely_flutter_sdk_logger`) — native → Dart
+  log forwarding.
+
+Dart layer:
+- `OptimizelyLogger` abstract class defines the logging interface.
+- `DefaultOptimizelyLogger` provides the default implementation.
+- `LoggerBridge` listens on the logger channel and forwards native
+  log messages to the Dart logger.
+
+Native layer:
+- **iOS**: `OptimizelyFlutterLogger.swift` dispatches log calls to
+  the main thread via `DispatchQueue.main.async`.
+- **Android**: `FlutterLogbackAppender` uses logback integration and
+  dispatches via `mainThreadHandler.post()`.
+
+Custom loggers are configured during SDK initialisation via the
+`logger` parameter.
+
 ## Platform Compatibility Standards
 
 ### Minimum Platform Versions
@@ -153,9 +231,16 @@ Native SDK upgrades MUST:
 | Flutter  | >=2.5.0  | —             |
 | Android  | API 21 (5.0) | API 35 (15) |
 | iOS      | 10.0     | —             |
+| macOS    | Declared | Experimental   |
+| Windows  | Declared | Experimental   |
 
-Changes that raise minimum platform versions MUST be treated as
-breaking changes (major version bump).
+macOS and Windows plugin platforms are declared in `pubspec.yaml` but
+are not yet fully supported — they share the Dart layer but lack
+dedicated native plugin implementations. They are NOT subject to
+Principle III (Platform Parity) until formally promoted.
+
+Changes that raise minimum platform versions for iOS or Android MUST
+be treated as breaking changes (major version bump).
 
 ### Language & Tooling
 
@@ -204,12 +289,15 @@ Follow Angular commit message guidelines:
 
 ### CI Pipeline
 
-All four CI jobs MUST pass before merge:
+All five CI jobs MUST pass before merge:
 
 1. `unit_test_coverage` — Dart tests + Coveralls upload (macOS)
 2. `build_test_android` — Android build validation (Ubuntu)
 3. `build_test_ios` — iOS build validation (macOS)
-4. Integration tests — Triggered in `optimizely-flutter-testapp`
+4. `integration_android_tests` — Triggers `optimizely-flutter-testapp`
+   repo via ci-helper-tools (Ubuntu)
+5. `integration_ios_tests` — Triggers `optimizely-flutter-testapp`
+   repo via ci-helper-tools (Ubuntu)
 
 ### Adding a Cross-Platform Feature (Checklist)
 
@@ -255,4 +343,4 @@ All code changes MUST comply with the principles defined above.
 - Use `CLAUDE.md` for runtime development guidance that supplements
   (but does not override) this constitution.
 
-**Version**: 1.0.0 | **Ratified**: 2022-06-07 | **Last Amended**: 2026-04-29
+**Version**: 1.1.0 | **Ratified**: 2022-06-07 | **Last Amended**: 2026-08-20
