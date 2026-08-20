@@ -17,9 +17,17 @@ on:
   #       default: "master"
 
 jobs:
+  version_drift_check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Check OptimizelySwiftSDK version parity
+      run: bash .github/scripts/check-version-drift.sh
+
   unit_test_coverage:
     runs-on: macos-latest
-    
+    needs: version_drift_check
+
     steps:
     - uses: actions/checkout@v3
     - name: Install Flutter

@@ -53,10 +53,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Run `flutter config --enable-swift-package-manager` to enable SPM for testing
-- [ ] T015 [US1] Run `flutter clean && flutter pub get` from `example/` directory
-- [ ] T016 [US1] Verify `flutter build ios --simulator --no-codesign` succeeds from `example/` directory with SPM resolving the swift-sdk package
-- [ ] T017 [US1] Run `flutter test` from SDK repo root and verify all existing unit tests pass with zero failures
+- [x] T014 [US1] Run `flutter config --enable-swift-package-manager` to enable SPM for testing
+- [x] T015 [US1] Run `flutter clean && flutter pub get` from `example/` directory
+- [x] T016 [US1] Verify `flutter build ios --simulator --no-codesign` succeeds from `example/` directory with SPM resolving the swift-sdk package
+- [x] T017 [US1] Run `flutter test` from SDK repo root and verify all existing unit tests pass with zero failures
 
 **Checkpoint**: SDK plugin builds for iOS via SPM. Example app compiles via SPM. All unit tests pass.
 
@@ -70,12 +70,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Update `ios/optimizely_flutter_sdk.podspec`: change `s.source_files` from `'Classes/**/*'` to `'optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/**/*'`
-- [ ] T019 [US2] Run `pod lib lint ios/optimizely_flutter_sdk.podspec --allow-warnings` to verify podspec validity with new source paths
-- [ ] T020 [US2] Run `flutter config --no-enable-swift-package-manager` to test CocoaPods path
-- [ ] T021 [US2] Run `flutter clean && flutter pub get` from `example/` directory
-- [ ] T022 [US2] Verify `flutter build ios --simulator --no-codesign` succeeds from `example/` directory via CocoaPods
-- [ ] T023 [US2] Run `flutter test` from SDK repo root and verify all existing unit tests still pass
+- [x] T018 [US2] Update `ios/optimizely_flutter_sdk.podspec`: change `s.source_files` from `'Classes/**/*'` to `'optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/**/*'`
+- [x] T019 [US2] Run `pod lib lint ios/optimizely_flutter_sdk.podspec --allow-warnings` to verify podspec validity with new source paths
+- [x] T020 [US2] Run `flutter config --no-enable-swift-package-manager` to test CocoaPods path
+- [x] T021 [US2] Run `flutter clean && flutter pub get` from `example/` directory
+- [x] T022 [US2] Verify `flutter build ios --simulator --no-codesign` succeeds from `example/` directory via CocoaPods
+- [x] T023 [US2] Run `flutter test` from SDK repo root and verify all existing unit tests still pass
 
 **Checkpoint**: SDK plugin builds for iOS via CocoaPods with updated source paths. Podspec lints clean. All unit tests pass.
 
@@ -89,8 +89,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Ensure test app's dependency on `optimizely_flutter_sdk` resolves the SPM-enabled version (check `/Users/muzahidul.islam/workspace/optimizely-flutter-testapp/pubspec.yaml` path dependency)
-- [ ] T025 [US3] Update test app CI workflow at `/Users/muzahidul.islam/workspace/optimizely-flutter-testapp/.github/workflows/ios.yml`: add `flutter config --enable-swift-package-manager` step before the build step; keep existing `brew install cocoapods` + `pod repo update` steps as fallback for CocoaPods backward compatibility
+- [x] T024 [US3] Ensure test app's dependency on `optimizely_flutter_sdk` resolves the SPM-enabled version (check `/Users/muzahidul.islam/workspace/optimizely-flutter-testapp/pubspec.yaml` path dependency)
+- [x] T025 [US3] Update test app CI workflow at `/Users/muzahidul.islam/workspace/optimizely-flutter-testapp/.github/workflows/ios.yml`: add `flutter config --enable-swift-package-manager` step before the build step; keep existing `brew install cocoapods` + `pod repo update` steps as fallback for CocoaPods backward compatibility
 - [ ] T026 [US3] Run `flutter config --enable-swift-package-manager && flutter clean && flutter pub get` from test app repo root
 - [ ] T027 [US3] Verify `flutter build ios --simulator --no-codesign` succeeds from test app repo with SPM resolving dependencies
 - [ ] T028 [US3] Run integration tests on iOS simulator and verify all e2e test cases pass with zero failures
@@ -107,9 +107,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Create version drift check script at `.github/scripts/check-version-drift.sh` (FR-014) that extracts OptimizelySwiftSDK version from both `ios/optimizely_flutter_sdk.podspec` and `ios/optimizely_flutter_sdk/Package.swift`, compares them, and exits non-zero if they diverge
-- [ ] T030 [US4] Integrate version drift check into SDK CI workflow `.github/workflows/flutter.yml` as a job step that runs before build jobs
-- [ ] T031 [US4] Review and confirm SDK CI `.github/workflows/flutter.yml` needs no other changes (no explicit pod commands exist)
+- [x] T029 [US4] Create version drift check script at `.github/scripts/check-version-drift.sh` (FR-014) that extracts OptimizelySwiftSDK version from both `ios/optimizely_flutter_sdk.podspec` and `ios/optimizely_flutter_sdk/Package.swift`, compares them, and exits non-zero if they diverge
+- [x] T030 [US4] Integrate version drift check into SDK CI workflow `.github/workflows/flutter.yml` as a job step that runs before build jobs
+- [x] T031 [US4] Review and confirm SDK CI `.github/workflows/flutter.yml` needs no other changes (no explicit pod commands exist)
 - [ ] T032 [US4] Push branch and create PR to trigger all five CI jobs: `unit_test_coverage`, `build_test_android`, `build_test_ios`, `integration_android_tests`, `integration_ios_tests`
 - [ ] T033 [US4] Verify all five CI jobs pass green, including the version drift check
 
@@ -121,11 +121,11 @@
 
 **Purpose**: Documentation updates, version sync, and final validation
 
-- [ ] T034 [P] Update `CLAUDE.md`: remove `cd ios && pod install` from setup commands (no longer needed), add note about dual SPM/CocoaPods support, update iOS setup instructions, add `ios/optimizely_flutter_sdk/Package.swift` to version pinning source-of-truth list in the Native SDK Version Pinning section
-- [ ] T035 [P] Update `README.md`: add note about SPM support alongside existing CocoaPods instructions if applicable (FR-009)
-- [ ] T036 Verify version consistency: confirm `ios/optimizely_flutter_sdk.podspec` and `ios/optimizely_flutter_sdk/Package.swift` both declare OptimizelySwiftSDK 5.4.2
-- [ ] T037 Run full `flutter test` from SDK repo root — verify zero failures (final regression check)
-- [ ] T038 Run full `flutter analyze` from SDK repo root — verify zero issues
+- [x] T034 [P] Update `CLAUDE.md`: remove `cd ios && pod install` from setup commands (no longer needed), add note about dual SPM/CocoaPods support, update iOS setup instructions, add `ios/optimizely_flutter_sdk/Package.swift` to version pinning source-of-truth list in the Native SDK Version Pinning section
+- [x] T035 [P] Update `README.md`: add note about SPM support alongside existing CocoaPods instructions if applicable (FR-009)
+- [x] T036 Verify version consistency: confirm `ios/optimizely_flutter_sdk.podspec` and `ios/optimizely_flutter_sdk/Package.swift` both declare OptimizelySwiftSDK 5.4.2
+- [x] T037 Run full `flutter test` from SDK repo root — verify zero failures (final regression check)
+- [x] T038 Run full `flutter analyze` from SDK repo root — verify zero issues
 - [ ] T039 Run quickstart.md validation scenarios end-to-end (both SPM and CocoaPods paths, including version drift check)
 
 ---

@@ -29,6 +29,7 @@ let package = Package(
                 .product(name: "FlutterFramework", package: "FlutterFramework"),
                 .product(name: "Optimizely", package: "swift-sdk")
             ],
+            path: "Classes",
             exclude: ["OptimizelyFlutterSdkPlugin.m", "include"]
         )
     ]
