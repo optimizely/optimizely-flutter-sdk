@@ -18,8 +18,8 @@
 
 **Purpose**: Verify prerequisites and prepare for migration
 
-- [ ] T001 Verify OptimizelySwiftSDK git tag format for version 5.4.2 on https://github.com/optimizely/swift-sdk (confirm tag is `5.4.2` vs `v5.4.2` and note the exact string for Package.swift)
-- [ ] T002 Create SPM directory structure: `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/include/optimizely_flutter_sdk/`
+- [x] T001 Verify OptimizelySwiftSDK git tag format for version 5.4.2 on https://github.com/optimizely/swift-sdk (confirm tag is `5.4.2` vs `v5.4.2` and note the exact string for Package.swift)
+- [x] T002 Create SPM directory structure: `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/include/optimizely_flutter_sdk/`
 
 ---
 
@@ -29,17 +29,17 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Move `ios/Classes/OptimizelyFlutterSdkPlugin.h` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/include/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.h`
-- [ ] T004 Move `ios/Classes/OptimizelyFlutterSdkPlugin.m` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.m` and update its import path from `#import "OptimizelyFlutterSdkPlugin.h"` to `#import "./include/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.h"`
-- [ ] T005 [P] Move `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/SwiftOptimizelyFlutterSdkPlugin.swift`
-- [ ] T006 [P] Move `ios/Classes/OptimizelyFlutterLogger.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyFlutterLogger.swift`
-- [ ] T007 [P] Move `ios/Classes/HelperClasses/Constants.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/Constants.swift`
-- [ ] T008 [P] Move `ios/Classes/HelperClasses/OptimizelyConfig+Extension.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyConfig+Extension.swift`
-- [ ] T009 [P] Move `ios/Classes/HelperClasses/Utils.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/Utils.swift`
-- [ ] T010 Remove empty `ios/Classes/` directory (including `HelperClasses/` subdirectory)
-- [ ] T011 Remove empty `ios/Assets/` directory
-- [ ] T012 Create `ios/optimizely_flutter_sdk/Package.swift` with: swift-tools-version 5.9, iOS platform 10.0, FlutterFramework dependency, OptimizelySwiftSDK via `https://github.com/optimizely/swift-sdk.git` with exact version pinning, and `cSettings: [.headerSearchPath("include/optimizely_flutter_sdk")]` in target
-- [ ] T013 Verify `flutter pub get` succeeds from SDK repo root after file restructuring
+- [x] T003 Move `ios/Classes/OptimizelyFlutterSdkPlugin.h` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/include/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.h`
+- [x] T004 Move `ios/Classes/OptimizelyFlutterSdkPlugin.m` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.m` and update its import path from `#import "OptimizelyFlutterSdkPlugin.h"` to `#import "./include/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.h"`
+- [x] T005 [P] Move `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/SwiftOptimizelyFlutterSdkPlugin.swift`
+- [x] T006 [P] Move `ios/Classes/OptimizelyFlutterLogger.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyFlutterLogger.swift`
+- [x] T007 [P] Move `ios/Classes/HelperClasses/Constants.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/Constants.swift`
+- [x] T008 [P] Move `ios/Classes/HelperClasses/OptimizelyConfig+Extension.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyConfig+Extension.swift`
+- [x] T009 [P] Move `ios/Classes/HelperClasses/Utils.swift` to `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/Utils.swift`
+- [x] T010 Remove empty `ios/Classes/` directory (including `HelperClasses/` subdirectory)
+- [x] T011 Remove empty `ios/Assets/` directory
+- [x] T012 Create `ios/optimizely_flutter_sdk/Package.swift` with: swift-tools-version 5.9, iOS platform 10.0, FlutterFramework dependency, OptimizelySwiftSDK via `https://github.com/optimizely/swift-sdk.git` with exact version pinning, and `cSettings: [.headerSearchPath("include/optimizely_flutter_sdk")]` in target
+- [x] T013 Verify `flutter pub get` succeeds from SDK repo root after file restructuring
 
 **Checkpoint**: SPM package structure is in place, all source files are in their new locations, Package.swift is created
 
