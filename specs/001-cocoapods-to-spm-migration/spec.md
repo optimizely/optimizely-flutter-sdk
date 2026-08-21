@@ -77,8 +77,11 @@ CI workflows validate that the SDK works with both CocoaPods and SPM. The existi
 
 - **Mixed CocoaPods/SPM state (Podfile + SPM-capable Flutter)**: Flutter's tooling handles resolution automatically. The SDK provides both Package.swift and podspec; Flutter picks the appropriate mechanism based on version and project configuration. No SDK-level detection or intervention is needed.
 - **SPM package URL or version tag format differs from CocoaPods**: Mitigated by FR-006 — both manifests pin the same OptimizelySwiftSDK version. The SPM repository URL must match the official OptimizelySwiftSDK SPM-compatible repository.
-- **Podspec source file paths after directory restructuring**: The podspec's `source_files` declaration is updated to point to the new SPM-compatible directory structure (FR-008). Existing CocoaPods users running `pod install` will pick up the new paths automatically.
+- **Podspec source file paths after directory restructuring**: The podspec's `source_files` declaration is updated to point to the new directory structure (FR-008). Existing CocoaPods users running `pod install` will pick up the new paths automatically.
 - **Package.swift and podspec declare different OptimizelySwiftSDK versions**: Prevented by FR-006 and enforced by FR-014 — a CI validation check fails the build if versions diverge.
+- **SPM identity normalization (underscore vs hyphen)**: SPM 5.6+ normalizes package identities by replacing underscores with hyphens (SE-0292). The plugin name `optimizely_flutter_sdk` becomes `optimizely-flutter-sdk` in SPM. The real directory uses hyphens (`ios/optimizely-flutter-sdk/`) to match SPM's normalized identity, and a symlink with underscores (`ios/optimizely_flutter_sdk` → `optimizely-flutter-sdk/`) allows Flutter's tooling to discover the Package.swift at the expected path. Both paths are required — without the hyphenated directory SPM resolution fails, without the underscore symlink Flutter won't detect SPM support.
+- **Mixed Swift/ObjC in SPM target**: SPM does not support mixed Swift and Objective-C in a single target. The ObjC files (`OptimizelyFlutterSdkPlugin.m`, `OptimizelyFlutterSdkPlugin.h`) are excluded from the SPM target via the `exclude` parameter but remain on disk for CocoaPods builds, which still use them.
+- **Plugin registration class change**: The `pluginClass` in `pubspec.yaml` is changed from the ObjC class `OptimizelyFlutterSdkPlugin` to the Swift class `SwiftOptimizelyFlutterSdkPlugin` for direct SPM registration (since SPM cannot compile the ObjC registration shim).
 
 ## Requirements *(mandatory)*
 
@@ -91,7 +94,7 @@ CI workflows validate that the SDK works with both CocoaPods and SPM. The existi
 - **FR-005**: The SDK MUST maintain all existing iOS functionality (MethodChannel handlers, logger bridge, type encoding) without any behavioral changes.
 - **FR-006**: The podspec and Package.swift MUST declare the same OptimizelySwiftSDK version to prevent version drift.
 - **FR-007**: The SDK's `pubspec.yaml` plugin declaration for iOS MUST remain compatible with both Flutter's SPM plugin system and CocoaPods.
-- **FR-008**: Source files MUST be organized in a directory structure that is accessible from both the SPM Package.swift target and the podspec `source_files` declaration.
+- **FR-008**: Source files MUST be organized in a directory structure that is accessible from both the SPM Package.swift target and the podspec `source_files` declaration. The actual layout uses `ios/optimizely-flutter-sdk/Classes/` with SPM's `path: "Classes"` override, and ObjC files excluded from the SPM target via `exclude`.
 - **FR-009**: The SDK documentation (README.md, CLAUDE.md) MUST be updated to document both CocoaPods and SPM setup paths.
 - **FR-010**: The SDK MUST retain iOS 10.0 as its minimum deployment target. The test app maintains its own minimum of iOS 13.0.
 - **FR-011**: All existing SDK unit tests (`flutter test`) MUST pass with zero failures after the changes — no test regressions are acceptable.
@@ -101,9 +104,10 @@ CI workflows validate that the SDK works with both CocoaPods and SPM. The existi
 
 ### Key Entities
 
-- **Package.swift**: SPM package manifest declaring the OptimizelySwiftSDK dependency and linking the plugin's Swift source files. Coexists with the podspec.
-- **optimizely_flutter_sdk.podspec**: Updated CocoaPods spec with source file paths pointing to the new SPM-compatible directory layout.
-- **Plugin Registration**: The mechanism by which Flutter discovers and loads the native iOS plugin, which must work through both SPM and CocoaPods.
+- **Package.swift**: SPM package manifest at `ios/optimizely-flutter-sdk/Package.swift`, declaring the OptimizelySwiftSDK dependency and linking the plugin's Swift source files. Uses `path: "Classes"` to override the default SPM `Sources/<target>/` convention. Coexists with the podspec.
+- **optimizely_flutter_sdk.podspec**: Updated CocoaPods spec with `source_files` pointing to `optimizely-flutter-sdk/Classes/**/*`.
+- **Plugin Registration**: The `pluginClass` in `pubspec.yaml` is set to `SwiftOptimizelyFlutterSdkPlugin` (Swift class) for SPM compatibility. CocoaPods builds still compile the ObjC shim but Flutter routes registration through the Swift class.
+- **Symlink**: `ios/optimizely_flutter_sdk` → `ios/optimizely-flutter-sdk/` — bridges Flutter's underscore-based plugin discovery with SPM's hyphen-normalized package identity.
 
 ## Success Criteria *(mandatory)*
 
@@ -134,7 +138,8 @@ CI workflows validate that the SDK works with both CocoaPods and SPM. The existi
 - The OptimizelySwiftSDK already publishes SPM-compatible releases (it does — the library supports SPM via its Package.swift).
 - Flutter's SPM integration for plugins is stable enough for production use (Flutter has been shipping SPM support and is actively deprecating CocoaPods).
 - The SDK retains iOS 10.0 as its minimum deployment target; the test app uses iOS 13.0. These are independent and intentional.
-- Source files can be organized in a single directory structure (SPM layout) that both Package.swift and podspec reference via their respective path declarations.
+- Source files are organized in `ios/optimizely-flutter-sdk/Classes/`. Both Package.swift (via `path: "Classes"`) and podspec (via `source_files: 'optimizely-flutter-sdk/Classes/**/*'`) reference the same files.
+- SPM 5.6+ normalizes package identities by replacing underscores with hyphens (SE-0292). A symlink `ios/optimizely_flutter_sdk` → `ios/optimizely-flutter-sdk/` is required so Flutter can discover the Package.swift.
 - The example app (`example/`) within the SDK repo will work with whichever dependency mechanism the local Flutter version prefers.
 - macOS plugin platform (declared but experimental in pubspec.yaml) is out of scope for this effort.
 - The `optimizely-flutter-testapp` repository is accessible and modifiable as part of this effort. Changes include CI workflow updates and adding SPM configuration to the test app's iOS project.
