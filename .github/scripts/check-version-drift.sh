@@ -5,7 +5,7 @@
 set -euo pipefail
 
 PODSPEC="ios/optimizely_flutter_sdk.podspec"
-PACKAGE_SWIFT="ios/optimizely-flutter-sdk/Package.swift"
+PACKAGE_SWIFT="ios/optimizely_flutter_sdk/Package.swift"
 
 PODSPEC_VER=$(grep "OptimizelySwiftSDK" "$PODSPEC" | grep -oE "'[0-9]+\.[0-9]+\.[0-9]+'" | tr -d "'")
 SPM_VER=$(grep 'exact' "$PACKAGE_SWIFT" | grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' | tr -d '"')

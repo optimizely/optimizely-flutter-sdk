@@ -80,7 +80,7 @@ Native Optimizely SDKs (check podspec/build.gradle for current versions)
 
 **Two locations must stay synchronized (native iOS SDK version):**
 1. `ios/optimizely_flutter_sdk.podspec` → `s.dependency 'OptimizelySwiftSDK', 'A.B.C'`
-2. `ios/optimizely-flutter-sdk/Package.swift` → `.package(url: "...swift-sdk.git", exact: "A.B.C")`
+2. `ios/optimizely_flutter_sdk/Package.swift` → `.package(url: "...swift-sdk.git", exact: "A.B.C")`
 
 A CI check (`.github/scripts/check-version-drift.sh`) enforces parity between these two files.
 
@@ -192,7 +192,7 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 **iOS:**
 - Minimum: iOS 10.0
 - Swift: 5.0
-- Native SDK: OptimizelySwiftSDK (see ios/optimizely_flutter_sdk.podspec and ios/optimizely-flutter-sdk/Package.swift for current version)
+- Native SDK: OptimizelySwiftSDK (see ios/optimizely_flutter_sdk.podspec and ios/optimizely_flutter_sdk/Package.swift for current version)
 
 ## Key Implementation Files
 
@@ -208,11 +208,10 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 - `android/build.gradle` - Dependencies & SDK versions
 
 **iOS Layer:**
-- `ios/optimizely-flutter-sdk/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` - Plugin implementation (786 LOC)
-- `ios/optimizely-flutter-sdk/Classes/OptimizelyFlutterLogger.swift` - Logger bridge (main-thread dispatch)
-- `ios/optimizely-flutter-sdk/Package.swift` - SPM dependencies
+- `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/SwiftOptimizelyFlutterSdkPlugin.swift` - Plugin implementation (786 LOC)
+- `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyFlutterLogger.swift` - Logger bridge (main-thread dispatch)
+- `ios/optimizely_flutter_sdk/Package.swift` - SPM dependencies
 - `ios/optimizely_flutter_sdk.podspec` - CocoaPods dependencies
-- `ios/optimizely_flutter_sdk` - Symlink to `optimizely-flutter-sdk/` (required for Flutter SPM detection)
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
