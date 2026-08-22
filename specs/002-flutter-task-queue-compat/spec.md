@@ -67,38 +67,27 @@ let loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CH
 ### After
 
 ```swift
-let messenger = registrar.messenger()
-let loggerChannel: FlutterMethodChannel
-if messenger.responds(to: Selector(("makeBackgroundTaskQueue"))) {
-    let taskQueue = messenger.makeBackgroundTaskQueue?()
-    loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL,
-                                        binaryMessenger: messenger,
-                                        codec: FlutterStandardMethodCodec.sharedInstance(),
-                                        taskQueue: taskQueue)
-} else {
-    loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL,
+let loggerChannel = FlutterMethodChannel(name: OptimizelyFlutterLogger.LOGGER_CHANNEL,
                                         binaryMessenger: messenger)
-}
 ```
 
-### Why not `#available`?
+### Why drop `taskQueue` instead of guarding it?
 
-`FlutterTaskQueue` availability is tied to the Flutter framework version, not
-the iOS SDK version. `#available` checks the OS version at runtime, which is
-unrelated. `responds(to:)` checks for the actual method on the ObjC object,
-which is the correct guard.
+A runtime guard (`responds(to:)`) is insufficient because the Swift compiler
+rejects the code at **compile time** — `FlutterTaskQueue` is incomplete, so any
+code path that references `makeBackgroundTaskQueue` or casts to `FlutterTaskQueue`
+fails to compile regardless of whether it would execute at runtime.
 
-### Why not drop `taskQueue` entirely?
-
-The background task queue is a valid optimization for newer Flutter versions. It
-offloads logger channel serialization from the main thread. Keeping it where
-available is preferable.
+`performSelector`-based workarounds are fragile and hard to maintain for a minor
+optimization. The logger channel already dispatches callbacks to the main thread
+via `DispatchQueue.main.async` in `OptimizelyFlutterLogger.swift`, so the
+background task queue adds no real value here.
 
 ## Files Changed
 
 | File | Change |
 |------|--------|
-| `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` | Guard `makeBackgroundTaskQueue` with `responds(to:)` |
+| `ios/Classes/SwiftOptimizelyFlutterSdkPlugin.swift` | Remove `makeBackgroundTaskQueue` / `taskQueue` usage from logger channel creation |
 
 ## Testing
 
