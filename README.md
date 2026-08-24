@@ -21,7 +21,7 @@ See the [pubspec.yaml](https://github.com/optimizely/optimizely-flutter-sdk/blob
 
 On the Android platform, the SDK requires a minimum SDK version of 21 or higher and compile SDK version of 32.
 
-On the iOS platform, the SDK requires a minimum version of 10.0.
+On the iOS platform, the SDK requires a minimum version of 10.0. The SDK supports both Swift Package Manager (SPM) and CocoaPods for iOS dependency resolution. Flutter 3.44+ uses SPM by default; older versions use CocoaPods.
 
 Other Flutter platforms are not currently supported by this SDK.
 

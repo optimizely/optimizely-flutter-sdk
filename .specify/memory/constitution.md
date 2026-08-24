@@ -141,7 +141,9 @@ The source-of-truth for current versions is always the build files
 themselves — not this document:
 
 - **iOS**: `OptimizelySwiftSDK` version in
-  `ios/optimizely_flutter_sdk.podspec`.
+  `ios/optimizely_flutter_sdk.podspec` (CocoaPods) and
+  `ios/optimizely_flutter_sdk/Package.swift` (SPM). Both files MUST
+  declare the same version.
 - **Android**: `com.optimizely.ab:android-sdk` version in
   `android/build.gradle`.
 
@@ -343,4 +345,4 @@ All code changes MUST comply with the principles defined above.
 - Use `CLAUDE.md` for runtime development guidance that supplements
   (but does not override) this constitution.
 
-**Version**: 1.1.0 | **Ratified**: 2022-06-07 | **Last Amended**: 2026-08-20
+**Version**: 1.1.1 | **Ratified**: 2022-06-07 | **Last Amended**: 2026-08-22

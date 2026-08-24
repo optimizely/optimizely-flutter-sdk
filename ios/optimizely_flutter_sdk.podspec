@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license             = { :type => "Apache License, Version 2.0", :file => "../LICENSE" }
   s.author              = { "Optimizely" => "support@optimizely.com" }
   s.source              = { :path => '.' }
-  s.source_files        = 'Classes/**/*'
+  s.source_files        = 'optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/**/*'
   s.dependency 'Flutter'
   s.dependency 'OptimizelySwiftSDK', '5.4.2'
   s.platform            = :ios, '10.0'
