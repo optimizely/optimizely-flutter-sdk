@@ -1,7 +1,7 @@
 # Spec: FlutterTaskQueue Backward Compatibility
 
 **Date**: 2026-08-22
-**Status**: In Progress
+**Status**: Implemented
 **Severity**: Build-breaking on older Flutter + modern Xcode
 
 ## Problem
@@ -50,9 +50,11 @@ ship a complete protocol definition, so the same code compiles cleanly.
 
 ## Solution
 
-Use `responds(to:)` to guard the `makeBackgroundTaskQueue` call at runtime.
-If the method is unavailable (older Flutter), fall back to creating the
-`FlutterMethodChannel` without a `taskQueue` parameter.
+Remove `makeBackgroundTaskQueue` and `taskQueue` entirely from the logger
+channel creation. The logger already dispatches all callbacks to the main
+thread via `DispatchQueue.main.async` in `OptimizelyFlutterLogger.swift`, so
+the background task queue provided no additional value. Dropping it eliminates
+the compile-time dependency on the incomplete `FlutterTaskQueue` protocol.
 
 ### Before
 
