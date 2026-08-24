@@ -1,5 +1,15 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.7.0
+August 24th, 2026
+
+### New Features
+* Add Swift Package Manager (SPM) support for iOS ([#116](https://github.com/optimizely/optimizely-flutter-sdk/pull/116))
+
+### Bug Fixes
+* Guard FlutterTaskQueue for backward compatibility ([#117](https://github.com/optimizely/optimizely-flutter-sdk/pull/117))
+
+
 ## 3.6.0
 July 9th, 2026
 
