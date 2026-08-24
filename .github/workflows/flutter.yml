@@ -17,14 +17,23 @@ on:
   #       default: "master"
 
 jobs:
+  version_drift_check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Check OptimizelySwiftSDK version parity
+      run: bash .github/scripts/check-version-drift.sh
+
   unit_test_coverage:
     runs-on: macos-latest
-    
+    needs: version_drift_check
+
     steps:
     - uses: actions/checkout@v3
     - name: Install Flutter
       uses: subosito/flutter-action@v2
       with:
+        flutter-version: '3.44.0'
         channel: 'stable'
         architecture: x64
     - name: Install app dependencies
@@ -127,32 +136,32 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable' # or: 'beta' or 'master'
+          flutter-version: '3.44.0'
+          channel: 'stable'
           cache: true
-          cache-key: 'flutter-:os:-:arch:-:channel:-:version:-:hash:' # optional, change this to force refresh cache
-          cache-path: ${{ runner.tool_cache }}/flutter # optional, change this to specify the cache path
-          architecture: x64 # optional, x64 or arm64
-      - run: flutter --version
-
+          cache-key: 'flutter-:os:-:arch:-:channel:-:version:-:hash:'
+          cache-path: ${{ runner.tool_cache }}/flutter
+          architecture: x64
       - name: Setup java
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
           java-version: '11'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.0.5'
       - run: flutter pub get
       - run: flutter test
   
   build_test_ios:
     runs-on: macos-latest
-    
+    needs: version_drift_check
+
     steps:
     - uses: actions/checkout@v3
     - uses: subosito/flutter-action@v2
       with:
+        flutter-version: '3.44.0'
         channel: 'stable'
         architecture: x64
+    - name: Enable Swift Package Manager
+      run: flutter config --enable-swift-package-manager
     - run: flutter pub get
     - run: flutter test

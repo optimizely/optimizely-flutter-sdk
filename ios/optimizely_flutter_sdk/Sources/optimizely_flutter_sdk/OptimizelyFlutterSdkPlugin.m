@@ -14,7 +14,7 @@
  * limitations under the License.                                           *
  ***************************************************************************/
  
-#import "OptimizelyFlutterSdkPlugin.h"
+#import "./include/optimizely_flutter_sdk/OptimizelyFlutterSdkPlugin.h"
 #if __has_include(<optimizely_flutter_sdk/optimizely_flutter_sdk-Swift.h>)
 #import <optimizely_flutter_sdk/optimizely_flutter_sdk-Swift.h>
 #else

@@ -26,7 +26,7 @@ flutter:
         package: com.optimizely.optimizely_flutter_sdk
         pluginClass: OptimizelyFlutterSdkPlugin
       ios:
-        pluginClass: OptimizelyFlutterSdkPlugin
+        pluginClass: SwiftOptimizelyFlutterSdkPlugin
       macos:
         pluginClass: OptimizelyFlutterSdkPlugin
       windows:
