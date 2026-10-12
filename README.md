@@ -21,7 +21,14 @@ See the [pubspec.yaml](https://github.com/optimizely/optimizely-flutter-sdk/blob
 
 On the Android platform, the SDK requires a minimum SDK version of 21 or higher and compile SDK version of 32.
 
-On the iOS platform, the SDK requires a minimum version of 10.0. The SDK supports both Swift Package Manager (SPM) and CocoaPods for iOS dependency resolution. Flutter 3.44+ uses SPM by default; older versions use CocoaPods.
+On the iOS platform, the SDK requires a minimum version of 15.0 and Flutter 3.44 or later. The SDK is integrated through Swift Package Manager (SPM) only; CocoaPods is no longer supported.
+
+#### Migrating from CocoaPods
+
+1. Use Flutter 3.44 or later (SPM is enabled by default; otherwise run `flutter config --enable-swift-package-manager`).
+2. Set your app's iOS deployment target to 15.0 or higher (Xcode Runner target, and `platform :ios` in your Podfile if you still have one).
+3. Run `flutter pub get` and `flutter build ios`. Flutter migrates your Xcode project to SPM automatically.
+4. If no other CocoaPods plugins remain, you may run `pod deintegrate` and delete your Podfile.
 
 Other Flutter platforms are not currently supported by this SDK.
 

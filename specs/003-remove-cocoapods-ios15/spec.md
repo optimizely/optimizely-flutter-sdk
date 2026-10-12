@@ -32,11 +32,11 @@ A developer whose app targets iOS below 15.0, or whose Flutter version cannot co
 
 **Why this priority**: This is a breaking change. Constitution (Platform Compatibility Standards) requires raised minimums to ship as a major version, and consumers need a clear upgrade path.
 
-**Independent Test**: Attempt to depend on the SDK from (a) an app with iOS target 14.0 and (b) a project on a Flutter version below the new minimum; verify each fails with a message that identifies the unmet requirement, and that the README migration note explains the fix.
+**Independent Test**: Attempt to depend on the SDK from (a) an app with iOS target 14.0 and (b) a project on a Flutter version below the new minimum; verify (a) Flutter raises the app's deployment target to 15.0 and reports it, and (b) dependency resolution fails naming the Flutter constraint, and that the README migration note explains the fix.
 
 **Acceptance Scenarios**:
 
-1. **Given** an app with iOS deployment target below 15.0, **When** it builds with the SDK, **Then** the build fails with an error identifying the iOS 15.0 minimum.
+1. **Given** an app with iOS deployment target below 15.0, **When** it builds with the SDK, **Then** Flutter raises the app's iOS deployment target to 15.0, prints "Updating minimum iOS deployment target to 15.0", and the build succeeds (verified 2026-10-12).
 2. **Given** a project on a Flutter version below the declared minimum, **When** the developer runs `flutter pub get`, **Then** dependency resolution fails, naming the Flutter version constraint.
 3. **Given** the README and CHANGELOG, **When** a developer reads the upgrade section, **Then** it lists the new iOS and Flutter minimums and the steps to migrate an app from CocoaPods to SPM.
 
