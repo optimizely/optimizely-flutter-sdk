@@ -1,19 +1,17 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.0.0 → 1.1.0 (codebase alignment audit)
+Version change: 1.1.1 → 1.2.0 (SPM-only iOS, iOS 15 minimum)
 
 Modified principles:
-  - V. Thread Safety — corrected Android/iOS threading descriptions
-  - VIII. Native SDK Version Pinning — removed stale pinned versions,
-    now references source-of-truth files only
+  - VIII. Native SDK Version Pinning — iOS source of truth is now
+    Package.swift only (CocoaPods podspec removed)
 
-Added sections:
-  - IX. CMAB & Async Decide
-  - X. ODP Integration
-  - XI. Event Batching Configuration
-  - XII. Logger Bridge Architecture
-  - Platform Compatibility: macOS/Windows noted as experimental
+Modified sections:
+  - Platform Compatibility: Minimum Platform Versions — iOS 15.0,
+    Flutter >=3.44.0
+
+Added sections: N/A
 
 Removed sections: N/A
 
@@ -141,9 +139,7 @@ The source-of-truth for current versions is always the build files
 themselves — not this document:
 
 - **iOS**: `OptimizelySwiftSDK` version in
-  `ios/optimizely_flutter_sdk.podspec` (CocoaPods) and
-  `ios/optimizely_flutter_sdk/Package.swift` (SPM). Both files MUST
-  declare the same version.
+  `ios/optimizely_flutter_sdk/Package.swift` (SPM).
 - **Android**: `com.optimizely.ab:android-sdk` version in
   `android/build.gradle`.
 
@@ -230,9 +226,9 @@ Custom loggers are configured during SDK initialisation via the
 | Platform | Minimum | Compile/Target |
 |----------|---------|----------------|
 | Dart     | >=2.16.2 | <4.0.0        |
-| Flutter  | >=2.5.0  | —             |
+| Flutter  | >=3.44.0 | —             |
 | Android  | API 21 (5.0) | API 35 (15) |
-| iOS      | 10.0     | —             |
+| iOS      | 15.0     | —             |
 | macOS    | Declared | Experimental   |
 | Windows  | Declared | Experimental   |
 
@@ -345,4 +341,4 @@ All code changes MUST comply with the principles defined above.
 - Use `CLAUDE.md` for runtime development guidance that supplements
   (but does not override) this constitution.
 
-**Version**: 1.1.1 | **Ratified**: 2022-06-07 | **Last Amended**: 2026-08-22
+**Version**: 1.2.0 | **Ratified**: 2022-06-07 | **Last Amended**: 2026-10-12
