@@ -3,9 +3,23 @@
 ## 3.8.0
 October 13th, 2026
 
-### Bug Fixes
-* Chore: bump native SDKs to Swift 5.5.0 and Android 5.4.0 ([#120](https://github.com/optimizely/optimizely-flutter-sdk/pull/120))
+### Dependency Updates
 
+* Bumped iOS OptimizelySwiftSDK from 5.4.2 to 5.5.0 and Android android-sdk from 5.3.0 to 5.4.0 ([#120](https://github.com/optimizely/optimizely-flutter-sdk/pull/120))
+
+The native SDK bump includes the following changes:
+
+### New Features
+
+* **Holdout Targeted Delivery Exclusion**: Holdouts can now be configured to exclude Targeted Delivery rules, so users held out of experiments still receive their Targeted Delivery experiences. This gives you a cleaner measure of experiment impact without holding users back from ongoing rollouts.
+
+### Bug Fixes
+
+* Android: Fix Jackson serializer NoClassDefFoundError when R8 obfuscates naming strategy fields
+
+### Notes
+
+* This is the last 3.x release. The next major release (4.0.0) will support iOS via Swift Package Manager only (CocoaPods removed), and will require iOS 15.0+ and Flutter 3.44+.
 
 ## 3.7.0
 August 24th, 2026
