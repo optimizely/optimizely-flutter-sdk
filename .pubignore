@@ -6,3 +6,9 @@ CLAUDE.md
 
 # Spec Kit framework files
 .specify/
+
+# Spec Kit feature specs
+specs/
+
+# Local build output (e.g. flutter test cache)
+build/
