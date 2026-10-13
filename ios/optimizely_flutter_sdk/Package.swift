@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework"),
-        .package(url: "https://github.com/optimizely/swift-sdk.git", exact: "5.4.2")
+        .package(url: "https://github.com/optimizely/swift-sdk.git", exact: "5.5.0")
     ],
     targets: [
         .target(
