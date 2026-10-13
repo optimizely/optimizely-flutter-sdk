@@ -3,15 +3,11 @@
 ## 3.8.0
 October 13th, 2026
 
-### Dependency Updates
-
-* Bumped iOS OptimizelySwiftSDK from 5.4.2 to 5.5.0 and Android android-sdk from 5.3.0 to 5.4.0 ([#120](https://github.com/optimizely/optimizely-flutter-sdk/pull/120))
-
-The native SDK bump includes the following changes:
-
 ### New Features
 
-* **Holdout Targeted Delivery Exclusion**: Holdouts can now be configured to exclude Targeted Delivery rules, so users held out of experiments still receive their Targeted Delivery experiences. This gives you a cleaner measure of experiment impact without holding users back from ongoing rollouts.
+* **Holdout Targeted Delivery Exclusion** ([#120](https://github.com/optimizely/optimizely-flutter-sdk/pull/120))
+	- Holdouts can now be configured to exclude Targeted Delivery rules, so users held out of experiments still receive their Targeted Delivery experiences. This gives you a cleaner measure of experiment impact without holding users back from ongoing rollouts.
+	- Bumped iOS OptimizelySwiftSDK from 5.4.2 to 5.5.0 and Android android-sdk from 5.3.0 to 5.4.0.
 
 ### Bug Fixes
 
