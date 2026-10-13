@@ -1,5 +1,12 @@
 # Optimizely Flutter SDK Changelog
 
+## 3.8.0
+October 13th, 2026
+
+### Bug Fixes
+* Chore: bump native SDKs to Swift 5.5.0 and Android 5.4.0 ([#120](https://github.com/optimizely/optimizely-flutter-sdk/pull/120))
+
+
 ## 3.7.0
 August 24th, 2026
 
