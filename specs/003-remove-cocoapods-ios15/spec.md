@@ -78,7 +78,7 @@ SDK maintainers maintain a single iOS dependency manifest. CI no longer runs a p
 
 - **App has an existing Podfile with other pods**: Other plugins or pods may still use CocoaPods; Flutter's tooling supports mixed apps where SPM-capable plugins resolve via SPM. The SDK makes no assumptions about the app's other dependencies.
 - **SPM disabled in the developer's Flutter config**: With no CocoaPods spec, the plugin cannot be integrated. The migration note must tell developers to ensure SPM is enabled.
-- **macOS plugin platform**: macOS has its own separate CocoaPods spec and is experimental (constitution, Platform Compatibility Standards). It is out of scope and remains unchanged.
+- **macOS plugin platform**: macOS is experimental (constitution, Platform Compatibility Standards) and its plugin is a template stub. It moves to SPM too (Package.swift at macOS 10.15, Flutter 3.44's minimum), its podspec is removed, and the macOS example and test apps drop CocoaPods. Its behaviour is unchanged.
 - **Objective-C registration shim**: The iOS Objective-C plugin files exist only for CocoaPods builds (already excluded from the SPM target). They are removed with CocoaPods; registration continues through the Swift plugin class already declared in `pubspec.yaml`.
 - **Test app on `master` lags the SDK**: If the SDK change merges first, `integration_ios_tests` fails. Mitigated by merging the test-app change first or temporarily pointing SDK CI at the test-app feature branch, then reverting.
 - **Native SDK version**: This change keeps OptimizelySwiftSDK at its current version (5.4.2); the 6.0.0 bump is a separate ticket (Ticket 2) and must not be bundled (constitution VIII.1).
@@ -122,7 +122,7 @@ SDK maintainers maintain a single iOS dependency manifest. CI no longer runs a p
 
 - Flutter 3.44+ resolves SPM-capable plugins by default (README already states this; CI already uses 3.44.0).
 - Existing SPM integration from spec 001 (Package.swift, directory layout, Swift plugin registration) is correct and needs no structural change beyond the platform minimum.
-- The macOS and Windows plugin platforms are out of scope.
+- The Windows plugin platform is out of scope (it has no CocoaPods files).
 - Android is unaffected except for test-app CI continuing to pass.
 - The release (version files, CHANGELOG, 4.0.0) is handled by Ticket 3, not this change; this change only adds README/migration content.
 - Xcode 27 runner migration belongs to Ticket 2 (required by OptimizelySwiftSDK 6.0.0), not this change.
