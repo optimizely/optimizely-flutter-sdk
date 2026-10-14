@@ -1,13 +1,10 @@
 // swift-tools-version: 5.9
-// ObjC files (OptimizelyFlutterSdkPlugin.m/.h) are excluded from the SPM
-// target because SPM does not support mixed Swift/ObjC in a single target.
-// They remain on disk for CocoaPods builds, which still use them.
 
 import PackageDescription
 
 let package = Package(
     name: "optimizely_flutter_sdk",
-    platforms: [.iOS("10.0")],
+    platforms: [.iOS("15.0")],
     products: [
         .library(name: "optimizely-flutter-sdk", targets: ["optimizely_flutter_sdk"])
     ],
@@ -21,8 +18,7 @@ let package = Package(
             dependencies: [
                 .product(name: "FlutterFramework", package: "FlutterFramework"),
                 .product(name: "Optimizely", package: "swift-sdk")
-            ],
-            exclude: ["OptimizelyFlutterSdkPlugin.m", "include"]
+            ]
         )
     ]
 )
