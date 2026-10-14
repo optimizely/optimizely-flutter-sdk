@@ -36,7 +36,7 @@ Wrapper (OptimizelyClientWrapper) + MethodChannel
     ↓
 Native Plugins (Swift/Java)
     ↓
-Native Optimizely SDKs (check podspec/build.gradle for current versions)
+Native Optimizely SDKs (check Package.swift/build.gradle for current versions)
 ```
 
 ### Critical Patterns
@@ -78,11 +78,8 @@ Native Optimizely SDKs (check podspec/build.gradle for current versions)
 2. `lib/package_info.dart` → `version = 'X.Y.Z'`
 3. `README.md` → Installation example `^X.Y.Z`
 
-**Two locations must stay synchronized (native iOS SDK version):**
-1. `ios/optimizely_flutter_sdk.podspec` → `s.dependency 'OptimizelySwiftSDK', 'A.B.C'`
-2. `ios/optimizely_flutter_sdk/Package.swift` → `.package(url: "...swift-sdk.git", exact: "A.B.C")`
-
-A CI check (`.github/scripts/check-version-drift.sh`) enforces parity between these two files.
+**Native iOS SDK version** lives in one place (SPM only):
+- `ios/optimizely_flutter_sdk/Package.swift` → `.package(url: "...swift-sdk.git", exact: "A.B.C")`
 
 ## Release Workflow
 
@@ -184,7 +181,7 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 
 **Flutter/Dart:**
 - Dart: >=2.16.2 <4.0.0
-- Flutter: >=2.5.0
+- Flutter: >=3.44.0
 
 **Android:**
 - minSdk: 21 (Android 5.0)
@@ -193,9 +190,9 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 - Native SDK: android-sdk (see android/build.gradle for current version)
 
 **iOS:**
-- Minimum: iOS 10.0
+- Minimum: iOS 15.0
 - Swift: 5.0
-- Native SDK: OptimizelySwiftSDK (see ios/optimizely_flutter_sdk.podspec and ios/optimizely_flutter_sdk/Package.swift for current version)
+- Native SDK: OptimizelySwiftSDK (see ios/optimizely_flutter_sdk/Package.swift for current version)
 
 ## Key Implementation Files
 
@@ -214,7 +211,6 @@ Follow [Angular guidelines](https://github.com/angular/angular/blob/master/CONTR
 - `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/SwiftOptimizelyFlutterSdkPlugin.swift` - Plugin implementation (786 LOC)
 - `ios/optimizely_flutter_sdk/Sources/optimizely_flutter_sdk/OptimizelyFlutterLogger.swift` - Logger bridge (main-thread dispatch)
 - `ios/optimizely_flutter_sdk/Package.swift` - SPM dependencies
-- `ios/optimizely_flutter_sdk.podspec` - CocoaPods dependencies
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,

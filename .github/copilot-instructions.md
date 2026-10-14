@@ -9,10 +9,10 @@ All code changes MUST comply with the project constitution at `.specify/memory/c
 This is a **Flutter SDK** wrapping native Optimizely SDKs for iOS and Android.
 
 **Technology Stack:**
-- **Dart/Flutter**: Cross-platform API layer (>=2.16.2, Flutter >=2.5.0)
-- **Swift**: iOS native bridge (Swift 5.0, iOS 10.0+)
+- **Dart/Flutter**: Cross-platform API layer (>=2.16.2, Flutter >=3.44.0)
+- **Swift**: iOS native bridge (Swift 5.0, iOS 15.0+)
 - **Kotlin/Java**: Android native bridge (Kotlin 2.1.0, Android 5.0+)
-- **Native SDKs**: OptimizelySwiftSDK 5.2.1 (iOS), android-sdk 5.1.1 (Android)
+- **Native SDKs**: OptimizelySwiftSDK 5.5.0 (iOS), android-sdk 5.4.0 (Android)
 
 ## Folder Structure
 
