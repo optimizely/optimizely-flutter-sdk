@@ -1,0 +1,41 @@
+name: Publish
+
+# Publishes tag v<version> to pub.dev, then creates the GitHub release from that version's CHANGELOG section.
+# pub.dev authenticates the run with GitHub's OIDC token (no stored secret), and only accepts tag-push runs.
+# One-time setup: enable "Publishing from GitHub Actions" on pub.dev (repository optimizely/optimizely-flutter-sdk,
+# tag pattern v{{version}}, required environment pub.dev), and add required reviewers to the pub.dev environment here.
+on:
+  push:
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]+*' ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pub.dev
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    # Exchanges the OIDC token for a pub.dev credential used by `flutter pub publish`
+    - uses: dart-lang/setup-dart@v1
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.44.0'
+        channel: 'stable'
+    - name: Publish to pub.dev
+      run: flutter pub publish --force
+    - name: Create GitHub release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        VERSION="${GITHUB_REF_NAME#v}"
+        awk -v h="## $VERSION" '$0==h{f=1;next} /^## [0-9]/{if(f)exit} f' CHANGELOG.md > notes.md
+        FLAGS=()
+        [[ "$VERSION" == *-* ]] && FLAGS+=(--prerelease)
+        git merge-base --is-ancestor "$GITHUB_SHA" origin/master || FLAGS+=(--latest=false)
+        gh release create "$GITHUB_REF_NAME" --verify-tag --title "Release $VERSION" \
+          --notes-file notes.md "${FLAGS[@]}"
