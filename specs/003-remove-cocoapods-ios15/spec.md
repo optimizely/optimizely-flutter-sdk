@@ -81,7 +81,7 @@ SDK maintainers maintain a single iOS dependency manifest. CI no longer runs a p
 - **macOS plugin platform**: macOS is experimental (constitution, Platform Compatibility Standards) and its plugin is a template stub. It moves to SPM too (Package.swift at macOS 10.15, Flutter 3.44's minimum), its podspec is removed, and the macOS example and test apps drop CocoaPods. Its behaviour is unchanged.
 - **Objective-C registration shim**: The iOS Objective-C plugin files exist only for CocoaPods builds (already excluded from the SPM target). They are removed with CocoaPods; registration continues through the Swift plugin class already declared in `pubspec.yaml`.
 - **Test app on `master` lags the SDK**: If the SDK change merges first, `integration_ios_tests` fails. Mitigated by merging the test-app change first or temporarily pointing SDK CI at the test-app feature branch, then reverting.
-- **Native SDK version**: This change keeps OptimizelySwiftSDK at its current version (5.4.2); the 6.0.0 bump is a separate ticket (Ticket 2) and must not be bundled (constitution VIII.1).
+- **Native SDK version**: This change keeps OptimizelySwiftSDK at its current version (5.5.0, from 3.8.0); the 6.0.0 bump is a separate ticket (Ticket 2) and must not be bundled (constitution VIII.1).
 
 ## Requirements *(mandatory)*
 
@@ -91,7 +91,7 @@ SDK maintainers maintain a single iOS dependency manifest. CI no longer runs a p
 - **FR-002**: The SDK MUST remove iOS source files used only by CocoaPods builds (the Objective-C registration shim and its header).
 - **FR-003**: The SDK MUST declare iOS 15.0 as its minimum iOS platform.
 - **FR-004**: The SDK MUST declare a minimum Flutter version that resolves SPM-only plugins by default (Flutter 3.44, the version CI already uses with SPM).
-- **FR-005**: The SDK MUST keep OptimizelySwiftSDK pinned at its current exact version (5.4.2) in this change.
+- **FR-005**: The SDK MUST keep OptimizelySwiftSDK pinned at its current exact version (5.5.0, from 3.8.0) in this change.
 - **FR-006**: The SDK MUST preserve all existing iOS behaviour (MethodChannel handlers, logger bridge, type encoding, main-thread result dispatch) with no Dart public API changes.
 - **FR-007**: CI MUST remove the podspec/SPM version-parity check and any job dependencies on it; all remaining CI jobs MUST pass.
 - **FR-008**: The in-repo example app MUST build on iOS via SPM with deployment target 15.0 and no CocoaPods artifacts.
