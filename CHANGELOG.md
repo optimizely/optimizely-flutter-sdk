@@ -1,5 +1,12 @@
 # Optimizely Flutter SDK Changelog
 
+## 4.0.0
+October 15th, 2026
+
+### Notes
+
+* Test entry for release workflow dry-run. DO NOT MERGE.
+
 ## 3.8.0
 October 13th, 2026
 

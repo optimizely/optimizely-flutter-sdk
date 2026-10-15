@@ -37,7 +37,7 @@ Other Flutter platforms are not currently supported by this SDK.
 To add the flutter-sdk to your project dependencies, include the following in your app's pubspec.yaml:
 
 ```
-   optimizely_flutter_sdk: ^3.8.0
+   optimizely_flutter_sdk: ^4.0.0
 ```
 
 Then run 
