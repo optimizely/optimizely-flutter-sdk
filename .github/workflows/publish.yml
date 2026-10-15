@@ -4,6 +4,7 @@ name: Publish
 # pub.dev authenticates the run with GitHub's OIDC token (no stored secret), and only accepts tag-push runs.
 # One-time setup: enable "Publishing from GitHub Actions" on pub.dev (repository optimizely/optimizely-flutter-sdk,
 # tag pattern v{{version}}, required environment pub.dev), and add required reviewers to the pub.dev environment here.
+# Separate jobs so "Re-run failed jobs" can retry the GitHub release without publishing again.
 on:
   push:
     tags: [ 'v[0-9]+.[0-9]+.[0-9]+*' ]
@@ -13,13 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     environment: pub.dev
     permissions:
-      contents: write
+      contents: read
       id-token: write
     steps:
     - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         persist-credentials: false
+    # Tags can also be pushed by hand, bypassing release.yml, so check before the irreversible publish
+    - name: Check tag
+      run: |
+        VERSION="${GITHUB_REF_NAME#v}"
+        git branch -r --contains "$GITHUB_SHA" | grep -qE '^ *origin/(master|[0-9]+\.x)$' \
+          || { echo "$GITHUB_REF_NAME is not on master or a maintenance branch"; exit 1; }
+        awk -v h="## $VERSION" '$0==h{f=1;next} /^## [0-9]/{if(f)exit} f' CHANGELOG.md > notes.md
+        [ -s notes.md ] || { echo "CHANGELOG.md has no '## $VERSION' section"; exit 1; }
     # Exchanges the OIDC token for a pub.dev credential used by `flutter pub publish`
     - uses: dart-lang/setup-dart@v1
     - uses: subosito/flutter-action@v2
@@ -28,6 +37,17 @@ jobs:
         channel: 'stable'
     - name: Publish to pub.dev
       run: flutter pub publish --force
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+        persist-credentials: false
     - name: Create GitHub release
       env:
         GH_TOKEN: ${{ github.token }}

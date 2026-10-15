@@ -104,7 +104,7 @@ Claude will execute the full workflow:
 - `release.yml` validates the version (pubspec.yaml, package_info.dart, README.md, CHANGELOG section) on the PR, and on merge pushes tag `vX.Y.Z`
 - `publish.yml` runs on the tag: publishes to pub.dev (waits for approval in the `pub.dev` environment), then creates the GitHub release from the CHANGELOG section
 - Versions with a `-` suffix (e.g. `4.0.0-rc.1`) are released as prereleases
-- If either workflow fails, re-run it from the Actions tab
+- If a workflow fails, use "Re-run failed jobs" in the Actions tab. A failed GitHub release step is retried without publishing again
 
 ### Manual Release
 
