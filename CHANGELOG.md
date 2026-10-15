@@ -1,5 +1,25 @@
 # Optimizely Flutter SDK Changelog
 
+## 4.0.0
+October 16th, 2026
+
+### Breaking Changes
+
+* **Swift Package Manager only on iOS**: CocoaPods support has been removed. The plugin now integrates through Swift Package Manager, matching OptimizelySwiftSDK 6.0.0 ([#119](https://github.com/optimizely/optimizely-flutter-sdk/pull/119))
+* **Raised minimum versions**: iOS 15.0 and Flutter 3.44.0 ([#119](https://github.com/optimizely/optimizely-flutter-sdk/pull/119))
+* **OptimizelySwiftSDK 6.0.0**: bumped from 5.5.0. No API changes; 6.0.0 drops CocoaPods and requires iOS 15 ([#124](https://github.com/optimizely/optimizely-flutter-sdk/pull/124))
+
+No Dart API changes. Android is unchanged (android-sdk 5.4.0).
+
+### Migration
+
+1. Use Flutter 3.44 or later (SPM is enabled by default; otherwise run `flutter config --enable-swift-package-manager`). If your app's `pubspec.yaml` turns SPM off (`flutter: config: enable-swift-package-manager: false`), remove that setting.
+2. Set your app's iOS deployment target to 15.0 or higher.
+3. Run `flutter pub get` and `flutter build ios`. Flutter migrates your Xcode project to SPM automatically.
+4. If no other CocoaPods plugins remain, you may run `pod deintegrate` and delete your Podfile.
+
+See [Migrating from CocoaPods](https://github.com/optimizely/optimizely-flutter-sdk#migrating-from-cocoapods) in the README.
+
 ## 3.8.0
 October 13th, 2026
 
