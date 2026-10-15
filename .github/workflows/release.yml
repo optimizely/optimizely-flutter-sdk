@@ -1,0 +1,51 @@
+name: Release
+
+# Merging a version change in pubspec.yaml into master (or a maintenance branch like 3.x)
+# pushes tag v<version>, which triggers publish.yml.
+# On a release PR it only validates, so a missing CHANGELOG section or a version mismatch fails before merge.
+# To retry a failed tag push, re-run that run from the Actions tab.
+on:
+  push:
+    branches: [ master, '[0-9]+.x' ]
+    paths: [ pubspec.yaml ]
+  pull_request:
+    branches: [ master, '[0-9]+.x' ]
+    paths: [ pubspec.yaml ]
+
+permissions:
+  contents: read
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+    - name: Validate version
+      id: version
+      run: |
+        VERSION=$(sed -nE 's/^version: *([^ ]+).*/\1/p' pubspec.yaml)
+        [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "Invalid version: $VERSION"; exit 1; }
+        grep -qF "version = '$VERSION';" lib/package_info.dart || { echo "lib/package_info.dart does not match $VERSION"; exit 1; }
+        grep -qF "optimizely_flutter_sdk: ^$VERSION" README.md || { echo "README.md does not match $VERSION"; exit 1; }
+        if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+          echo "v$VERSION already released"; exit 0
+        fi
+        grep -qxF "## $VERSION" CHANGELOG.md || { echo "CHANGELOG.md has no '## $VERSION' section"; exit 1; }
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+    - uses: subosito/flutter-action@v2
+      if: steps.version.outputs.version
+      with:
+        flutter-version: '3.44.0'
+        channel: 'stable'
+    - name: Validate package
+      if: steps.version.outputs.version
+      run: flutter pub publish --dry-run
+    - name: Push tag
+      if: steps.version.outputs.version && github.event_name != 'pull_request'
+      env:
+        # A tag pushed with GITHUB_TOKEN would not trigger publish.yml
+        GH_TOKEN: ${{ secrets.CI_USER_TOKEN }}
+        VERSION: ${{ steps.version.outputs.version }}
+      run: gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/v$VERSION" -f sha="$GITHUB_SHA"

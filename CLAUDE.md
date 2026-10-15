@@ -99,6 +99,13 @@ Claude will execute the full workflow:
 - ✅ Commit and push
 - ✅ Create PR
 
+### After the release PR merges (automated)
+
+- `release.yml` validates the version (pubspec.yaml, package_info.dart, README.md, CHANGELOG section) on the PR, and on merge pushes tag `vX.Y.Z`
+- `publish.yml` runs on the tag: publishes to pub.dev (waits for approval in the `pub.dev` environment), then creates the GitHub release from the CHANGELOG section
+- Versions with a `-` suffix (e.g. `4.0.0-rc.1`) are released as prereleases
+- If a workflow fails, use "Re-run failed jobs" in the Actions tab. A failed GitHub release step is retried without publishing again
+
 ### Manual Release
 
 ```bash
@@ -117,11 +124,7 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 git push -u origin prepare-X.Y.Z
 gh pr create --title "[FSSDK-XXXXX] prepare for release X.Y.Z"
 
-# 6. After merge, create GitHub release
-gh release create vX.Y.Z --title "Release X.Y.Z" --draft --target master
-
-# 7. Publish to pub.dev
-flutter pub publish
+# 6. After merge, the tag, pub.dev publish and GitHub release are automated (see above)
 ```
 
 ### CHANGELOG Format
