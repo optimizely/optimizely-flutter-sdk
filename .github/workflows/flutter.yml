@@ -21,7 +21,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - name: Install Flutter
       uses: subosito/flutter-action@v2
       with:
@@ -33,15 +35,16 @@ jobs:
     - name: Test app
       run: flutter test --coverage
     - name: Upload coverage to Coveralls
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         
   integration_android_tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
+        persist-credentials: false
         # You should create a personal access token and store it in your repository
         token: ${{ secrets.CI_USER_TOKEN }}
         repository: 'optimizely/ci-helper-tools'
@@ -52,14 +55,14 @@ jobs:
         HEAD_REF: ${{ github.head_ref }}
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        echo "SDK_BRANCH=$HEAD_REF" >> $GITHUB_ENV
+        echo "SDK_BRANCH=$HEAD_REF" >> "$GITHUB_ENV"
     - name: set SDK Branch if not pull request
       env:
         REF_NAME: ${{ github.ref_name }}
       if: ${{ github.event_name != 'pull_request' }}
       run: |
-        echo "SDK_BRANCH=$REF_NAME" >> $GITHUB_ENV
-        echo "TRAVIS_BRANCH=$REF_NAME" >> $GITHUB_ENV
+        echo "SDK_BRANCH=$REF_NAME" >> "$GITHUB_ENV"
+        echo "TRAVIS_BRANCH=$REF_NAME" >> "$GITHUB_ENV"
     - name: Trigger build
       env:
         SDK: android
@@ -82,8 +85,9 @@ jobs:
   integration_ios_tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
+        persist-credentials: false
         # You should create a personal access token and store it in your repository
         token: ${{ secrets.CI_USER_TOKEN }}
         repository: 'optimizely/ci-helper-tools'
@@ -94,14 +98,14 @@ jobs:
         HEAD_REF: ${{ github.head_ref }}
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        echo "SDK_BRANCH=$HEAD_REF" >> $GITHUB_ENV
+        echo "SDK_BRANCH=$HEAD_REF" >> "$GITHUB_ENV"
     - name: set SDK Branch if not pull request
       env:
         REF_NAME: ${{ github.ref_name }}
       if: ${{ github.event_name != 'pull_request' }}
       run: |
-        echo "SDK_BRANCH=$REF_NAME" >> $GITHUB_ENV
-        echo "TRAVIS_BRANCH=$REF_NAME" >> $GITHUB_ENV
+        echo "SDK_BRANCH=$REF_NAME" >> "$GITHUB_ENV"
+        echo "TRAVIS_BRANCH=$REF_NAME" >> "$GITHUB_ENV"
     - name: Trigger build
       env:
         SDK: ios
@@ -125,7 +129,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.0'
@@ -135,7 +141,7 @@ jobs:
           cache-path: ${{ runner.tool_cache }}/flutter
           architecture: x64
       - name: Setup java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '11'
@@ -146,7 +152,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.44.0'
