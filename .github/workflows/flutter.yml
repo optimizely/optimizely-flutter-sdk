@@ -22,6 +22,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - name: Install Flutter
       uses: subosito/flutter-action@v2
       with:
@@ -42,6 +44,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
       with:
+        persist-credentials: false
         # You should create a personal access token and store it in your repository
         token: ${{ secrets.CI_USER_TOKEN }}
         repository: 'optimizely/ci-helper-tools'
@@ -84,6 +87,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
       with:
+        persist-credentials: false
         # You should create a personal access token and store it in your repository
         token: ${{ secrets.CI_USER_TOKEN }}
         repository: 'optimizely/ci-helper-tools'
@@ -126,6 +130,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.0'
@@ -147,6 +153,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.44.0'
