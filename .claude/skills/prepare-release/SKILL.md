@@ -4,9 +4,9 @@ description: Prepare release branch with version updates and create PR for Optim
 compatibility: Requires Flutter SDK project
 ---
 
-# Prepare Release - Step 1 of Release Workflow
+# Prepare Release
 
-Creates prep branch, updates versions, fetches PR summaries, and creates PR.
+Creates prep branch, updates versions, fetches PR summaries, and creates PR. After the PR merges, `release.yml` and `publish.yml` tag, publish to pub.dev, and create the GitHub release.
 
 ## Usage
 
