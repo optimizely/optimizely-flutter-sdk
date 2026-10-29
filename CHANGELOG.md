@@ -3,8 +3,8 @@
 ## 4.0.1
 October 29th, 2026
 
-### Bug Fixes
-* Update with actual release notes
+### Enhancements
+* Bump native Swift SDK to 6.0.1 ([#129](https://github.com/optimizely/optimizely-flutter-sdk/pull/129))
 
 
 ## 4.0.0
