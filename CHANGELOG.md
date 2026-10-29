@@ -1,5 +1,12 @@
 # Optimizely Flutter SDK Changelog
 
+## 4.0.1
+October 29th, 2026
+
+### Bug Fixes
+* Update with actual release notes
+
+
 ## 4.0.0
 October 16th, 2026
 
