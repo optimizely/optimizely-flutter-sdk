@@ -4,7 +4,11 @@
 October 29th, 2026
 
 ### Enhancements
-* Bump native Swift SDK to 6.0.1 ([#129](https://github.com/optimizely/optimizely-flutter-sdk/pull/129))
+* Bump native Swift SDK to 6.0.1 ([#129](https://github.com/optimizely/optimizely-flutter-sdk/pull/129)):
+  * Custom storage directory: `DataStoreFile` and `DefaultEventDispatcher` can be configured with a custom directory for their persisted files ([swift-sdk#668](https://github.com/optimizely/swift-sdk/pull/668))
+
+### Bug Fixes
+* ODP: async `fetchQualifiedSegments` now forwards its `options`, so `.ignoreCache` and `.resetCache` are honored (Swift SDK 6.0.1, [swift-sdk#667](https://github.com/optimizely/swift-sdk/pull/667))
 
 
 ## 4.0.0
