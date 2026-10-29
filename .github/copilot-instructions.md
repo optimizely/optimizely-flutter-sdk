@@ -12,7 +12,7 @@ This is a **Flutter SDK** wrapping native Optimizely SDKs for iOS and Android.
 - **Dart/Flutter**: Cross-platform API layer (>=2.16.2, Flutter >=3.44.0)
 - **Swift**: iOS native bridge (Swift 5.0, iOS 15.0+)
 - **Kotlin/Java**: Android native bridge (Kotlin 2.1.0, Android 5.0+)
-- **Native SDKs**: OptimizelySwiftSDK 6.0.0 (iOS), android-sdk 5.4.0 (Android)
+- **Native SDKs**: OptimizelySwiftSDK 6.0.1 (iOS), android-sdk 5.4.0 (Android)
 
 ## Folder Structure
 
