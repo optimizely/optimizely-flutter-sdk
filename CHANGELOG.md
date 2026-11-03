@@ -11,6 +11,9 @@ and continues evaluating the remaining rules, instead of returning the holdout v
 the rest of the flag. Each local holdout hit sends its own holdout impression event (using the
 existing event format), regardless of `sendFlagDecisions`. Global holdouts are unchanged.
 
+### Enhancements
+* Bump native Swift SDK to 6.1.0 and Android SDK to 5.5.0, which carry the local holdout change above.
+
 
 ## 4.0.1
 October 29th, 2026
